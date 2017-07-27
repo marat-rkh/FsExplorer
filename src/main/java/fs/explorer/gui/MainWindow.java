@@ -8,21 +8,13 @@ public final class MainWindow {
     private final int WINDOW_HEIGHT = 480;
 
     private final JFrame frame;
-    private final StatusBar statusBar;
-    private final DirTree dirTree;
-    private final MenuBar menuBar;
 
-    public MainWindow(String name) {
+    public MainWindow(String name, MenuBar menuBar, StatusBar statusBar, DirTree dirTree) {
         frame = new JFrame(name);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.getContentPane().setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
-
-        statusBar = new StatusBar("Ready");
-        dirTree = new DirTree();
-        menuBar = new MenuBar(statusBar, dirTree);
-
         frame.setJMenuBar(menuBar.asJMenuBar());
-        frame.getContentPane().add(createMainPane(), BorderLayout.CENTER);
+        frame.getContentPane().add(createMainPane(statusBar, dirTree), BorderLayout.CENTER);
     }
 
     public void show() {
@@ -30,9 +22,9 @@ public final class MainWindow {
         frame.setVisible(true);
     }
 
-    private JSplitPane createMainPane() {
+    private JSplitPane createMainPane(StatusBar statusBar, DirTree dirTree) {
         JSplitPane treeAndPreviewPanes = new JSplitPane(
-                JSplitPane.HORIZONTAL_SPLIT, createDirTreePane(), new JLabel());
+                JSplitPane.HORIZONTAL_SPLIT, createDirTreePane(dirTree), new JLabel());
         treeAndPreviewPanes.setOneTouchExpandable(true);
         treeAndPreviewPanes.setDividerLocation(WINDOW_WIDTH / 3);
 
@@ -43,7 +35,7 @@ public final class MainWindow {
         return mainAndStatusPanes;
     }
 
-    private JScrollPane createDirTreePane() {
+    private JScrollPane createDirTreePane(DirTree dirTree) {
         return new JScrollPane(dirTree.asJComponent());
     }
 }

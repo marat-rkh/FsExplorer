@@ -1,5 +1,7 @@
 package fs.explorer.gui;
 
+import fs.explorer.datasource.TreeDataProvider;
+
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -10,6 +12,7 @@ public class DirTree {
     private final JTree tree;
     private final DefaultTreeModel treeModel;
     private final DefaultMutableTreeNode root;
+    private TreeDataProvider treeDataProvider;
 
     public DirTree() {
         root = new DefaultMutableTreeNode("root", /*allowsChildren*/true);
@@ -21,10 +24,14 @@ public class DirTree {
         tree.setShowsRootHandles(true);
     }
 
-    public void resetTopNode(String name) {
+    public void resetDataProvider(TreeDataProvider treeDataProvider) {
+        this.treeDataProvider = treeDataProvider;
         removeAllChildren(root);
-        treeModel.insertNodeInto(lazyDirNode(name), root, root.getChildCount());
-        tree.expandPath(new TreePath(root.getPath()));
+        treeDataProvider.getTopNode(nodeData -> {
+            DefaultMutableTreeNode newTop = lazyDirNode(nodeData.getLabel());
+            treeModel.insertNodeInto(newTop, root, root.getChildCount());
+            tree.expandPath(new TreePath(root.getPath()));
+        });
     }
 
     public JComponent asJComponent() { return tree; }
