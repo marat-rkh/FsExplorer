@@ -1,5 +1,6 @@
 package fs.explorer.gui.dirtree;
 
+import fs.explorer.datasource.FsPath;
 import fs.explorer.datasource.TreeDataProvider;
 import fs.explorer.datasource.TreeNodeData;
 
@@ -62,8 +63,12 @@ public class DirTreePane {
         DefaultMutableTreeNode node =
                 new DefaultMutableTreeNode(nodeData, /*allowsChildren*/true);
         DefaultMutableTreeNode tmpNode =
-                new DefaultMutableTreeNode("loading...", /*allowsChildren*/false);
+                new DefaultMutableTreeNode(fakeNode("loading..."), /*allowsChildren*/false);
         node.add(tmpNode);
         return node;
+    }
+
+    private TreeNodeData fakeNode(String text) {
+        return new TreeNodeData(new FsPath("", text));
     }
 }

@@ -18,6 +18,7 @@ public class Application {
         MenuBar menuBar = new MenuBar(
                 statusBar, dirTreePane, localFilesProvider, remoteFilesProvider);
         PreviewPane previewPane = new PreviewPane();
+        dirTreePane.addTreeSelectionListener(previewPane::updatePreview);
         this.mainWindow = new MainWindow(
                 "FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
     }
