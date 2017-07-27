@@ -8,13 +8,14 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-public class DirTree {
+public class DirTreePane {
+    private final JScrollPane scrollPane;
     private final JTree tree;
     private final DefaultTreeModel treeModel;
     private final DefaultMutableTreeNode root;
     private TreeDataProvider treeDataProvider;
 
-    public DirTree() {
+    public DirTreePane() {
         root = new DefaultMutableTreeNode("root", /*allowsChildren*/true);
         treeModel = new DefaultTreeModel(root);
         tree = new JTree(treeModel);
@@ -22,6 +23,7 @@ public class DirTree {
         tree.setEditable(true);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setShowsRootHandles(true);
+        scrollPane = new JScrollPane(tree);
     }
 
     public void resetDataProvider(TreeDataProvider treeDataProvider) {
@@ -34,7 +36,7 @@ public class DirTree {
         });
     }
 
-    public JComponent asJComponent() { return tree; }
+    public JComponent asJComponent() { return scrollPane; }
 
     private void removeAllChildren(DefaultMutableTreeNode parent) {
         for(int i = 0; i < treeModel.getChildCount(parent); ++i) {

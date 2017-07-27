@@ -11,12 +11,14 @@ public class Application {
 
     public Application() {
         StatusBar statusBar = new StatusBar("Ready");
-        DirTree dirTree = new DirTree();
+        DirTreePane dirTreePane = new DirTreePane();
         LocalFilesProvider localFilesProvider = new LocalFilesProvider();
         RemoteFilesProvider remoteFilesProvider = new RemoteFilesProvider();
-        MenuBar menuBar = new MenuBar(statusBar, dirTree, localFilesProvider, remoteFilesProvider);
+        MenuBar menuBar = new MenuBar(
+                statusBar, dirTreePane, localFilesProvider, remoteFilesProvider);
         PreviewPane previewPane = new PreviewPane();
-        this.mainWindow = new MainWindow("FsExplorer", menuBar, statusBar, dirTree, previewPane);
+        this.mainWindow = new MainWindow(
+                "FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
     }
 
     public void run() {

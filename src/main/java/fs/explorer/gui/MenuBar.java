@@ -13,14 +13,14 @@ public final class MenuBar {
     private final JMenuBar menuBar;
     private final FTPDialog ftpDialog;
     private final StatusBar statusBar;
-    private final DirTree dirTree;
+    private final DirTreePane dirTreePane;
 
     private final LocalFilesProvider localFilesProvider;
     private final RemoteFilesProvider remoteFilesProvider;
 
     public MenuBar(
             StatusBar statusBar,
-            DirTree dirTree,
+            DirTreePane dirTreePane,
             LocalFilesProvider localFilesProvider,
             RemoteFilesProvider remoteFilesProvider
     ) {
@@ -32,7 +32,7 @@ public final class MenuBar {
 
         ftpDialog = new FTPDialog();
         this.statusBar = statusBar;
-        this.dirTree = dirTree;
+        this.dirTreePane = dirTreePane;
 
         this.localFilesProvider = localFilesProvider;
         this.remoteFilesProvider = remoteFilesProvider;
@@ -43,7 +43,7 @@ public final class MenuBar {
     private JMenuItem localFilesItem() {
         JMenuItem item = new JMenuItem(LOCAL_FILES_ITEM);
         item.addActionListener(e ->
-                dirTree.resetDataProvider(localFilesProvider)
+                dirTreePane.resetDataProvider(localFilesProvider)
         );
         return item;
     }
@@ -53,7 +53,7 @@ public final class MenuBar {
         item.addActionListener(e -> {
             ftpDialog.showAndWaitResult().ifPresent(connectionInfo -> {
                 remoteFilesProvider.setConnectionInfo(connectionInfo);
-                dirTree.resetDataProvider(remoteFilesProvider);
+                dirTreePane.resetDataProvider(remoteFilesProvider);
             });
         });
         return item;

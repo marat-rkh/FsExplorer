@@ -15,14 +15,14 @@ public final class MainWindow {
             String name,
             MenuBar menuBar,
             StatusBar statusBar,
-            DirTree dirTree,
+            DirTreePane dirTreePane,
             PreviewPane previewPane
     ) {
         frame = new JFrame(name);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.getContentPane().setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         frame.setJMenuBar(menuBar.asJMenuBar());
-        JSplitPane mainPane = createMainPane(statusBar, dirTree, previewPane);
+        JSplitPane mainPane = createMainPane(statusBar, dirTreePane, previewPane);
         frame.getContentPane().add(mainPane, BorderLayout.CENTER);
     }
 
@@ -33,25 +33,24 @@ public final class MainWindow {
 
     private JSplitPane createMainPane(
             StatusBar statusBar,
-            DirTree dirTree,
+            DirTreePane dirTreePane,
             PreviewPane previewPane
     ) {
-        JSplitPane treeAndPreviewPanes = new JSplitPane(
+        JSplitPane treeAndPreview = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
-                createDirTreePane(dirTree),
+                dirTreePane.asJComponent(),
                 previewPane.asJComponent()
         );
-        treeAndPreviewPanes.setOneTouchExpandable(true);
-        treeAndPreviewPanes.setDividerLocation(WINDOW_WIDTH / 3);
+        treeAndPreview.setOneTouchExpandable(true);
+        treeAndPreview.setDividerLocation(WINDOW_WIDTH / 3);
 
-        JSplitPane mainAndStatusPanes = new JSplitPane(
-                JSplitPane.VERTICAL_SPLIT, treeAndPreviewPanes, statusBar.asJComponent());
-        mainAndStatusPanes.setOneTouchExpandable(true);
-        mainAndStatusPanes.setDividerLocation(9 * WINDOW_HEIGHT / 10);
-        return mainAndStatusPanes;
-    }
-
-    private JScrollPane createDirTreePane(DirTree dirTree) {
-        return new JScrollPane(dirTree.asJComponent());
+        JSplitPane mainAndStatusBar = new JSplitPane(
+                JSplitPane.VERTICAL_SPLIT,
+                treeAndPreview,
+                statusBar.asJComponent()
+        );
+        mainAndStatusBar.setOneTouchExpandable(true);
+        mainAndStatusBar.setDividerLocation(9 * WINDOW_HEIGHT / 10);
+        return mainAndStatusBar;
     }
 }
