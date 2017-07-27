@@ -1,5 +1,7 @@
 package fs.explorer.datasource;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class LocalFilesProvider implements TreeDataProvider {
@@ -7,7 +9,12 @@ public class LocalFilesProvider implements TreeDataProvider {
 
     @Override
     public void getTopNode(Consumer<TreeNodeData> onComplete) {
-        FsPath fsPath = new FsPath(topDirName, topDirName);
+        FsPath fsPath = new FsPath(topDirName, topDirName, /*isDirectory*/true);
         onComplete.accept(new TreeNodeData(fsPath));
+    }
+
+    @Override
+    public void getNodesFor(TreeNodeData node, Consumer<List<TreeNodeData>> onComplete) {
+        onComplete.accept(Collections.emptyList());
     }
 }

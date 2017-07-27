@@ -2,6 +2,8 @@ package fs.explorer.datasource;
 
 import fs.explorer.ftp.ConnectionInfo;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class RemoteFilesProvider implements TreeDataProvider{
@@ -16,7 +18,16 @@ public class RemoteFilesProvider implements TreeDataProvider{
         if(connectionInfo == null) {
             throw new IllegalStateException("connection info is not set");
         }
-        FsPath fsPath = new FsPath(connectionInfo.getServer(), connectionInfo.getServer());
+        FsPath fsPath = new FsPath(
+                connectionInfo.getServer(),
+                connectionInfo.getServer(),
+                /*isDirectory*/true
+        );
         onComplete.accept(new TreeNodeData(fsPath));
+    }
+
+    @Override
+    public void getNodesFor(TreeNodeData node, Consumer<List<TreeNodeData>> onComplete) {
+        onComplete.accept(Collections.emptyList());
     }
 }
