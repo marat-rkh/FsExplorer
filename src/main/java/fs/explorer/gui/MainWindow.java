@@ -1,5 +1,7 @@
 package fs.explorer.gui;
 
+import fs.explorer.gui.preview.PreviewPane;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,12 +11,19 @@ public final class MainWindow {
 
     private final JFrame frame;
 
-    public MainWindow(String name, MenuBar menuBar, StatusBar statusBar, DirTree dirTree) {
+    public MainWindow(
+            String name,
+            MenuBar menuBar,
+            StatusBar statusBar,
+            DirTree dirTree,
+            PreviewPane previewPane
+    ) {
         frame = new JFrame(name);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.getContentPane().setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         frame.setJMenuBar(menuBar.asJMenuBar());
-        frame.getContentPane().add(createMainPane(statusBar, dirTree), BorderLayout.CENTER);
+        JSplitPane mainPane = createMainPane(statusBar, dirTree, previewPane);
+        frame.getContentPane().add(mainPane, BorderLayout.CENTER);
     }
 
     public void show() {
@@ -22,9 +31,16 @@ public final class MainWindow {
         frame.setVisible(true);
     }
 
-    private JSplitPane createMainPane(StatusBar statusBar, DirTree dirTree) {
+    private JSplitPane createMainPane(
+            StatusBar statusBar,
+            DirTree dirTree,
+            PreviewPane previewPane
+    ) {
         JSplitPane treeAndPreviewPanes = new JSplitPane(
-                JSplitPane.HORIZONTAL_SPLIT, createDirTreePane(dirTree), new JLabel());
+                JSplitPane.HORIZONTAL_SPLIT,
+                createDirTreePane(dirTree),
+                previewPane.asJComponent()
+        );
         treeAndPreviewPanes.setOneTouchExpandable(true);
         treeAndPreviewPanes.setDividerLocation(WINDOW_WIDTH / 3);
 

@@ -2,6 +2,7 @@ package fs.explorer.gui;
 
 import fs.explorer.datasource.LocalFilesProvider;
 import fs.explorer.datasource.RemoteFilesProvider;
+import fs.explorer.gui.preview.PreviewPane;
 
 import javax.swing.*;
 
@@ -14,7 +15,8 @@ public class Application {
         LocalFilesProvider localFilesProvider = new LocalFilesProvider();
         RemoteFilesProvider remoteFilesProvider = new RemoteFilesProvider();
         MenuBar menuBar = new MenuBar(statusBar, dirTree, localFilesProvider, remoteFilesProvider);
-        this.mainWindow = new MainWindow("FsExplorer", menuBar, statusBar, dirTree);
+        PreviewPane previewPane = new PreviewPane();
+        this.mainWindow = new MainWindow("FsExplorer", menuBar, statusBar, dirTree, previewPane);
     }
 
     public void run() {
