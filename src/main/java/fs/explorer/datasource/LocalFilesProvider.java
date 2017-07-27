@@ -7,6 +7,7 @@ public class LocalFilesProvider implements TreeDataProvider {
 
     @Override
     public void getTopNode(Consumer<TreeNodeData> onComplete) {
-        onComplete.accept(new TreeNodeData(topDirName, TreeNodeData.Type.DIRECTORY));
+        FsPath fsPath = new FsPath(topDirName, topDirName);
+        onComplete.accept(new TreeNodeData(fsPath));
     }
 }

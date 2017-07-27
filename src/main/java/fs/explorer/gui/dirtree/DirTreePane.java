@@ -1,6 +1,7 @@
-package fs.explorer.gui;
+package fs.explorer.gui.dirtree;
 
 import fs.explorer.datasource.TreeDataProvider;
+import fs.explorer.datasource.TreeNodeData;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -30,9 +31,21 @@ public class DirTreePane {
         this.treeDataProvider = treeDataProvider;
         removeAllChildren(root);
         treeDataProvider.getTopNode(nodeData -> {
-            DefaultMutableTreeNode newTop = lazyDirNode(nodeData.getLabel());
+            DefaultMutableTreeNode newTop = lazyDirNode(nodeData);
             treeModel.insertNodeInto(newTop, root, root.getChildCount());
             tree.expandPath(new TreePath(root.getPath()));
+        });
+    }
+
+    public void addTreeSelectionListener(DirTreeSelectionListener listener) {
+        tree.addTreeSelectionListener(e -> {
+            DefaultMutableTreeNode node =
+                    (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+            if (node == null) {
+                return;
+            }
+            TreeNodeData nodeData = (TreeNodeData) node.getUserObject();
+            listener.valueChanged(nodeData);
         });
     }
 
@@ -45,8 +58,9 @@ public class DirTreePane {
         }
     }
 
-    private DefaultMutableTreeNode lazyDirNode(String name) {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(name, /*allowsChildren*/true);
+    private DefaultMutableTreeNode lazyDirNode(TreeNodeData nodeData) {
+        DefaultMutableTreeNode node =
+                new DefaultMutableTreeNode(nodeData, /*allowsChildren*/true);
         DefaultMutableTreeNode tmpNode =
                 new DefaultMutableTreeNode("loading...", /*allowsChildren*/false);
         node.add(tmpNode);

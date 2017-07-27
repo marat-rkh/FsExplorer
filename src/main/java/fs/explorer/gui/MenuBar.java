@@ -2,6 +2,7 @@ package fs.explorer.gui;
 
 import fs.explorer.datasource.LocalFilesProvider;
 import fs.explorer.datasource.RemoteFilesProvider;
+import fs.explorer.gui.dirtree.DirTreePane;
 
 import javax.swing.*;
 

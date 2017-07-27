@@ -1,20 +1,16 @@
 package fs.explorer.datasource;
 
 public class TreeNodeData {
-    private final String label;
-    private final Type type;
+    private final FsPath fsPath;
 
-    public TreeNodeData(String label, Type type) {
-        this.label = label;
-        this.type = type;
+    public TreeNodeData(FsPath fsPath) {
+        this.fsPath = fsPath;
     }
 
-    public String getLabel() { return label; }
+    public FsPath getFsPath() { return fsPath; }
 
-    public Type getType() { return type; }
-
-    public enum Type {
-        DIRECTORY,
-        FILE
+    @Override
+    public String toString() {
+        return fsPath.getName();
     }
 }

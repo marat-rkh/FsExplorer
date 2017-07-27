@@ -16,7 +16,7 @@ public class RemoteFilesProvider implements TreeDataProvider{
         if(connectionInfo == null) {
             throw new IllegalStateException("connection info is not set");
         }
-        onComplete.accept(new TreeNodeData(
-                connectionInfo.getServer(), TreeNodeData.Type.DIRECTORY));
+        FsPath fsPath = new FsPath(connectionInfo.getServer(), connectionInfo.getServer());
+        onComplete.accept(new TreeNodeData(fsPath));
     }
 }
