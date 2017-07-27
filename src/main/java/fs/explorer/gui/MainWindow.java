@@ -4,29 +4,31 @@ import javax.swing.*;
 import java.awt.*;
 
 public final class MainWindow {
-    private final String name;
     private final int WINDOW_WIDTH = 640;
     private final int WINDOW_HEIGHT = 480;
 
+    private final JFrame frame;
+    private final StatusBar statusBar;
+    private final MenuBar menuBar;
+
     public MainWindow(String name) {
-        this.name = name;
-    }
-
-    public void show() {
-        SwingUtilities.invokeLater(this::createAndShow);
-    }
-
-    private void createAndShow() {
-        JFrame frame = new JFrame(name);
+        frame = new JFrame(name);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.getContentPane().setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
 
-        frame.setJMenuBar(MenuBar.create());
-        frame.getContentPane().add(createSplitPane(), BorderLayout.CENTER);
+        statusBar = new StatusBar("Ready");
+        menuBar = new MenuBar(statusBar);
 
+        frame.setJMenuBar(menuBar.asJMenuBar());
+        frame.getContentPane().add(createSplitPane(), BorderLayout.CENTER);
+    }
+
+    public void show() {
         frame.pack();
         frame.setVisible(true);
     }
+
+    public StatusBar getStatusBar() { return statusBar; }
 
     private JSplitPane createSplitPane() {
         JSplitPane treeAndPreviewPanes = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
@@ -35,7 +37,7 @@ public final class MainWindow {
         treeAndPreviewPanes.setDividerLocation(WINDOW_WIDTH / 3);
 
         JSplitPane mainAndStatusPanes = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                treeAndPreviewPanes, new JLabel("Status: OK"));
+                treeAndPreviewPanes, statusBar.asJComponent());
         mainAndStatusPanes.setOneTouchExpandable(true);
         mainAndStatusPanes.setDividerLocation(9 * WINDOW_HEIGHT / 10);
         return mainAndStatusPanes;

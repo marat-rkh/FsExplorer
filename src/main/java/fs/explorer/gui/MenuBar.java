@@ -3,30 +3,40 @@ package fs.explorer.gui;
 import javax.swing.*;
 
 public final class MenuBar {
-    private final static String EXPLORE_MENU = "Explore";
-    private final static String LOCAL_FILES_ITEM = "Local files";
-    private final static String REMOTE_FILES_ITEM = "Remote files (FTP)";
+    private final String EXPLORE_MENU = "Explore";
+    private final String LOCAL_FILES_ITEM = "Local files";
+    private final String REMOTE_FILES_ITEM = "Remote files (FTP)";
 
-    public static JMenuBar create() {
-        JMenuBar menuBar = new JMenuBar();
+    private final JMenuBar menuBar;
+    private final FTPDialog ftpDialog;
+    private final StatusBar statusBar;
 
+    public MenuBar(StatusBar statusBar) {
+        menuBar = new JMenuBar();
         JMenu menu = new JMenu(EXPLORE_MENU);
         menu.add(localFilesItem());
         menu.add(remoteFilesItem());
-
         menuBar.add(menu);
-        return menuBar;
+
+        ftpDialog = new FTPDialog();
+        this.statusBar = statusBar;
     }
 
-    private static JMenuItem localFilesItem() {
+    public JMenuBar asJMenuBar() { return menuBar; }
+
+    private JMenuItem localFilesItem() {
         JMenuItem item = new JMenuItem(LOCAL_FILES_ITEM);
         // TODO addActionListener
         return item;
     }
 
-    private static JMenuItem remoteFilesItem() {
+    private JMenuItem remoteFilesItem() {
         JMenuItem item = new JMenuItem(REMOTE_FILES_ITEM);
-        // TODO addActionListener
+        item.addActionListener(e -> {
+            ftpDialog.showAndWaitResult().ifPresent(connectionInfo ->
+                statusBar.setMessage("Requested FTP connection: " + connectionInfo.getServer())
+            );
+        });
         return item;
     }
 }
