@@ -10,8 +10,9 @@ public final class MenuBar {
     private final JMenuBar menuBar;
     private final FTPDialog ftpDialog;
     private final StatusBar statusBar;
+    private final DirTree dirTree;
 
-    public MenuBar(StatusBar statusBar) {
+    public MenuBar(StatusBar statusBar, DirTree dirTree) {
         menuBar = new JMenuBar();
         JMenu menu = new JMenu(EXPLORE_MENU);
         menu.add(localFilesItem());
@@ -20,13 +21,16 @@ public final class MenuBar {
 
         ftpDialog = new FTPDialog();
         this.statusBar = statusBar;
+        this.dirTree = dirTree;
     }
 
     public JMenuBar asJMenuBar() { return menuBar; }
 
     private JMenuItem localFilesItem() {
         JMenuItem item = new JMenuItem(LOCAL_FILES_ITEM);
-        // TODO addActionListener
+        item.addActionListener(e -> {
+            dirTree.resetTopNode("/");
+        });
         return item;
     }
 
@@ -34,7 +38,7 @@ public final class MenuBar {
         JMenuItem item = new JMenuItem(REMOTE_FILES_ITEM);
         item.addActionListener(e -> {
             ftpDialog.showAndWaitResult().ifPresent(connectionInfo ->
-                statusBar.setMessage("Requested FTP connection: " + connectionInfo.getServer())
+                    dirTree.resetTopNode(connectionInfo.getServer())
             );
         });
         return item;
