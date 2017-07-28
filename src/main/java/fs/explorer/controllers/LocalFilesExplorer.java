@@ -1,4 +1,4 @@
-package fs.explorer.listeners;
+package fs.explorer.controllers;
 
 import fs.explorer.datasource.LocalFilesProvider;
 import fs.explorer.gui.dirtree.DirTreePane;
