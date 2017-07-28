@@ -1,38 +1,31 @@
-package fs.explorer.gui.dirtree;
+package fs.explorer.model.dirtree;
 
-import fs.explorer.controllers.DirTreeController;
 import fs.explorer.datasource.TreeDataProvider;
 import fs.explorer.datasource.TreeNodeData;
+import fs.explorer.gui.DirTreePane;
+import fs.explorer.model.preview.PreviewModel;
 
-import javax.swing.*;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 
-public class DirTreePane implements TreeExpansionListener {
-    private final JScrollPane scrollPane;
-    private final JTree tree;
+public class DirTreeModel {
     private final DefaultTreeModel treeModel;
     private final DefaultMutableTreeNode root;
+    private DirTreePane dirTreePane;
     private TreeDataProvider treeDataProvider;
+    private final PreviewModel previewModel;
 
-    public DirTreePane(DirTreeController controller) {
+    public DirTreeModel(PreviewModel previewModel) {
         root = new DefaultMutableTreeNode(
                 ExtTreeNodeData.fakeNodeData("root"), /*allowsChildren*/true);
         treeModel = new DefaultTreeModel(root);
-        tree = new JTree(treeModel);
-        tree.setRootVisible(false);
-        tree.setEditable(true);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.setShowsRootHandles(true);
-        tree.addTreeExpansionListener(this);
-        scrollPane = new JScrollPane(tree);
-
-        addTreeSelectionListener(controller);
+        this.previewModel = previewModel;
     }
+
+    public DefaultTreeModel getInnerTreeModel() { return treeModel; }
+
+    public void setDirTreePane(DirTreePane pane) { this.dirTreePane = pane; }
 
     public void resetDataProvider(TreeDataProvider treeDataProvider) {
         this.treeDataProvider = treeDataProvider;
@@ -40,45 +33,25 @@ public class DirTreePane implements TreeExpansionListener {
         treeDataProvider.getTopNode(nodeData -> {
             DefaultMutableTreeNode newTop = nullDirNode(nodeData);
             addChild(root, newTop);
-            tree.expandPath(new TreePath(root.getPath()));
+            if(dirTreePane != null) {
+                dirTreePane.expandPath(new TreePath(root.getPath()));
+            }
         });
     }
 
-    public JComponent asJComponent() { return scrollPane; }
+    public void selectNode(DefaultMutableTreeNode node) {
+        ExtTreeNodeData extNodeData = (ExtTreeNodeData) node.getUserObject();
+        if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
+            previewModel.updatePreview(extNodeData.getNodeData());
+        }
+    }
 
-    @Override
-    public void treeExpanded(TreeExpansionEvent event) {
-        TreePath treePath = event.getPath();
-        if(treePath == null) {
-            return;
-        }
-        DefaultMutableTreeNode node =
-                (DefaultMutableTreeNode) treePath.getLastPathComponent();
-        if(node == null) {
-            return;
-        }
+    public void expandNode(DefaultMutableTreeNode node) {
         ExtTreeNodeData extNodeData = (ExtTreeNodeData) node.getUserObject();
         if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
                 extNodeData.getStatus() == ExtTreeNodeData.Status.NULL) {
             loadContents(node, extNodeData);
         }
-    }
-
-    @Override
-    public void treeCollapsed(TreeExpansionEvent event) {}
-
-    private void addTreeSelectionListener(DirTreeSelectionListener listener) {
-        tree.addTreeSelectionListener(e -> {
-            DefaultMutableTreeNode node =
-                    (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-            if (node == null) {
-                return;
-            }
-            ExtTreeNodeData extNodeData = (ExtTreeNodeData) node.getUserObject();
-            if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
-                listener.valueChanged(extNodeData.getNodeData());
-            }
-        });
     }
 
     private void removeAllChildren(DefaultMutableTreeNode parent) {
@@ -123,7 +96,9 @@ public class DirTreePane implements TreeExpansionListener {
                     }
                 }
             }
-            tree.expandPath(new TreePath(node.getPath()));
+            if(dirTreePane != null) {
+                dirTreePane.expandPath(new TreePath(node.getPath()));
+            }
             extNodeData.setStatus(ExtTreeNodeData.Status.LOADED);
         });
     }

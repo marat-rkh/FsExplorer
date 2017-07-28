@@ -4,7 +4,7 @@ import fs.explorer.controllers.MenuBarController;
 import fs.explorer.controllers.DirTreeController;
 import fs.explorer.datasource.LocalFilesProvider;
 import fs.explorer.datasource.RemoteFilesProvider;
-import fs.explorer.gui.dirtree.DirTreePane;
+import fs.explorer.model.dirtree.DirTreeModel;
 import fs.explorer.model.ftpdialog.FTPDialogModel;
 import fs.explorer.model.preview.PreviewModel;
 
@@ -16,9 +16,14 @@ public class Application {
     public Application() {
         PreviewPane previewPane = new PreviewPane();
         PreviewModel previewModel = new PreviewModel(previewPane);
-        DirTreeController dirTreeController = new DirTreeController(previewModel);
-        DirTreePane dirTreePane = new DirTreePane(dirTreeController);
-        MenuBar menuBar = createMenuBar(dirTreePane);
+
+        DirTreeModel dirTreeModel = new DirTreeModel(previewModel);
+        DirTreeController dirTreeController = new DirTreeController(dirTreeModel);
+        DirTreePane dirTreePane =
+                new DirTreePane(dirTreeModel.getInnerTreeModel(), dirTreeController);
+        dirTreeModel.setDirTreePane(dirTreePane);
+
+        MenuBar menuBar = createMenuBar(dirTreeModel);
         StatusBar statusBar = new StatusBar("Ready");
         this.mainWindow = new MainWindow(
                 "FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
@@ -28,14 +33,14 @@ public class Application {
         SwingUtilities.invokeLater(mainWindow::show);
     }
 
-    private MenuBar createMenuBar(DirTreePane dirTreePane) {
+    private MenuBar createMenuBar(DirTreeModel dirTreeModel) {
         LocalFilesProvider localFilesProvider = new LocalFilesProvider();
         RemoteFilesProvider remoteFilesProvider = new RemoteFilesProvider();
         FTPDialog ftpDialog = new FTPDialog();
         FTPDialogModel ftpDialogModel =
-                new FTPDialogModel(ftpDialog, dirTreePane, remoteFilesProvider);
+                new FTPDialogModel(ftpDialog, dirTreeModel, remoteFilesProvider);
         MenuBarController controller =
-                new MenuBarController(dirTreePane, localFilesProvider, ftpDialogModel);
+                new MenuBarController(dirTreeModel, localFilesProvider, ftpDialogModel);
         return new MenuBar(controller);
     }
 }

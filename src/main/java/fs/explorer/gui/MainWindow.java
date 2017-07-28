@@ -1,7 +1,5 @@
 package fs.explorer.gui;
 
-import fs.explorer.gui.dirtree.DirTreePane;
-
 import javax.swing.*;
 import java.awt.*;
 

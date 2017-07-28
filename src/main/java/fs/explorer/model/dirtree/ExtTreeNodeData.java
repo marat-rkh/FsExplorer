@@ -1,9 +1,9 @@
-package fs.explorer.gui.dirtree;
+package fs.explorer.model.dirtree;
 
 import fs.explorer.datasource.FsPath;
 import fs.explorer.datasource.TreeNodeData;
 
-class ExtTreeNodeData {
+public class ExtTreeNodeData {
     private final TreeNodeData nodeData;
     private Status status;
     private final Type type;
