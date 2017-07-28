@@ -1,4 +1,4 @@
-package fs.explorer.model.ftpdialog;
+package fs.explorer.models.ftpdialog;
 
 public class FTPDialogData {
     private final String server;

@@ -1,4 +1,4 @@
-package fs.explorer.gui;
+package fs.explorer.views;
 
 import javax.swing.*;
 

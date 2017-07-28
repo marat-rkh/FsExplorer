@@ -1,6 +1,6 @@
-package fs.explorer.gui;
+package fs.explorer.views;
 
-import fs.explorer.model.ftpdialog.FTPDialogData;
+import fs.explorer.models.ftpdialog.FTPDialogData;
 
 import javax.swing.*;
 import java.util.Optional;

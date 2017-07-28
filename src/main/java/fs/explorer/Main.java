@@ -1,9 +1,6 @@
 package fs.explorer;
 
-import fs.explorer.gui.Application;
-import fs.explorer.gui.MainWindow;
-
-import javax.swing.*;
+import fs.explorer.views.Application;
 
 public class Main {
     public static void main(String[] args) {

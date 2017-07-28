@@ -1,8 +1,8 @@
-package fs.explorer.model.preview;
+package fs.explorer.models.preview;
 
 import fs.explorer.datasource.PreviewData;
 import fs.explorer.datasource.TreeNodeData;
-import fs.explorer.gui.PreviewPane;
+import fs.explorer.views.PreviewPane;
 
 import javax.swing.*;
 

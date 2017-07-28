@@ -1,6 +1,6 @@
 package fs.explorer.controllers;
 
-import fs.explorer.model.dirtree.DirTreeModel;
+import fs.explorer.models.dirtree.DirTreeModel;
 
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeSelectionEvent;

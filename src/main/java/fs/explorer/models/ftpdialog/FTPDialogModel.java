@@ -1,8 +1,8 @@
-package fs.explorer.model.ftpdialog;
+package fs.explorer.models.ftpdialog;
 
 import fs.explorer.datasource.RemoteFilesProvider;
-import fs.explorer.gui.FTPDialog;
-import fs.explorer.model.dirtree.DirTreeModel;
+import fs.explorer.views.FTPDialog;
+import fs.explorer.models.dirtree.DirTreeModel;
 
 public class FTPDialogModel {
     private final FTPDialog ftpDialog;

@@ -1,8 +1,8 @@
 package fs.explorer.controllers;
 
 import fs.explorer.datasource.LocalFilesProvider;
-import fs.explorer.model.dirtree.DirTreeModel;
-import fs.explorer.model.ftpdialog.FTPDialogModel;
+import fs.explorer.models.dirtree.DirTreeModel;
+import fs.explorer.models.ftpdialog.FTPDialogModel;
 
 import java.awt.event.ActionEvent;
 

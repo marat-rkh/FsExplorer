@@ -1,12 +1,12 @@
-package fs.explorer.gui;
+package fs.explorer.views;
 
 import fs.explorer.controllers.MenuBarController;
 import fs.explorer.controllers.DirTreeController;
 import fs.explorer.datasource.LocalFilesProvider;
 import fs.explorer.datasource.RemoteFilesProvider;
-import fs.explorer.model.dirtree.DirTreeModel;
-import fs.explorer.model.ftpdialog.FTPDialogModel;
-import fs.explorer.model.preview.PreviewModel;
+import fs.explorer.models.dirtree.DirTreeModel;
+import fs.explorer.models.ftpdialog.FTPDialogModel;
+import fs.explorer.models.preview.PreviewModel;
 
 import javax.swing.*;
 

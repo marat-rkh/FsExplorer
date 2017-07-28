@@ -1,9 +1,9 @@
-package fs.explorer.model.dirtree;
+package fs.explorer.models.dirtree;
 
 import fs.explorer.datasource.TreeDataProvider;
 import fs.explorer.datasource.TreeNodeData;
-import fs.explorer.gui.DirTreePane;
-import fs.explorer.model.preview.PreviewModel;
+import fs.explorer.views.DirTreePane;
+import fs.explorer.models.preview.PreviewModel;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;

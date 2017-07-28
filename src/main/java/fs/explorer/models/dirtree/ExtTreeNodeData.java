@@ -1,4 +1,4 @@
-package fs.explorer.model.dirtree;
+package fs.explorer.models.dirtree;
 
 import fs.explorer.datasource.FsPath;
 import fs.explorer.datasource.TreeNodeData;
