@@ -1,5 +1,7 @@
 package fs.explorer.gui;
 
+import fs.explorer.controllers.MenuBarController;
+
 import javax.swing.*;
 import java.awt.event.ActionListener;
 
@@ -10,14 +12,11 @@ public final class MenuBar {
 
     private final JMenuBar menuBar;
 
-    public MenuBar(
-            ActionListener localFilesItemListener,
-            ActionListener remoteFilesItemListener
-    ) {
+    public MenuBar(MenuBarController menuBarController) {
         menuBar = new JMenuBar();
         JMenu menu = new JMenu(EXPLORE_MENU);
-        menu.add(menuItem(LOCAL_FILES_ITEM, localFilesItemListener));
-        menu.add(menuItem(REMOTE_FILES_ITEM, remoteFilesItemListener));
+        menu.add(menuItem(LOCAL_FILES_ITEM, menuBarController::handleExploreLocalFiles));
+        menu.add(menuItem(REMOTE_FILES_ITEM, menuBarController::handleExploreRemoteFiles));
         menuBar.add(menu);
     }
 
