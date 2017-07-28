@@ -1,6 +1,6 @@
 package fs.explorer.views;
 
-import fs.explorer.controllers.FTPDialogController;
+import fs.explorer.controllers.ftpdialog.FTPDialogController;
 import fs.explorer.controllers.MenuBarController;
 import fs.explorer.controllers.DirTreeController;
 import fs.explorer.datasource.LocalFilesProvider;

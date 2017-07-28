@@ -1,5 +1,6 @@
-package fs.explorer.controllers;
+package fs.explorer.controllers.ftpdialog;
 
+import fs.explorer.controllers.DirTreeController;
 import fs.explorer.datasource.RemoteFilesProvider;
 import fs.explorer.views.FTPDialog;
 

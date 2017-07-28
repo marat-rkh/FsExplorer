@@ -1,6 +1,6 @@
 package fs.explorer.datasource;
 
-import fs.explorer.controllers.FTPDialogData;
+import fs.explorer.controllers.ftpdialog.FTPDialogData;
 
 import java.util.Collections;
 import java.util.List;
