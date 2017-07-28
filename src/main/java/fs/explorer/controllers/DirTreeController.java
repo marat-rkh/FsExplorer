@@ -22,7 +22,7 @@ public class DirTreeController {
         dirTreeModel.selectNode(lastSelectedNode);
     }
 
-    public void handleTreeExpanded(TreeExpansionEvent event) {
+    public void handleTreeExpansion(TreeExpansionEvent event) {
         TreePath treePath = event.getPath();
         if(treePath == null) {
             return;

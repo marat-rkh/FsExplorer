@@ -54,7 +54,7 @@ public class DirTreePane {
 
         @Override
         public void treeExpanded(TreeExpansionEvent event) {
-            controller.handleTreeExpanded(event);
+            controller.handleTreeExpansion(event);
         }
 
         @Override

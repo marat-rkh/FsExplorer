@@ -25,17 +25,17 @@ public class MenuBarControllerTest {
     }
 
     @Test
-    public void exploreLocalFilesEventShouldBeHandled() throws Exception {
+    public void resetsDataProviderOnExploreLocalFilesEvent() throws Exception {
         controller.handleExploreLocalFiles(null);
         ArgumentCaptor<LocalFilesProvider> captor =
                 ArgumentCaptor.forClass(LocalFilesProvider.class);
-        verify(dirTreeModel, times(1)).resetDataProvider(captor.capture());
+        verify(dirTreeModel).resetDataProvider(captor.capture());
         assertTrue(captor.getValue() == localFilesProvider);
     }
 
     @Test
-    public void exploreRemoteFilesEventShouldBeHandled() throws Exception {
+    public void showsFTPDialogOnExploreRemoteFilesEvent() throws Exception {
         controller.handleExploreRemoteFiles(null);
-        verify(ftpDialogModel, times(1)).show();
+        verify(ftpDialogModel).show();
     }
 }
