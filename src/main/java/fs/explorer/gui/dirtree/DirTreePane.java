@@ -1,5 +1,6 @@
 package fs.explorer.gui.dirtree;
 
+import fs.explorer.controllers.DirTreeController;
 import fs.explorer.datasource.TreeDataProvider;
 import fs.explorer.datasource.TreeNodeData;
 
@@ -18,7 +19,7 @@ public class DirTreePane implements TreeExpansionListener {
     private final DefaultMutableTreeNode root;
     private TreeDataProvider treeDataProvider;
 
-    public DirTreePane() {
+    public DirTreePane(DirTreeController controller) {
         root = new DefaultMutableTreeNode(
                 ExtTreeNodeData.fakeNodeData("root"), /*allowsChildren*/true);
         treeModel = new DefaultTreeModel(root);
@@ -29,6 +30,8 @@ public class DirTreePane implements TreeExpansionListener {
         tree.setShowsRootHandles(true);
         tree.addTreeExpansionListener(this);
         scrollPane = new JScrollPane(tree);
+
+        addTreeSelectionListener(controller);
     }
 
     public void resetDataProvider(TreeDataProvider treeDataProvider) {
@@ -38,20 +41,6 @@ public class DirTreePane implements TreeExpansionListener {
             DefaultMutableTreeNode newTop = nullDirNode(nodeData);
             addChild(root, newTop);
             tree.expandPath(new TreePath(root.getPath()));
-        });
-    }
-
-    public void addTreeSelectionListener(DirTreeSelectionListener listener) {
-        tree.addTreeSelectionListener(e -> {
-            DefaultMutableTreeNode node =
-                    (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-            if (node == null) {
-                return;
-            }
-            ExtTreeNodeData extNodeData = (ExtTreeNodeData) node.getUserObject();
-            if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
-                listener.valueChanged(extNodeData.getNodeData());
-            }
         });
     }
 
@@ -77,6 +66,20 @@ public class DirTreePane implements TreeExpansionListener {
 
     @Override
     public void treeCollapsed(TreeExpansionEvent event) {}
+
+    private void addTreeSelectionListener(DirTreeSelectionListener listener) {
+        tree.addTreeSelectionListener(e -> {
+            DefaultMutableTreeNode node =
+                    (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+            if (node == null) {
+                return;
+            }
+            ExtTreeNodeData extNodeData = (ExtTreeNodeData) node.getUserObject();
+            if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
+                listener.valueChanged(extNodeData.getNodeData());
+            }
+        });
+    }
 
     private void removeAllChildren(DefaultMutableTreeNode parent) {
         for(int i = 0; i < treeModel.getChildCount(parent); ++i) {

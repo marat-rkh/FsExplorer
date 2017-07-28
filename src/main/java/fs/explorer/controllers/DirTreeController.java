@@ -4,10 +4,10 @@ import fs.explorer.datasource.TreeNodeData;
 import fs.explorer.gui.dirtree.DirTreeSelectionListener;
 import fs.explorer.model.preview.PreviewModel;
 
-public class PreviewUpdater implements DirTreeSelectionListener {
+public class DirTreeController implements DirTreeSelectionListener {
     private final PreviewModel previewModel;
 
-    public PreviewUpdater(PreviewModel previewModel) {
+    public DirTreeController(PreviewModel previewModel) {
         this.previewModel = previewModel;
     }
 

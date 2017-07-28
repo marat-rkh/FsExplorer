@@ -1,7 +1,7 @@
 package fs.explorer.gui;
 
 import fs.explorer.controllers.MenuBarController;
-import fs.explorer.controllers.PreviewUpdater;
+import fs.explorer.controllers.DirTreeController;
 import fs.explorer.datasource.LocalFilesProvider;
 import fs.explorer.datasource.RemoteFilesProvider;
 import fs.explorer.gui.dirtree.DirTreePane;
@@ -16,9 +16,8 @@ public class Application {
     public Application() {
         PreviewPane previewPane = new PreviewPane();
         PreviewModel previewModel = new PreviewModel(previewPane);
-        PreviewUpdater previewUpdater = new PreviewUpdater(previewModel);
-        DirTreePane dirTreePane = new DirTreePane();
-        dirTreePane.addTreeSelectionListener(previewUpdater);
+        DirTreeController dirTreeController = new DirTreeController(previewModel);
+        DirTreePane dirTreePane = new DirTreePane(dirTreeController);
         MenuBar menuBar = createMenuBar(dirTreePane);
         StatusBar statusBar = new StatusBar("Ready");
         this.mainWindow = new MainWindow(
