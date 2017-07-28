@@ -4,8 +4,9 @@ import fs.explorer.datasource.LocalFilesProvider;
 import fs.explorer.datasource.RemoteFilesProvider;
 import fs.explorer.gui.dirtree.DirTreePane;
 import fs.explorer.controllers.LocalFilesExplorer;
-import fs.explorer.controllers.preivew.PreviewUpdater;
+import fs.explorer.controllers.PreviewUpdater;
 import fs.explorer.controllers.RemoteFilesExplorer;
+import fs.explorer.model.preview.PreviewModel;
 
 import javax.swing.*;
 
@@ -14,8 +15,9 @@ public class Application {
 
     public Application() {
         PreviewPane previewPane = new PreviewPane();
+        PreviewModel previewModel = new PreviewModel(previewPane);
+        PreviewUpdater previewUpdater = new PreviewUpdater(previewModel);
         DirTreePane dirTreePane = new DirTreePane();
-        PreviewUpdater previewUpdater = new PreviewUpdater(previewPane);
         dirTreePane.addTreeSelectionListener(previewUpdater);
         MenuBar menuBar = createMenuBar(dirTreePane);
         StatusBar statusBar = new StatusBar("Ready");

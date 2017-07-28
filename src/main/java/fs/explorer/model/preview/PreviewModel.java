@@ -1,16 +1,15 @@
-package fs.explorer.controllers.preivew;
+package fs.explorer.model.preview;
 
 import fs.explorer.datasource.PreviewData;
 import fs.explorer.datasource.TreeNodeData;
-import fs.explorer.gui.dirtree.DirTreeSelectionListener;
 import fs.explorer.gui.PreviewPane;
 
 import javax.swing.*;
 
-public class PreviewUpdater implements DirTreeSelectionListener {
+public class PreviewModel {
     private final PreviewPane previewPane;
 
-    public PreviewUpdater(PreviewPane previewPane) {
+    public PreviewModel(PreviewPane previewPane) {
         this.previewPane = previewPane;
     }
 
@@ -20,10 +19,5 @@ public class PreviewUpdater implements DirTreeSelectionListener {
                 nodeData.toString().getBytes(), PreviewData.Type.TEXT);
         JComponent preview = PreviewRenderer.render(previewData);
         previewPane.updatePreview(preview);
-    }
-
-    @Override
-    public void valueChanged(TreeNodeData e) {
-        updatePreview(e);
     }
 }

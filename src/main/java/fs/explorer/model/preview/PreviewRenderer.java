@@ -1,4 +1,4 @@
-package fs.explorer.controllers.preivew;
+package fs.explorer.model.preview;
 
 import fs.explorer.datasource.PreviewData;
 
