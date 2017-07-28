@@ -6,6 +6,7 @@ import fs.explorer.gui.dirtree.DirTreePane;
 import fs.explorer.controllers.LocalFilesExplorer;
 import fs.explorer.controllers.PreviewUpdater;
 import fs.explorer.controllers.RemoteFilesExplorer;
+import fs.explorer.model.ftpdialog.FTPDialogModel;
 import fs.explorer.model.preview.PreviewModel;
 
 import javax.swing.*;
@@ -35,8 +36,9 @@ public class Application {
         LocalFilesExplorer localFilesExplorer =
                 new LocalFilesExplorer(dirTreePane, localFilesProvider);
         FTPDialog ftpDialog = new FTPDialog();
-        RemoteFilesExplorer remoteFilesExplorer =
-                new RemoteFilesExplorer(ftpDialog, dirTreePane, remoteFilesProvider);
+        FTPDialogModel ftpDialogModel =
+                new FTPDialogModel(ftpDialog, dirTreePane, remoteFilesProvider);
+        RemoteFilesExplorer remoteFilesExplorer = new RemoteFilesExplorer(ftpDialogModel);
         return new MenuBar(localFilesExplorer, remoteFilesExplorer);
     }
 }

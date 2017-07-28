@@ -1,6 +1,6 @@
 package fs.explorer.gui;
 
-import fs.explorer.ftp.ConnectionInfo;
+import fs.explorer.model.ftpdialog.FTPDialogData;
 
 import javax.swing.*;
 import java.util.Optional;
@@ -23,11 +23,11 @@ public class FTPDialog {
         };
     }
 
-    public Optional<ConnectionInfo> showAndWaitResult() {
+    public Optional<FTPDialogData> showAndWaitResult() {
         int result = JOptionPane.showConfirmDialog(
                 null, components, TITLE, JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            return Optional.of(new ConnectionInfo(
+            return Optional.of(new FTPDialogData(
                     server.getText(), login.getText(), password.getPassword()));
         }
         return Optional.empty();

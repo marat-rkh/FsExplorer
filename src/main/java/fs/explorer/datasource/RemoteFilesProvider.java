@@ -1,26 +1,26 @@
 package fs.explorer.datasource;
 
-import fs.explorer.ftp.ConnectionInfo;
+import fs.explorer.model.ftpdialog.FTPDialogData;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class RemoteFilesProvider implements TreeDataProvider{
-    private ConnectionInfo connectionInfo;
+    private FTPDialogData FTPDialogData;
 
-    public void setConnectionInfo(ConnectionInfo connectionInfo) {
-        this.connectionInfo = connectionInfo;
+    public void setConnectionInfo(FTPDialogData FTPDialogData) {
+        this.FTPDialogData = FTPDialogData;
     }
 
     @Override
     public void getTopNode(Consumer<TreeNodeData> onComplete) {
-        if(connectionInfo == null) {
+        if(FTPDialogData == null) {
             throw new IllegalStateException("connection info is not set");
         }
         FsPath fsPath = new FsPath(
-                connectionInfo.getServer(),
-                connectionInfo.getServer(),
+                FTPDialogData.getServer(),
+                FTPDialogData.getServer(),
                 /*isDirectory*/true
         );
         onComplete.accept(new TreeNodeData(fsPath));
