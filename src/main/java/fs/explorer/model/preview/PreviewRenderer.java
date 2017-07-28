@@ -1,4 +1,6 @@
-package fs.explorer.gui.preview;
+package fs.explorer.model.preview;
+
+import fs.explorer.datasource.PreviewData;
 
 import javax.swing.*;
 

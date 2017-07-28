@@ -1,4 +1,4 @@
-package fs.explorer.gui.preview;
+package fs.explorer.datasource;
 
 public class PreviewData {
     private final byte[] rawData;

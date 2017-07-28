@@ -3,7 +3,6 @@ package fs.explorer.gui;
 import fs.explorer.datasource.LocalFilesProvider;
 import fs.explorer.datasource.RemoteFilesProvider;
 import fs.explorer.gui.dirtree.DirTreePane;
-import fs.explorer.gui.preview.PreviewPane;
 import fs.explorer.listeners.LocalFilesExplorer;
 import fs.explorer.listeners.PreviewUpdater;
 import fs.explorer.listeners.RemoteFilesExplorer;

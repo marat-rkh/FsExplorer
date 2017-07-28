@@ -2,7 +2,7 @@ package fs.explorer.listeners;
 
 import fs.explorer.datasource.TreeNodeData;
 import fs.explorer.gui.dirtree.DirTreeSelectionListener;
-import fs.explorer.gui.preview.PreviewPane;
+import fs.explorer.gui.PreviewPane;
 
 public class PreviewUpdater implements DirTreeSelectionListener {
     private final PreviewPane previewPane;
