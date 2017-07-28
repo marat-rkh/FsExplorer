@@ -6,7 +6,7 @@ import fs.explorer.controllers.DirTreeController;
 import fs.explorer.datasource.LocalFilesProvider;
 import fs.explorer.datasource.RemoteFilesProvider;
 import fs.explorer.models.dirtree.DirTreeModel;
-import fs.explorer.models.preview.PreviewModel;
+import fs.explorer.controllers.preview.PreviewController;
 
 import javax.swing.*;
 
@@ -15,12 +15,12 @@ public class Application {
 
     public Application() {
         PreviewPane previewPane = new PreviewPane();
-        PreviewModel previewModel = new PreviewModel(previewPane);
+        PreviewController previewController = new PreviewController(previewPane);
 
         DirTreeModel dirTreeModel = new DirTreeModel();
         DirTreePane dirTreePane = new DirTreePane(dirTreeModel.getInnerTreeModel());
         DirTreeController dirTreeController =
-                new DirTreeController(dirTreePane, dirTreeModel, previewModel);
+                new DirTreeController(dirTreePane, dirTreeModel, previewController);
         dirTreePane.setController(dirTreeController);
 
         MenuBar menuBar = createMenuBar(dirTreeController);

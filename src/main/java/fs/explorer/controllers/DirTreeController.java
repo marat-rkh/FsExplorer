@@ -1,10 +1,10 @@
 package fs.explorer.controllers;
 
+import fs.explorer.controllers.preview.PreviewController;
 import fs.explorer.datasource.TreeDataProvider;
 import fs.explorer.datasource.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.models.dirtree.ExtTreeNodeData;
-import fs.explorer.models.preview.PreviewModel;
 import fs.explorer.views.DirTreePane;
 
 import javax.swing.event.TreeExpansionEvent;
@@ -15,17 +15,17 @@ import javax.swing.tree.TreePath;
 public class DirTreeController {
     private final DirTreePane dirTreePane;
     private final DirTreeModel dirTreeModel;
-    private final PreviewModel previewModel;
+    private final PreviewController previewController;
     private TreeDataProvider treeDataProvider;
 
     public DirTreeController(
             DirTreePane dirTreePane,
             DirTreeModel dirTreeModel,
-            PreviewModel previewModel
+            PreviewController previewController
     ) {
         this.dirTreePane = dirTreePane;
         this.dirTreeModel = dirTreeModel;
-        this.previewModel = previewModel;
+        this.previewController = previewController;
     }
 
     public void resetDataProvider(TreeDataProvider treeDataProvider) {
@@ -45,7 +45,7 @@ public class DirTreeController {
         }
         ExtTreeNodeData extNodeData = dirTreeModel.getExtTreeNodeData(lastSelectedNode);
         if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
-            previewModel.updatePreview(extNodeData.getNodeData());
+            previewController.updatePreview(extNodeData.getNodeData());
         }
     }
 

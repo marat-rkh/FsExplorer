@@ -1,4 +1,4 @@
-package fs.explorer.models.preview;
+package fs.explorer.controllers.preview;
 
 import fs.explorer.datasource.PreviewData;
 import fs.explorer.datasource.TreeNodeData;
@@ -6,10 +6,10 @@ import fs.explorer.views.PreviewPane;
 
 import javax.swing.*;
 
-public class PreviewModel {
+public class PreviewController {
     private final PreviewPane previewPane;
 
-    public PreviewModel(PreviewPane previewPane) {
+    public PreviewController(PreviewPane previewPane) {
         this.previewPane = previewPane;
     }
 
