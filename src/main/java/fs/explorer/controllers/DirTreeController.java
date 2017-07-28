@@ -30,11 +30,11 @@ public class DirTreeController {
 
     public void resetDataProvider(TreeDataProvider treeDataProvider) {
         this.treeDataProvider = treeDataProvider;
-        dirTreeModel.removeAllChildren(dirTreeModel.getRoot());
+        DefaultMutableTreeNode root = dirTreeModel.getRoot();
+        dirTreeModel.removeAllChildren(root);
         treeDataProvider.getTopNode(nodeData -> {
-            DefaultMutableTreeNode newTop = DirTreeModel.nullDirNode(nodeData);
-            dirTreeModel.addChild(dirTreeModel.getRoot(), newTop);
-            dirTreePane.expandPath(new TreePath(dirTreeModel.getRoot().getPath()));
+            dirTreeModel.addNullDirChild(root, nodeData);
+            dirTreePane.expandPath(new TreePath(root.getPath()));
         });
     }
 
@@ -43,7 +43,7 @@ public class DirTreeController {
         if (lastSelectedNode == null) {
             return;
         }
-        ExtTreeNodeData extNodeData = dirTreeModel.getExtTreeNodeData(lastSelectedNode);
+        ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(lastSelectedNode);
         if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
             previewController.updatePreview(extNodeData.getNodeData());
         }
@@ -59,7 +59,7 @@ public class DirTreeController {
         if(node == null) {
             return;
         }
-        ExtTreeNodeData extNodeData = dirTreeModel.getExtTreeNodeData(node);
+        ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(node);
         if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
                 extNodeData.getStatus() == ExtTreeNodeData.Status.NULL) {
             loadContents(node, extNodeData);
@@ -71,21 +71,17 @@ public class DirTreeController {
         treeDataProvider.getNodesFor(extNodeData.getNodeData(), contents -> {
             dirTreeModel.removeAllChildren(node);
             if(contents.isEmpty()) {
-                DefaultMutableTreeNode emptyNode = new DefaultMutableTreeNode(
-                        ExtTreeNodeData.fakeNodeData("<empty>"), /*allowsChildren*/false);
-                dirTreeModel.addChild(node, emptyNode);
+                dirTreeModel.addFakeChild(node, "<empty>");
             } else {
                 for(TreeNodeData nodeData : contents) {
                     if(nodeData.getFsPath().isDirectory()) {
-                        dirTreeModel.addChild(node, DirTreeModel.nullDirNode(nodeData));
+                        dirTreeModel.addNullDirChild(node, nodeData);
                     } else {
-                        dirTreeModel.addChild(node, DirTreeModel.fileNode(nodeData));
+                        dirTreeModel.addFileChild(node, nodeData);
                     }
                 }
             }
-            if(dirTreePane != null) {
-                dirTreePane.expandPath(new TreePath(node.getPath()));
-            }
+            dirTreePane.expandPath(new TreePath(node.getPath()));
             extNodeData.setStatus(ExtTreeNodeData.Status.LOADED);
         });
     }
