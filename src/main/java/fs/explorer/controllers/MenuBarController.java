@@ -1,31 +1,29 @@
 package fs.explorer.controllers;
 
 import fs.explorer.datasource.LocalFilesProvider;
-import fs.explorer.models.dirtree.DirTreeModel;
-import fs.explorer.models.ftpdialog.FTPDialogModel;
 
 import java.awt.event.ActionEvent;
 
 public class MenuBarController {
-    private final DirTreeModel dirTreeModel;
+    private final DirTreeController dirTreeController;
     private final LocalFilesProvider localFilesProvider;
-    private final FTPDialogModel ftpDialogModel;
+    private final FTPDialogController ftpDialogController;
 
     public MenuBarController(
-            DirTreeModel dirTreeModel,
+            DirTreeController dirTreeController,
             LocalFilesProvider localFilesProvider,
-            FTPDialogModel ftpDialogModel
+            FTPDialogController ftpDialogController
     ) {
-        this.dirTreeModel = dirTreeModel;
+        this.dirTreeController = dirTreeController;
         this.localFilesProvider = localFilesProvider;
-        this.ftpDialogModel = ftpDialogModel;
+        this.ftpDialogController = ftpDialogController;
     }
 
     public void handleExploreLocalFiles(ActionEvent e) {
-        dirTreeModel.resetDataProvider(localFilesProvider);
+        dirTreeController.resetDataProvider(localFilesProvider);
     }
 
     public void handleExploreRemoteFiles(ActionEvent e) {
-        ftpDialogModel.show();
+        ftpDialogController.showAndHandleInput();
     }
 }

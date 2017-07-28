@@ -17,16 +17,20 @@ public class DirTreePane {
     private final JTree tree;
     private final EventsListener eventsListener;
 
-    public DirTreePane(DefaultTreeModel treeModel, DirTreeController controller) {
+    public DirTreePane(DefaultTreeModel treeModel) {
         tree = new JTree(treeModel);
         tree.setRootVisible(false);
         tree.setEditable(true);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setShowsRootHandles(true);
         scrollPane = new JScrollPane(tree);
-        eventsListener = new EventsListener(tree, controller);
+        eventsListener = new EventsListener(tree);
         tree.addTreeExpansionListener(eventsListener);
         tree.addTreeSelectionListener(eventsListener);
+    }
+
+    public void setController(DirTreeController controller) {
+        this.eventsListener.setController(controller);
     }
 
     public JComponent asJComponent() { return scrollPane; }
@@ -38,15 +42,21 @@ public class DirTreePane {
     private static class EventsListener
             implements TreeSelectionListener, TreeExpansionListener {
         private final JTree tree;
-        private final DirTreeController controller;
+        private DirTreeController controller;
 
-        private EventsListener(JTree tree, DirTreeController controller) {
+        private EventsListener(JTree tree) {
             this.tree = tree;
+        }
+
+        public void setController(DirTreeController controller) {
             this.controller = controller;
         }
 
         @Override
         public void valueChanged(TreeSelectionEvent e) {
+            if(controller == null) {
+                return;
+            }
             DefaultMutableTreeNode node =
                     (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
             controller.handleTreeSelection(e, node);
@@ -54,6 +64,9 @@ public class DirTreePane {
 
         @Override
         public void treeExpanded(TreeExpansionEvent event) {
+            if(controller == null) {
+                return;
+            }
             controller.handleTreeExpansion(event);
         }
 

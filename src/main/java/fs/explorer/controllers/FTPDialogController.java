@@ -1,28 +1,27 @@
-package fs.explorer.models.ftpdialog;
+package fs.explorer.controllers;
 
 import fs.explorer.datasource.RemoteFilesProvider;
 import fs.explorer.views.FTPDialog;
-import fs.explorer.models.dirtree.DirTreeModel;
 
-public class FTPDialogModel {
+public class FTPDialogController {
     private final FTPDialog ftpDialog;
-    private final DirTreeModel dirTreeModel;
+    private final DirTreeController dirTreeController;
     private final RemoteFilesProvider remoteFilesProvider;
 
-    public FTPDialogModel(
+    public FTPDialogController(
             FTPDialog ftpDialog,
-            DirTreeModel dirTreeModel,
+            DirTreeController dirTreeController,
             RemoteFilesProvider remoteFilesProvider
     ) {
         this.ftpDialog = ftpDialog;
-        this.dirTreeModel = dirTreeModel;
+        this.dirTreeController = dirTreeController;
         this.remoteFilesProvider = remoteFilesProvider;
     }
 
-    public void show() {
+    public void showAndHandleInput() {
         ftpDialog.showAndWaitResult().ifPresent(ftpDialogData -> {
             remoteFilesProvider.setConnectionInfo(ftpDialogData);
-            dirTreeModel.resetDataProvider(remoteFilesProvider);
+            dirTreeController.resetDataProvider(remoteFilesProvider);
         });
     }
 }
