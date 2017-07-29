@@ -1,4 +1,4 @@
-package fs.explorer.datasource;
+package fs.explorer.providers;
 
 public class FsPath {
     private final String path;

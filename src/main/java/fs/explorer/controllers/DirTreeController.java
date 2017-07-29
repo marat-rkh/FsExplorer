@@ -1,8 +1,8 @@
 package fs.explorer.controllers;
 
 import fs.explorer.controllers.preview.PreviewController;
-import fs.explorer.datasource.TreeDataProvider;
-import fs.explorer.datasource.TreeNodeData;
+import fs.explorer.providers.TreeDataProvider;
+import fs.explorer.providers.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.models.dirtree.ExtTreeNodeData;
 import fs.explorer.views.DirTreePane;

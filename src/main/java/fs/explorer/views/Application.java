@@ -4,8 +4,8 @@ import fs.explorer.controllers.StatusBarController;
 import fs.explorer.controllers.ftpdialog.FTPDialogController;
 import fs.explorer.controllers.MenuBarController;
 import fs.explorer.controllers.DirTreeController;
-import fs.explorer.datasource.LocalFilesProvider;
-import fs.explorer.datasource.RemoteFilesProvider;
+import fs.explorer.providers.LocalFilesProvider;
+import fs.explorer.providers.RemoteFilesProvider;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.controllers.preview.PreviewController;
 

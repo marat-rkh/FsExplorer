@@ -1,4 +1,4 @@
-package fs.explorer.datasource;
+package fs.explorer.providers;
 
 import java.util.List;
 import java.util.function.Consumer;

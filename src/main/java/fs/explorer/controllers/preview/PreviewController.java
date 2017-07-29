@@ -1,7 +1,7 @@
 package fs.explorer.controllers.preview;
 
-import fs.explorer.datasource.PreviewData;
-import fs.explorer.datasource.TreeNodeData;
+import fs.explorer.providers.PreviewData;
+import fs.explorer.providers.TreeNodeData;
 import fs.explorer.views.PreviewPane;
 
 import javax.swing.*;

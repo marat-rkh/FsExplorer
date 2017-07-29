@@ -1,7 +1,7 @@
 package fs.explorer.controllers;
 
 import fs.explorer.controllers.ftpdialog.FTPDialogController;
-import fs.explorer.datasource.LocalFilesProvider;
+import fs.explorer.providers.LocalFilesProvider;
 
 import java.awt.event.ActionEvent;
 

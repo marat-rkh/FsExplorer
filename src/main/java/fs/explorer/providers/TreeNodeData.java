@@ -1,4 +1,4 @@
-package fs.explorer.datasource;
+package fs.explorer.providers;
 
 public class TreeNodeData {
     private final String label;

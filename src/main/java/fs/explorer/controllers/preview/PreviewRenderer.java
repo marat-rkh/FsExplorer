@@ -1,6 +1,6 @@
 package fs.explorer.controllers.preview;
 
-import fs.explorer.datasource.PreviewData;
+import fs.explorer.providers.PreviewData;
 
 import javax.swing.*;
 

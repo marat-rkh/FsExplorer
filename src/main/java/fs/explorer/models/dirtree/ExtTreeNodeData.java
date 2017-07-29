@@ -1,7 +1,7 @@
 package fs.explorer.models.dirtree;
 
-import fs.explorer.datasource.FsPath;
-import fs.explorer.datasource.TreeNodeData;
+import fs.explorer.providers.FsPath;
+import fs.explorer.providers.TreeNodeData;
 
 public class ExtTreeNodeData {
     private final TreeNodeData nodeData;
