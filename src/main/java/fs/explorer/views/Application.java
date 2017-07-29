@@ -17,13 +17,15 @@ public class Application {
         PreviewPane previewPane = new PreviewPane();
         PreviewController previewController = new PreviewController(previewPane);
 
+        LocalFilesProvider localFilesProvider = new LocalFilesProvider();
+
         DirTreeModel dirTreeModel = new DirTreeModel();
         DirTreePane dirTreePane = new DirTreePane(dirTreeModel.getInnerTreeModel());
-        DirTreeController dirTreeController =
-                new DirTreeController(dirTreePane, dirTreeModel, previewController);
+        DirTreeController dirTreeController = new DirTreeController(
+                dirTreePane, dirTreeModel, previewController, localFilesProvider);
         dirTreePane.setController(dirTreeController);
 
-        MenuBar menuBar = createMenuBar(dirTreeController);
+        MenuBar menuBar = createMenuBar(dirTreeController, localFilesProvider);
         StatusBar statusBar = new StatusBar("Ready");
         this.mainWindow = new MainWindow(
                 "FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
@@ -33,8 +35,10 @@ public class Application {
         SwingUtilities.invokeLater(mainWindow::show);
     }
 
-    private MenuBar createMenuBar(DirTreeController dirTreeController) {
-        LocalFilesProvider localFilesProvider = new LocalFilesProvider();
+    private MenuBar createMenuBar(
+            DirTreeController dirTreeController,
+            LocalFilesProvider localFilesProvider
+    ) {
         RemoteFilesProvider remoteFilesProvider = new RemoteFilesProvider();
         FTPDialog ftpDialog = new FTPDialog();
         FTPDialogController ftpDialogController =

@@ -21,12 +21,16 @@ public class DirTreeController {
     public DirTreeController(
             DirTreePane dirTreePane,
             DirTreeModel dirTreeModel,
-            PreviewController previewController
+            PreviewController previewController,
+            TreeDataProvider defaultDataProvider
     ) {
         this.dirTreePane = dirTreePane;
         this.dirTreeModel = dirTreeModel;
         this.previewController = previewController;
+        this.treeDataProvider = defaultDataProvider;
     }
+
+    public TreeDataProvider getTreeDataProvider() { return treeDataProvider; }
 
     public void resetDataProvider(TreeDataProvider treeDataProvider) {
         this.treeDataProvider = treeDataProvider;
