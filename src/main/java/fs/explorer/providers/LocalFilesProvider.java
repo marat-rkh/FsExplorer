@@ -42,6 +42,7 @@ public class LocalFilesProvider implements TreeDataProvider {
         FsPath nodeFsPath = node.getFsPath();
         if(!nodeFsPath.isDirectory()) {
             onFail.accept("");
+            return;
         }
         try {
             Path path = Paths.get(nodeFsPath.getPath());
