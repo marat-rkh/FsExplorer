@@ -11,22 +11,29 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class DirTreeController {
     private final DirTreePane dirTreePane;
     private final DirTreeModel dirTreeModel;
     private final PreviewController previewController;
+    private final StatusBarController statusBarController;
     private TreeDataProvider treeDataProvider;
+
+    private static final String DATA_PROVIDER_ERROR = "Failed to load data";
 
     public DirTreeController(
             DirTreePane dirTreePane,
             DirTreeModel dirTreeModel,
             PreviewController previewController,
+            StatusBarController statusBarController,
             TreeDataProvider defaultDataProvider
     ) {
         this.dirTreePane = dirTreePane;
         this.dirTreeModel = dirTreeModel;
         this.previewController = previewController;
+        this.statusBarController = statusBarController;
         this.treeDataProvider = defaultDataProvider;
     }
 
@@ -72,7 +79,16 @@ public class DirTreeController {
 
     private void loadContents(DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
         extNodeData.setStatus(ExtTreeNodeData.Status.LOADING);
-        treeDataProvider.getNodesFor(extNodeData.getNodeData(), contents -> {
+        treeDataProvider.getNodesFor(
+                extNodeData.getNodeData(),
+                contentsInserter(node, extNodeData),
+                loadContentsErrorHandler(node, extNodeData)
+        );
+    }
+
+    private Consumer<List<TreeNodeData>> contentsInserter(
+            DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
+        return contents -> {
             dirTreeModel.removeAllChildren(node);
             if(contents.isEmpty()) {
                 dirTreeModel.addFakeChild(node, "<empty>");
@@ -87,6 +103,21 @@ public class DirTreeController {
             }
             dirTreePane.expandPath(new TreePath(node.getPath()));
             extNodeData.setStatus(ExtTreeNodeData.Status.LOADED);
-        });
+        };
+    }
+
+    private Consumer<String> loadContentsErrorHandler(
+            DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
+        return errorMessage -> {
+            dirTreeModel.removeAllChildren(node);
+            dirTreeModel.addFakeChild(node, "<no data>");
+            String fullMessage = DATA_PROVIDER_ERROR;
+            if(errorMessage != null && !errorMessage.isEmpty()) {
+                fullMessage += ": " + errorMessage;
+            }
+            statusBarController.setErrorMessage(fullMessage);
+            dirTreePane.expandPath(new TreePath(node.getPath()));
+            extNodeData.setStatus(ExtTreeNodeData.Status.LOADED);
+        };
     }
 }

@@ -35,4 +35,6 @@ public class ExtTreeNodeDataTest {
         assertEquals(data.getStatus(), ExtTreeNodeData.Status.LOADED);
         assertEquals(data.toString(), "simpleData");
     }
+
+    // TODO test toString as it is used by views
 }

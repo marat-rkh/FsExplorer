@@ -1,5 +1,6 @@
 package fs.explorer.views;
 
+import fs.explorer.controllers.StatusBarController;
 import fs.explorer.controllers.ftpdialog.FTPDialogController;
 import fs.explorer.controllers.MenuBarController;
 import fs.explorer.controllers.DirTreeController;
@@ -19,14 +20,21 @@ public class Application {
 
         LocalFilesProvider localFilesProvider = new LocalFilesProvider();
 
+        StatusBar statusBar = new StatusBar("Ready");
+        StatusBarController statusBarController = new StatusBarController(statusBar);
+
         DirTreeModel dirTreeModel = new DirTreeModel();
         DirTreePane dirTreePane = new DirTreePane(dirTreeModel.getInnerTreeModel());
         DirTreeController dirTreeController = new DirTreeController(
-                dirTreePane, dirTreeModel, previewController, localFilesProvider);
+                dirTreePane,
+                dirTreeModel,
+                previewController,
+                statusBarController,
+                localFilesProvider
+        );
         dirTreePane.setController(dirTreeController);
 
         MenuBar menuBar = createMenuBar(dirTreeController, localFilesProvider);
-        StatusBar statusBar = new StatusBar("Ready");
         this.mainWindow = new MainWindow(
                 "FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
     }

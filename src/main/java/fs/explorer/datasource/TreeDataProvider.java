@@ -5,5 +5,10 @@ import java.util.function.Consumer;
 
 public interface TreeDataProvider {
     void getTopNode(Consumer<TreeNodeData> onComplete);
-    void getNodesFor(TreeNodeData node, Consumer<List<TreeNodeData>> onComplete);
+
+    void getNodesFor(
+            TreeNodeData node,
+            Consumer<List<TreeNodeData>> onComplete,
+            Consumer<String> onFail
+    );
 }

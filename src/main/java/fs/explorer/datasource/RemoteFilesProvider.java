@@ -20,14 +20,17 @@ public class RemoteFilesProvider implements TreeDataProvider{
         }
         FsPath fsPath = new FsPath(
                 FTPDialogData.getServer(),
-                FTPDialogData.getServer(),
                 /*isDirectory*/true
         );
-        onComplete.accept(new TreeNodeData(fsPath));
+        onComplete.accept(new TreeNodeData(FTPDialogData.getServer(), fsPath));
     }
 
     @Override
-    public void getNodesFor(TreeNodeData node, Consumer<List<TreeNodeData>> onComplete) {
+    public void getNodesFor(
+            TreeNodeData node,
+            Consumer<List<TreeNodeData>> onComplete,
+            Consumer<String> onFail
+    ) {
         onComplete.accept(Collections.emptyList());
     }
 }
