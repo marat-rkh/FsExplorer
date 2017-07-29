@@ -7,7 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -43,14 +45,23 @@ public class LocalFilesProvider implements TreeDataProvider {
         }
         try {
             Path path = Paths.get(nodeFsPath.getPath());
-            List<TreeNodeData> childNodes = Files.list(path).map(p -> {
-                String label = p.getFileName().toString();
-                FsPath fsPath = new FsPath(p.toString(), Files.isDirectory(p));
-                return new TreeNodeData(label, fsPath);
-            }).collect(Collectors.toList());
-            onComplete.accept(childNodes);
+            Map<Boolean, List<TreeNodeData>> data = Files.list(path)
+                    .map(LocalFilesProvider::toTreeNodeData)
+                    .collect(Collectors.partitioningBy(d -> d.getFsPath().isDirectory()));
+            List<TreeNodeData> dirsData = data.get(true);
+            List<TreeNodeData> filesData = data.get(false);
+            dirsData.sort(Comparator.comparing(TreeNodeData::getLabel));
+            filesData.sort(Comparator.comparing(TreeNodeData::getLabel));
+            dirsData.addAll(filesData);
+            onComplete.accept(dirsData);
         } catch (InvalidPathException | IOException e) {
             onFail.accept(DISK_READ_ERROR);
         }
+    }
+
+    private static TreeNodeData toTreeNodeData(Path path) {
+        String label = path.getFileName().toString();
+        FsPath fsPath = new FsPath(path.toString(), Files.isDirectory(path));
+        return new TreeNodeData(label, fsPath);
     }
 }
