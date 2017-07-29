@@ -110,7 +110,7 @@ public class DirTreeController {
             DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
         return errorMessage -> {
             dirTreeModel.removeAllChildren(node);
-            dirTreeModel.addFakeChild(node, "<no data>");
+            dirTreeModel.addFakeChild(node, "<error>");
             String fullMessage = DATA_PROVIDER_ERROR;
             if(errorMessage != null && !errorMessage.isEmpty()) {
                 fullMessage += ": " + errorMessage;
