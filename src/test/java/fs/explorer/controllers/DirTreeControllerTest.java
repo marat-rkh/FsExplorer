@@ -6,6 +6,7 @@ import fs.explorer.datasource.FsPath;
 import fs.explorer.datasource.TreeDataProvider;
 import fs.explorer.datasource.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
+import fs.explorer.models.dirtree.ExtTreeNodeData;
 import fs.explorer.views.DirTreePane;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -26,7 +28,7 @@ public class DirTreeControllerTest {
     private DirTreeController dirTreeController;
     private DirTreePane dirTreePane;
     private DirTreeModel dirTreeModel;
-    private TreeDataProvider treeDataProvider;
+    private TestDataProvider treeDataProvider;
     private PreviewController previewController;
 
     @Before
@@ -115,6 +117,27 @@ public class DirTreeControllerTest {
     }
 
     @Test
+    public void createsEmptyFakeNodeOnNullDirExpansion() {
+        treeDataProvider.setTestNodes(Collections.emptyList());
+        setupTestDirTreeModel();
+        DefaultMutableTreeNode dir2 = TestUtils.getChild(dirTreeModel, 0, 1);
+        dirTreeController.handleTreeExpansion(expansionEvent(dir2));
+
+        verify(treeDataProvider).getNodesFor(any(), any());
+
+        assertEquals(Status.LOADED, dirTreeModel.getExtNodeData(dir2).getStatus());
+        List<DefaultMutableTreeNode> chs = dirTreeModel.getChildren(dir2);
+        assertEquals(1, chs.size());
+        ExtTreeNodeData childData = dirTreeModel.getExtNodeData(chs.get(0));
+        assertEquals("<empty>", childData.toString());
+        assertEquals(Type.FAKE, childData.getType());
+
+        ArgumentCaptor<TreePath> captor = ArgumentCaptor.forClass(TreePath.class);
+        verify(dirTreePane).expandPath(captor.capture());
+        assertEquals(new TreePath(dir2.getPath()), captor.getValue());
+    }
+
+    @Test
     public void doesNotLoadContentsOnLoadedDirExpansion() {
         setupTestDirTreeModel();
         DefaultMutableTreeNode dir1 = TestUtils.getChild(dirTreeModel, 0);
@@ -196,19 +219,26 @@ public class DirTreeControllerTest {
     }
 
     private static class TestDataProvider implements TreeDataProvider {
+        private TreeNodeData testTopNode = nodeData("/", /*isDirectory*/true);
+
+        private List<TreeNodeData> testNodes = Arrays.asList(
+                nodeData("newDir1", /*isDirectory*/true),
+                nodeData("newDir2", /*isDirectory*/true),
+                nodeData("newFile1", /*isDirectory*/false)
+        );
+
         @Override
         public void getTopNode(Consumer<TreeNodeData> onComplete) {
-            TreeNodeData testData = nodeData("/", /*isDirectory*/true);
-            onComplete.accept(testData);
+            onComplete.accept(testTopNode);
         }
 
         @Override
         public void getNodesFor(TreeNodeData node, Consumer<List<TreeNodeData>> onComplete) {
-            onComplete.accept(Arrays.asList(
-                    nodeData("newDir1", /*isDirectory*/true),
-                    nodeData("newDir2", /*isDirectory*/true),
-                    nodeData("newFile1", /*isDirectory*/false)
-            ));
+            onComplete.accept(testNodes);
+        }
+
+        public void setTestNodes(List<TreeNodeData> testNodes) {
+            this.testNodes = testNodes;
         }
     }
 }
