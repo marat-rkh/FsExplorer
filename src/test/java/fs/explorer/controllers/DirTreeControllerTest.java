@@ -213,7 +213,7 @@ public class DirTreeControllerTest {
         DefaultMutableTreeNode dir2 = TestUtils.getChild(dirTreeModel, 0, 1);
         dirTreeController.handleTreeExpansion(expansionEvent(dir2));
 
-        verify(statusBarController).setErrorMessage(any());
+        verify(statusBarController).setErrorMessage(any(), any());
     }
 
     private TreeDataProvider makeTestDataProvider() {

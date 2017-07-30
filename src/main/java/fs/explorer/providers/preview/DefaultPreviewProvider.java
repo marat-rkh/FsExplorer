@@ -5,12 +5,14 @@ import fs.explorer.providers.TreeNodeData;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class DefaultPreviewProvider implements PreviewProvider {
     private final FsManager fsManager;
 
     private static final String FILE_READ_FAILED = "failed to read file";
+    private static final String RENDERING_FAILED = "failed to create preview";
 
     public DefaultPreviewProvider(FsManager fsManager) {
         this.fsManager = fsManager;
@@ -32,8 +34,12 @@ public class DefaultPreviewProvider implements PreviewProvider {
         // TODO support encodings
         String contents = new String(bytes);
         TextPreviewData previewData = new TextPreviewData(contents);
-        JComponent preview = PreviewRenderer.renderText(previewData);
-        onComplete.accept(preview);
+        Optional<JComponent> optPreview = PreviewRenderer.renderText(previewData);
+        if(optPreview.isPresent()) {
+            onComplete.accept(optPreview.get());
+        } else {
+            onFail.accept(RENDERING_FAILED);
+        }
     }
 
     @Override
@@ -50,7 +56,11 @@ public class DefaultPreviewProvider implements PreviewProvider {
             return;
         }
         ImagePreviewData previewData = new ImagePreviewData(bytes);
-        JComponent preview = PreviewRenderer.renderImage(previewData);
-        onComplete.accept(preview);
+        Optional<JComponent> optPreview = PreviewRenderer.renderImage(previewData);
+        if(optPreview.isPresent()) {
+            onComplete.accept(optPreview.get());
+        } else {
+            onFail.accept(RENDERING_FAILED);
+        }
     }
 }
