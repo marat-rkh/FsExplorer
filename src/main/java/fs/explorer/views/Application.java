@@ -4,10 +4,13 @@ import fs.explorer.controllers.StatusBarController;
 import fs.explorer.controllers.ftpdialog.FTPDialogController;
 import fs.explorer.controllers.MenuBarController;
 import fs.explorer.controllers.DirTreeController;
+import fs.explorer.providers.FsManager;
 import fs.explorer.providers.LocalFilesProvider;
+import fs.explorer.providers.LocalFsManager;
 import fs.explorer.providers.RemoteFilesProvider;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.controllers.preview.PreviewController;
+import fs.explorer.providers.preview.PreviewProvider;
 
 import javax.swing.*;
 
@@ -15,8 +18,12 @@ public class Application {
     private final MainWindow mainWindow;
 
     public Application() {
+        FsManager localFsManager = new LocalFsManager();
+
         PreviewPane previewPane = new PreviewPane();
-        PreviewController previewController = new PreviewController(previewPane);
+        PreviewProvider previewProvider = new PreviewProvider(localFsManager);
+        PreviewController previewController =
+                new PreviewController(previewPane, previewProvider);
 
         LocalFilesProvider localFilesProvider = new LocalFilesProvider();
 

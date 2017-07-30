@@ -1,23 +1,31 @@
 package fs.explorer.controllers.preview;
 
-import fs.explorer.providers.PreviewData;
 import fs.explorer.providers.TreeNodeData;
+import fs.explorer.providers.preview.PreviewProvider;
+import fs.explorer.utils.FileTypeInfo;
 import fs.explorer.views.PreviewPane;
-
-import javax.swing.*;
 
 public class PreviewController {
     private final PreviewPane previewPane;
+    private final PreviewProvider previewProvider;
 
-    public PreviewController(PreviewPane previewPane) {
+    public PreviewController(PreviewPane previewPane, PreviewProvider previewProvider) {
         this.previewPane = previewPane;
+        this.previewProvider = previewProvider;
     }
 
     public void updatePreview(TreeNodeData nodeData) {
-        // TODO load preview data
-        PreviewData previewData = new PreviewData(
-                nodeData.toString().getBytes(), PreviewData.Type.TEXT);
-        JComponent preview = PreviewRenderer.render(previewData);
-        previewPane.updatePreview(preview);
+        String path = nodeData.getFsPath().getPath();
+        if (FileTypeInfo.isTextFile(path)) {
+            previewProvider.getTextPreview(
+                    nodeData, previewPane::updatePreview, this::showErrorOnStatusBar);
+        } else if (FileTypeInfo.isImageFile(path)) {
+            previewProvider.getImagePreview(
+                    nodeData, previewPane::updatePreview, this::showErrorOnStatusBar);
+        }
+    }
+
+    private void showErrorOnStatusBar(String errorMessage) {
+
     }
 }
