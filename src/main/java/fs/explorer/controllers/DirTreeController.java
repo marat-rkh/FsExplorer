@@ -1,6 +1,5 @@
 package fs.explorer.controllers;
 
-import fs.explorer.controllers.preview.PreviewController;
 import fs.explorer.providers.TreeDataProvider;
 import fs.explorer.providers.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;

@@ -1,4 +1,4 @@
-package fs.explorer.controllers.preview;
+package fs.explorer.controllers;
 
 import fs.explorer.providers.TreeNodeData;
 import fs.explorer.providers.preview.PreviewProvider;

@@ -1,7 +1,6 @@
 package fs.explorer.controllers;
 
 import fs.explorer.TestUtils;
-import fs.explorer.controllers.preview.PreviewController;
 import fs.explorer.providers.FsPath;
 import fs.explorer.providers.TreeDataProvider;
 import fs.explorer.providers.TreeNodeData;
