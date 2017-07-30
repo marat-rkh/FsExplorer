@@ -11,6 +11,7 @@ public class PreviewController {
     private final StatusBarController statusBarController;
 
     private static final String PREVIEW_FAILED = "Preview rendering failed";
+    private static final String INTERNAL_ERROR = "internal error";
 
     public PreviewController(
             PreviewPane previewPane,
@@ -23,6 +24,14 @@ public class PreviewController {
     }
 
     public void updatePreview(TreeNodeData nodeData) {
+        if(nodeData == null) {
+            statusBarController.setErrorMessage(PREVIEW_FAILED, INTERNAL_ERROR);
+            previewPane.showDefaultPreview();
+            return;
+        }
+        if(nodeData.getFsPath().isDirectory()) {
+            return;
+        }
         String path = nodeData.getFsPath().getPath();
         if (FileTypeInfo.isTextFile(path)) {
             previewProvider.getTextPreview(

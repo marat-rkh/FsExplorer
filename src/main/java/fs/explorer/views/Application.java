@@ -10,6 +10,7 @@ import fs.explorer.providers.LocalFsManager;
 import fs.explorer.providers.RemoteFilesProvider;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.controllers.PreviewController;
+import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.PreviewProvider;
 
 import javax.swing.*;
@@ -24,7 +25,7 @@ public class Application {
         StatusBarController statusBarController = new StatusBarController(statusBar);
 
         PreviewPane previewPane = new PreviewPane();
-        PreviewProvider previewProvider = new PreviewProvider(localFsManager);
+        PreviewProvider previewProvider = new DefaultPreviewProvider(localFsManager);
         PreviewController previewController =
                 new PreviewController(previewPane, previewProvider, statusBarController);
 
