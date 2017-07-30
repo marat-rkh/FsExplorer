@@ -1,5 +1,8 @@
 package fs.explorer.utils;
 
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,21 +39,36 @@ public class FileTypeInfo {
     }
 
     public static boolean isTextFile(String path) {
-        return TEXT_FILE_EXTENSIONS.contains(getExtension(path).toLowerCase());
+        return TEXT_FILE_EXTENSIONS.contains(getExtension(path));
     }
 
     public static boolean isImageFile(String path) {
-        return IMG_FILE_EXTENSIONS.contains(getExtension(path).toLowerCase());
+        return IMG_FILE_EXTENSIONS.contains(getExtension(path));
     }
 
+    // TODO there are better alternatives, see:
+    // https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getExtension(java.lang.String)
     public static String getExtension(String path) {
         if(path == null) {
             return "";
         }
-        int lastDotIndex = path.lastIndexOf(".");
+        String fileName = getLastComponent(path);
+        if(fileName.isEmpty()) {
+            return "";
+        }
+        int lastDotIndex = fileName.lastIndexOf(".");
         if(lastDotIndex != -1 && lastDotIndex != 0) {
-            return path.substring(lastDotIndex + 1);
+            return fileName.substring(lastDotIndex + 1).toLowerCase();
         }
         return "";
+    }
+
+    private static String getLastComponent(String path) {
+        try {
+            Path fileName = Paths.get(path).getFileName();
+            return fileName == null ? "" : fileName.toString();
+        } catch (InvalidPathException e) {
+            return "";
+        }
     }
 }

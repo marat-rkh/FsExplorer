@@ -1,6 +1,7 @@
 package fs.explorer.providers;
 
 public class FsPath {
+    // TODO consider replacing this with java.nio.file.Path
     private final String path;
     private final boolean isDirectory;
 
