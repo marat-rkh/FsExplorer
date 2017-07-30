@@ -110,11 +110,7 @@ public class DirTreeController {
         return errorMessage -> {
             dirTreeModel.removeAllChildren(node);
             dirTreeModel.addFakeChild(node, "<error>");
-            String fullMessage = DATA_PROVIDER_ERROR;
-            if(errorMessage != null && !errorMessage.isEmpty()) {
-                fullMessage += ": " + errorMessage;
-            }
-            statusBarController.setErrorMessage(fullMessage);
+            statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, errorMessage);
             dirTreePane.expandPath(new TreePath(node.getPath()));
             extNodeData.setStatus(ExtTreeNodeData.Status.LOADED);
         };

@@ -25,4 +25,12 @@ public class StatusBarController {
         statusBar.setText(msg);
         statusBar.setTextColor(Color.RED);
     }
+
+    public void setErrorMessage(String msg, String optionalDetail) {
+        String fullMessage = msg;
+        if(optionalDetail != null && !optionalDetail.isEmpty()) {
+            fullMessage += ": " + optionalDetail;
+        }
+        setErrorMessage(fullMessage);
+    }
 }

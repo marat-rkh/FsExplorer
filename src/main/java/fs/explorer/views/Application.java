@@ -20,15 +20,15 @@ public class Application {
     public Application() {
         FsManager localFsManager = new LocalFsManager();
 
+        StatusBar statusBar = new StatusBar("Ready");
+        StatusBarController statusBarController = new StatusBarController(statusBar);
+
         PreviewPane previewPane = new PreviewPane();
         PreviewProvider previewProvider = new PreviewProvider(localFsManager);
         PreviewController previewController =
-                new PreviewController(previewPane, previewProvider);
+                new PreviewController(previewPane, previewProvider, statusBarController);
 
         LocalFilesProvider localFilesProvider = new LocalFilesProvider();
-
-        StatusBar statusBar = new StatusBar("Ready");
-        StatusBarController statusBarController = new StatusBarController(statusBar);
 
         DirTreeModel dirTreeModel = new DirTreeModel();
         DirTreePane dirTreePane = new DirTreePane(dirTreeModel.getInnerTreeModel());

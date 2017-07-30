@@ -8,24 +8,33 @@ import fs.explorer.views.PreviewPane;
 public class PreviewController {
     private final PreviewPane previewPane;
     private final PreviewProvider previewProvider;
+    private final StatusBarController statusBarController;
 
-    public PreviewController(PreviewPane previewPane, PreviewProvider previewProvider) {
+    private static final String PREVIEW_FAILED = "Preview rendering failed";
+
+    public PreviewController(
+            PreviewPane previewPane,
+            PreviewProvider previewProvider,
+            StatusBarController statusBarController
+    ) {
         this.previewPane = previewPane;
         this.previewProvider = previewProvider;
+        this.statusBarController = statusBarController;
     }
 
     public void updatePreview(TreeNodeData nodeData) {
         String path = nodeData.getFsPath().getPath();
         if (FileTypeInfo.isTextFile(path)) {
             previewProvider.getTextPreview(
-                    nodeData, previewPane::updatePreview, this::showErrorOnStatusBar);
+                    nodeData, previewPane::updatePreview, this::handlePreviewError);
         } else if (FileTypeInfo.isImageFile(path)) {
             previewProvider.getImagePreview(
-                    nodeData, previewPane::updatePreview, this::showErrorOnStatusBar);
+                    nodeData, previewPane::updatePreview, this::handlePreviewError);
         }
     }
 
-    private void showErrorOnStatusBar(String errorMessage) {
-
+    private void handlePreviewError(String errorMessage) {
+        statusBarController.setErrorMessage(PREVIEW_FAILED, errorMessage);
+        previewPane.showDefaultPreview();
     }
 }
