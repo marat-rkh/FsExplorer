@@ -20,8 +20,7 @@ public class DirTreePane {
     public DirTreePane(DefaultTreeModel treeModel) {
         tree = new JTree(treeModel);
         tree.setRootVisible(false);
-        // TODO change to false
-        tree.setEditable(true);
+        tree.setEditable(false);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setShowsRootHandles(true);
         scrollPane = new JScrollPane(tree);
