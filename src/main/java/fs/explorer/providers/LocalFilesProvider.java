@@ -38,7 +38,8 @@ public class LocalFilesProvider implements TreeDataProvider {
     public void getNodesFor(
             TreeNodeData node,
             Consumer<List<TreeNodeData>> onComplete,
-            Consumer<String> onFail) {
+            Consumer<String> onFail
+    ) {
         FsPath nodeFsPath = node.getFsPath();
         if(!nodeFsPath.isDirectory()) {
             onFail.accept("");

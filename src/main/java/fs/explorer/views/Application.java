@@ -11,7 +11,9 @@ import fs.explorer.providers.RemoteFilesProvider;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.controllers.PreviewController;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
+import fs.explorer.providers.preview.DefaultPreviewRenderer;
 import fs.explorer.providers.preview.PreviewProvider;
+import fs.explorer.providers.preview.PreviewRenderer;
 
 import javax.swing.*;
 
@@ -24,8 +26,11 @@ public class Application {
         StatusBar statusBar = new StatusBar("Ready");
         StatusBarController statusBarController = new StatusBarController(statusBar);
 
+        PreviewRenderer previewRenderer = new DefaultPreviewRenderer();
+
         PreviewPane previewPane = new PreviewPane();
-        PreviewProvider previewProvider = new DefaultPreviewProvider(localFsManager);
+        PreviewProvider previewProvider =
+                new DefaultPreviewProvider(localFsManager, previewRenderer);
         PreviewController previewController =
                 new PreviewController(previewPane, previewProvider, statusBarController);
 
