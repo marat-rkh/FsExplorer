@@ -41,7 +41,7 @@ public class LocalFilesProviderTest {
         setUpTestDirs();
         TreeNodeData data = nodeData(testPath("/home"), /*isDir*/true);
         CapturingConsumer<List<TreeNodeData>> onComplete = new CapturingConsumer<>();
-        DummyConsumer<String> onFail = spy(new DummyConsumer<>());
+        Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
         localFilesProvider.getNodesFor(data, onComplete, onFail);
 
         List<TreeNodeData> nodes = onComplete.getValue();
@@ -56,8 +56,8 @@ public class LocalFilesProviderTest {
     @Test
     public void doesNotProvideNodesForFile() {
         TreeNodeData data = nodeData(testPath("/home"), /*isDir*/false);
-        DummyConsumer<List<TreeNodeData>> onComplete = spy(new DummyConsumer<>());
-        DummyConsumer<String> onFail = spy(new DummyConsumer<>());
+        Consumer<List<TreeNodeData>> onComplete = spy(new TestUtils.DummyConsumer<>());
+        Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
         localFilesProvider.getNodesFor(data, onComplete, onFail);
 
         verify(onComplete, never()).accept(any());
@@ -67,8 +67,8 @@ public class LocalFilesProviderTest {
     @Test
     public void doesNotProvideNodesOnInvalidPath() {
         TreeNodeData data = nodeData(testPath("-------"), /*isDir*/false);
-        DummyConsumer<List<TreeNodeData>> onComplete = spy(new DummyConsumer<>());
-        DummyConsumer<String> onFail = spy(new DummyConsumer<>());
+        Consumer<List<TreeNodeData>> onComplete = spy(new TestUtils.DummyConsumer<>());
+        Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
         localFilesProvider.getNodesFor(data, onComplete, onFail);
 
         verify(onComplete, never()).accept(any());
@@ -104,10 +104,5 @@ public class LocalFilesProviderTest {
         }
 
         public T getValue() { return value; }
-    }
-
-    private static class DummyConsumer<T> implements Consumer<T> {
-        @Override
-        public void accept(T t) {}
     }
 }

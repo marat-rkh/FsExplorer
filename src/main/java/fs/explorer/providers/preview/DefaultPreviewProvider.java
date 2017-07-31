@@ -13,6 +13,7 @@ public class DefaultPreviewProvider implements PreviewProvider {
 
     private static final String FILE_READ_FAILED = "failed to read file";
     private static final String RENDERING_FAILED = "failed to create preview";
+    private static final String INTERNAL_ERROR = "internal error";
 
     public DefaultPreviewProvider(FsManager fsManager, PreviewRenderer previewRenderer) {
         this.fsManager = fsManager;
@@ -25,6 +26,10 @@ public class DefaultPreviewProvider implements PreviewProvider {
             Consumer<JComponent> onComplete,
             Consumer<String> onFail
     ) {
+        if(data == null) {
+            onFail.accept(INTERNAL_ERROR);
+            return;
+        }
         byte[] bytes = readContents(data);
         if(bytes == null) {
             onFail.accept(FILE_READ_FAILED);
@@ -47,6 +52,10 @@ public class DefaultPreviewProvider implements PreviewProvider {
             Consumer<JComponent> onComplete,
             Consumer<String> onFail
     ) {
+        if(data == null) {
+            onFail.accept(INTERNAL_ERROR);
+            return;
+        }
         byte[] bytes = readContents(data);
         if(bytes == null) {
             onFail.accept(FILE_READ_FAILED);
