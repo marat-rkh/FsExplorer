@@ -1,37 +1,34 @@
 package fs.explorer.providers;
 
-import fs.explorer.utils.OSInfo;
-
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class LocalFilesProvider implements TreeDataProvider {
-    private final Path topDir;
+public class FsDataProvider implements TreeDataProvider {
+    private FsPath topDir;
+    private FsManager fsManager;
 
     private static final String DISK_READ_ERROR = "disk read error";
 
-    public LocalFilesProvider() {
-        if(OSInfo.isWindows()) {
-            topDir = Paths.get("C:\\");
-        } else if(OSInfo.isMac() || OSInfo.isUnix()) {
-            topDir = Paths.get("/");
-        } else {
-            throw new IllegalStateException("Unsupported OS");
-        }
+    public FsDataProvider(FsPath topDir, FsManager fsManager) {
+        this.topDir = topDir;
+        this.fsManager = fsManager;
+    }
+
+    public void setTopDir(FsPath topDir) {
+        this.topDir = topDir;
+    }
+
+    public void setFsManager(FsManager fsManager) {
+        this.fsManager = fsManager;
     }
 
     @Override
     public void getTopNode(Consumer<TreeNodeData> onComplete) {
-        FsPath fsPath = new FsPath(topDir.toString(), /*isDirectory*/true);
-        onComplete.accept(new TreeNodeData(topDir.toString(), fsPath));
+        onComplete.accept(new TreeNodeData(topDir.getLastComponent(), topDir));
     }
 
     @Override
@@ -46,9 +43,9 @@ public class LocalFilesProvider implements TreeDataProvider {
             return;
         }
         try {
-            Path path = Paths.get(nodeFsPath.getPath());
-            Map<Boolean, List<TreeNodeData>> data = Files.list(path)
-                    .map(LocalFilesProvider::toTreeNodeData)
+            List<FsPath> entries = fsManager.list(nodeFsPath);
+            Map<Boolean, List<TreeNodeData>> data = entries.stream()
+                    .map(FsDataProvider::toTreeNodeData)
                     .collect(Collectors.partitioningBy(d -> d.getFsPath().isDirectory()));
             List<TreeNodeData> dirsData = data.get(true);
             List<TreeNodeData> filesData = data.get(false);
@@ -56,14 +53,16 @@ public class LocalFilesProvider implements TreeDataProvider {
             filesData.sort(Comparator.comparing(TreeNodeData::getLabel));
             dirsData.addAll(filesData);
             onComplete.accept(dirsData);
-        } catch (InvalidPathException | IOException e) {
+        } catch (IOException e) {
             onFail.accept(DISK_READ_ERROR);
         }
     }
 
-    private static TreeNodeData toTreeNodeData(Path path) {
-        String label = path.getFileName().toString();
-        FsPath fsPath = new FsPath(path.toString(), Files.isDirectory(path));
+    private static TreeNodeData toTreeNodeData(FsPath fsPath) {
+        String label = fsPath.getLastComponent();
+        if(label.isEmpty()) {
+            label = "?";
+        }
         return new TreeNodeData(label, fsPath);
     }
 }

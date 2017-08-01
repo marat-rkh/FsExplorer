@@ -20,8 +20,8 @@ public class RemoteFilesProvider implements TreeDataProvider{
         }
         FsPath fsPath = new FsPath(
                 FTPDialogData.getServer(),
-                /*isDirectory*/true
-        );
+                /*isDirectory*/true,
+                FTPDialogData.getServer());
         onComplete.accept(new TreeNodeData(FTPDialogData.getServer(), fsPath));
     }
 

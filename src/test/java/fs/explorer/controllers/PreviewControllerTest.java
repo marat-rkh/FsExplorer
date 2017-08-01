@@ -99,7 +99,7 @@ public class PreviewControllerTest {
     }
 
     private static TreeNodeData nodeData(String path, boolean isDir) {
-        return new TreeNodeData("", new FsPath(path, isDir));
+        return new TreeNodeData("", new FsPath(path, isDir, ""));
     }
 
     private static class TestPreviewProvider implements PreviewProvider {

@@ -271,7 +271,7 @@ public class DirTreeControllerTest {
     }
 
     private static TreeNodeData nodeData(String label, boolean isDirectory) {
-        return new TreeNodeData(label, new FsPath("", isDirectory));
+        return new TreeNodeData(label, new FsPath("", isDirectory, ""));
     }
 
     private TreeExpansionEvent expansionEvent(DefaultMutableTreeNode node) {

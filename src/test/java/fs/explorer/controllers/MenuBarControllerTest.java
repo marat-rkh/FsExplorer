@@ -1,7 +1,7 @@
 package fs.explorer.controllers;
 
 import fs.explorer.controllers.ftpdialog.FTPDialogController;
-import fs.explorer.providers.LocalFilesProvider;
+import fs.explorer.providers.FsDataProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -12,25 +12,25 @@ import static org.mockito.Mockito.*;
 public class MenuBarControllerTest {
     private MenuBarController controller;
     private DirTreeController dirTreeController;
-    private LocalFilesProvider localFilesProvider;
+    private FsDataProvider fsDataProvider;
     private FTPDialogController ftpDialogController;
 
     @Before
     public void setUp() {
         dirTreeController = mock(DirTreeController.class);
-        localFilesProvider = mock(LocalFilesProvider.class);
+        fsDataProvider = mock(FsDataProvider.class);
         ftpDialogController = mock(FTPDialogController.class);
         controller = new MenuBarController(
-                dirTreeController, localFilesProvider, ftpDialogController);
+                dirTreeController, fsDataProvider, ftpDialogController);
     }
 
     @Test
     public void resetsDataProviderOnExploreLocalFilesEvent() throws Exception {
         controller.handleExploreLocalFiles(null);
-        ArgumentCaptor<LocalFilesProvider> captor =
-                ArgumentCaptor.forClass(LocalFilesProvider.class);
+        ArgumentCaptor<FsDataProvider> captor =
+                ArgumentCaptor.forClass(FsDataProvider.class);
         verify(dirTreeController).resetDataProvider(captor.capture());
-        assertTrue(captor.getValue() == localFilesProvider);
+        assertTrue(captor.getValue() == fsDataProvider);
     }
 
     @Test

@@ -5,7 +5,7 @@ import fs.explorer.controllers.ftpdialog.FTPDialogController;
 import fs.explorer.controllers.MenuBarController;
 import fs.explorer.controllers.DirTreeController;
 import fs.explorer.providers.FsManager;
-import fs.explorer.providers.LocalFilesProvider;
+import fs.explorer.providers.FsDataProvider;
 import fs.explorer.providers.LocalFsManager;
 import fs.explorer.providers.RemoteFilesProvider;
 import fs.explorer.models.dirtree.DirTreeModel;
@@ -14,6 +14,7 @@ import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewRenderer;
 import fs.explorer.providers.preview.PreviewProvider;
 import fs.explorer.providers.preview.PreviewRenderer;
+import fs.explorer.utils.OSInfo;
 
 import javax.swing.*;
 
@@ -34,7 +35,8 @@ public class Application {
         PreviewController previewController =
                 new PreviewController(previewPane, previewProvider, statusBarController);
 
-        LocalFilesProvider localFilesProvider = new LocalFilesProvider();
+        FsDataProvider fsDataProvider =
+                new FsDataProvider(OSInfo.getRootFsPath(), localFsManager);
 
         DirTreeModel dirTreeModel = new DirTreeModel();
         DirTreePane dirTreePane = new DirTreePane(dirTreeModel.getInnerTreeModel());
@@ -43,11 +45,11 @@ public class Application {
                 dirTreeModel,
                 previewController,
                 statusBarController,
-                localFilesProvider
+                fsDataProvider
         );
         dirTreePane.setController(dirTreeController);
 
-        MenuBar menuBar = createMenuBar(dirTreeController, localFilesProvider);
+        MenuBar menuBar = createMenuBar(dirTreeController, fsDataProvider);
         this.mainWindow = new MainWindow(
                 "FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
     }
@@ -58,14 +60,14 @@ public class Application {
 
     private MenuBar createMenuBar(
             DirTreeController dirTreeController,
-            LocalFilesProvider localFilesProvider
+            FsDataProvider fsDataProvider
     ) {
         RemoteFilesProvider remoteFilesProvider = new RemoteFilesProvider();
         FTPDialog ftpDialog = new FTPDialog();
         FTPDialogController ftpDialogController =
                 new FTPDialogController(ftpDialog, dirTreeController, remoteFilesProvider);
         MenuBarController controller = new MenuBarController(
-                dirTreeController, localFilesProvider, ftpDialogController);
+                dirTreeController, fsDataProvider, ftpDialogController);
         return new MenuBar(controller);
     }
 }

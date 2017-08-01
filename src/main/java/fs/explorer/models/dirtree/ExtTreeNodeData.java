@@ -39,7 +39,7 @@ public class ExtTreeNodeData {
     }
 
     public static ExtTreeNodeData fakeNodeData(String text) {
-        TreeNodeData nodeData = new TreeNodeData(text, new FsPath("", /*isDirectory*/false));
+        TreeNodeData nodeData = new TreeNodeData(text, new FsPath("", /*isDirectory*/false, ""));
         return new ExtTreeNodeData(nodeData, Status.LOADED, Type.FAKE);
     }
 

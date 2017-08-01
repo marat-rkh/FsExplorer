@@ -11,7 +11,6 @@ import javax.swing.*;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class DefaultPreviewProviderTest {
@@ -136,5 +135,5 @@ public class DefaultPreviewProviderTest {
     }
 
     private static TreeNodeData nodeData =
-            new TreeNodeData("", new FsPath("/some/path", /*isDir*/false));
+            new TreeNodeData("", new FsPath("/some/path", /*isDir*/false, ""));
 }
