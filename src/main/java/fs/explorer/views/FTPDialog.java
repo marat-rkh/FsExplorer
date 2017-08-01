@@ -1,6 +1,6 @@
 package fs.explorer.views;
 
-import fs.explorer.controllers.ftpdialog.FTPConnectionInfo;
+import fs.explorer.providers.FTPConnectionInfo;
 
 import javax.swing.*;
 import java.util.Optional;

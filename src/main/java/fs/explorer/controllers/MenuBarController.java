@@ -1,7 +1,5 @@
 package fs.explorer.controllers;
 
-import fs.explorer.controllers.ftpdialog.FTPDialogController;
-
 import java.awt.event.ActionEvent;
 
 public class MenuBarController {

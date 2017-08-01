@@ -1,7 +1,7 @@
 package fs.explorer.controllers;
 
-import fs.explorer.controllers.ftpdialog.FTPConnectionInfo;
-import fs.explorer.controllers.ftpdialog.FTPException;
+import fs.explorer.providers.FTPConnectionInfo;
+import fs.explorer.providers.FTPException;
 import fs.explorer.providers.*;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
 

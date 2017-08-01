@@ -1,6 +1,5 @@
 package fs.explorer.controllers;
 
-import fs.explorer.controllers.ftpdialog.FTPDialogController;
 import org.junit.Before;
 import org.junit.Test;
 

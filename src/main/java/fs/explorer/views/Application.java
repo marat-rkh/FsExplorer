@@ -1,12 +1,11 @@
 package fs.explorer.views;
 
 import fs.explorer.controllers.*;
-import fs.explorer.controllers.ftpdialog.FTPDialogController;
+import fs.explorer.controllers.FTPDialogController;
 import fs.explorer.providers.*;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewRenderer;
-import fs.explorer.providers.preview.PreviewProvider;
 import fs.explorer.providers.preview.PreviewRenderer;
 import fs.explorer.utils.OSInfo;
 

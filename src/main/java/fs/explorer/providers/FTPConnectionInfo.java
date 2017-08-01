@@ -1,4 +1,4 @@
-package fs.explorer.controllers.ftpdialog;
+package fs.explorer.providers;
 
 public class FTPConnectionInfo {
     private final String host;

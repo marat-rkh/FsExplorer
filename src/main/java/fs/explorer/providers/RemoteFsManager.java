@@ -1,7 +1,5 @@
 package fs.explorer.providers;
 
-import fs.explorer.controllers.ftpdialog.FTPConnectionInfo;
-import fs.explorer.controllers.ftpdialog.FTPException;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
