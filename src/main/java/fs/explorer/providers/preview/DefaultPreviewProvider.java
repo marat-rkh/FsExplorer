@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 public class DefaultPreviewProvider implements PreviewProvider {
-    private final FsManager fsManager;
+    private FsManager fsManager;
     private final PreviewRenderer previewRenderer;
 
     private static final String FILE_READ_FAILED = "failed to read file";
@@ -18,6 +18,10 @@ public class DefaultPreviewProvider implements PreviewProvider {
     public DefaultPreviewProvider(FsManager fsManager, PreviewRenderer previewRenderer) {
         this.fsManager = fsManager;
         this.previewRenderer = previewRenderer;
+    }
+
+    public void resetFsManager(FsManager fsManager) {
+        this.fsManager = fsManager;
     }
 
     @Override

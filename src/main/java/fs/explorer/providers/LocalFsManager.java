@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class LocalFsManager implements FsManager {
     @Override
     public byte[] readFile(FsPath fsPath) throws IOException {
+        // TODO check null inputs
         return Files.readAllBytes(Paths.get(fsPath.getPath()));
     }
 
@@ -19,6 +20,7 @@ public class LocalFsManager implements FsManager {
         if(!directoryPath.isDirectory()) {
             throw new IOException("not a directory");
         }
+        // TODO check directoryPath.getPath() for null
         try {
             return Files.list(Paths.get(directoryPath.getPath()))
                     .map(LocalFsManager::toFsPath)

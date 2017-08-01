@@ -94,6 +94,9 @@ public class FsDataProviderTest {
         verify(onFail, never()).accept(any());
     }
 
+    // TODO test null TreeNodeData passed to getNodesFor
+    // TODO test null entries list returned from fsManager in getNodesFor
+
     private void setUpTestDirs() throws IOException {
         List<FsPath> paths = Arrays.asList(
                 new FsPath("/home/documents", /*isDirectory*/true, "documents"),

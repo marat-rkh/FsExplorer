@@ -11,18 +11,10 @@ public class FsDataProvider implements TreeDataProvider {
     private FsPath topDir;
     private FsManager fsManager;
 
-    private static final String DISK_READ_ERROR = "disk read error";
+    private static final String DATA_READ_ERROR = "data read error";
 
     public FsDataProvider(FsPath topDir, FsManager fsManager) {
         this.topDir = topDir;
-        this.fsManager = fsManager;
-    }
-
-    public void setTopDir(FsPath topDir) {
-        this.topDir = topDir;
-    }
-
-    public void setFsManager(FsManager fsManager) {
         this.fsManager = fsManager;
     }
 
@@ -54,7 +46,7 @@ public class FsDataProvider implements TreeDataProvider {
             dirsData.addAll(filesData);
             onComplete.accept(dirsData);
         } catch (IOException e) {
-            onFail.accept(DISK_READ_ERROR);
+            onFail.accept(DATA_READ_ERROR);
         }
     }
 

@@ -4,10 +4,7 @@ import fs.explorer.controllers.StatusBarController;
 import fs.explorer.controllers.ftpdialog.FTPDialogController;
 import fs.explorer.controllers.MenuBarController;
 import fs.explorer.controllers.DirTreeController;
-import fs.explorer.providers.FsManager;
-import fs.explorer.providers.FsDataProvider;
-import fs.explorer.providers.LocalFsManager;
-import fs.explorer.providers.RemoteFilesProvider;
+import fs.explorer.providers.*;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.controllers.PreviewController;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
@@ -30,12 +27,12 @@ public class Application {
         PreviewRenderer previewRenderer = new DefaultPreviewRenderer();
 
         PreviewPane previewPane = new PreviewPane();
-        PreviewProvider previewProvider =
+        DefaultPreviewProvider previewProvider =
                 new DefaultPreviewProvider(localFsManager, previewRenderer);
         PreviewController previewController =
                 new PreviewController(previewPane, previewProvider, statusBarController);
 
-        FsDataProvider fsDataProvider =
+        FsDataProvider localFsDataProvider =
                 new FsDataProvider(OSInfo.getRootFsPath(), localFsManager);
 
         DirTreeModel dirTreeModel = new DirTreeModel();
@@ -45,11 +42,17 @@ public class Application {
                 dirTreeModel,
                 previewController,
                 statusBarController,
-                fsDataProvider
+                localFsDataProvider
         );
         dirTreePane.setController(dirTreeController);
 
-        MenuBar menuBar = createMenuBar(dirTreeController, fsDataProvider);
+        MenuBar menuBar = createMenuBar(
+                dirTreeController,
+                previewProvider,
+                localFsManager,
+                localFsDataProvider,
+                statusBarController
+        );
         this.mainWindow = new MainWindow(
                 "FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
     }
@@ -60,14 +63,27 @@ public class Application {
 
     private MenuBar createMenuBar(
             DirTreeController dirTreeController,
-            FsDataProvider fsDataProvider
+            DefaultPreviewProvider previewProvider,
+            FsManager localFsManager,
+            FsDataProvider fsDataProvider,
+            StatusBarController statusBarController
     ) {
-        RemoteFilesProvider remoteFilesProvider = new RemoteFilesProvider();
         FTPDialog ftpDialog = new FTPDialog();
-        FTPDialogController ftpDialogController =
-                new FTPDialogController(ftpDialog, dirTreeController, remoteFilesProvider);
+        RemoteFsManager remoteFsManager = new RemoteFsManager();
+        FTPDialogController ftpDialogController = new FTPDialogController(
+                ftpDialog,
+                dirTreeController,
+                previewProvider,
+                remoteFsManager,
+                statusBarController
+        );
         MenuBarController controller = new MenuBarController(
-                dirTreeController, fsDataProvider, ftpDialogController);
+                dirTreeController,
+                previewProvider,
+                localFsManager,
+                fsDataProvider,
+                ftpDialogController
+        );
         return new MenuBar(controller);
     }
 }
