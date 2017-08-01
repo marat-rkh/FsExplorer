@@ -1,12 +1,9 @@
 package fs.explorer.views;
 
-import fs.explorer.controllers.StatusBarController;
+import fs.explorer.controllers.*;
 import fs.explorer.controllers.ftpdialog.FTPDialogController;
-import fs.explorer.controllers.MenuBarController;
-import fs.explorer.controllers.DirTreeController;
 import fs.explorer.providers.*;
 import fs.explorer.models.dirtree.DirTreeModel;
-import fs.explorer.controllers.PreviewController;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewRenderer;
 import fs.explorer.providers.preview.PreviewProvider;
@@ -19,7 +16,7 @@ public class Application {
     private final MainWindow mainWindow;
 
     public Application() {
-        FsManager localFsManager = new LocalFsManager();
+        LocalFsManager localFsManager = new LocalFsManager();
 
         StatusBar statusBar = new StatusBar("Ready");
         StatusBarController statusBarController = new StatusBarController(statusBar);
@@ -64,26 +61,23 @@ public class Application {
     private MenuBar createMenuBar(
             DirTreeController dirTreeController,
             DefaultPreviewProvider previewProvider,
-            FsManager localFsManager,
-            FsDataProvider fsDataProvider,
+            LocalFsManager localFsManager,
+            FsDataProvider localFsDataProvider,
             StatusBarController statusBarController
     ) {
         FTPDialog ftpDialog = new FTPDialog();
         RemoteFsManager remoteFsManager = new RemoteFsManager();
-        FTPDialogController ftpDialogController = new FTPDialogController(
-                ftpDialog,
+        FsTypeSwitcher fsTypeSwitcher = new FsTypeSwitcher(
                 dirTreeController,
                 previewProvider,
-                remoteFsManager,
-                statusBarController
-        );
-        MenuBarController controller = new MenuBarController(
-                dirTreeController,
-                previewProvider,
+                localFsDataProvider,
                 localFsManager,
-                fsDataProvider,
-                ftpDialogController
+                remoteFsManager
         );
+        FTPDialogController ftpDialogController =
+                new FTPDialogController(ftpDialog, fsTypeSwitcher, statusBarController);
+        MenuBarController controller =
+                new MenuBarController(fsTypeSwitcher, ftpDialogController);
         return new MenuBar(controller);
     }
 }
