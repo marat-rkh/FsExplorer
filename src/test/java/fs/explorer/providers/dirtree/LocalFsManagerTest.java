@@ -1,4 +1,4 @@
-package fs.explorer.providers;
+package fs.explorer.providers.dirtree;
 
 import fs.explorer.providers.dirtree.FsPath;
 import fs.explorer.providers.dirtree.LocalFsManager;

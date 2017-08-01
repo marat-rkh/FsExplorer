@@ -1,5 +1,6 @@
-package fs.explorer.providers;
+package fs.explorer.providers.dirtree;
 
+import fs.explorer.providers.TestUtils;
 import fs.explorer.providers.dirtree.FsDataProvider;
 import fs.explorer.providers.dirtree.FsManager;
 import fs.explorer.providers.dirtree.FsPath;
