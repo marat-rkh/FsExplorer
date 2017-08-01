@@ -1,6 +1,6 @@
 package fs.explorer.controllers;
 
-import fs.explorer.controllers.ftpdialog.FTPDialogData;
+import fs.explorer.controllers.ftpdialog.FTPConnectionInfo;
 import fs.explorer.controllers.ftpdialog.FTPException;
 import fs.explorer.providers.*;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
@@ -34,7 +34,7 @@ public class FsTypeSwitcher {
         previewProvider.resetFsManager(localFsManager);
     }
 
-    public void switchToRemoteFs(FTPDialogData connectionInfo) throws FTPException {
+    public void switchToRemoteFs(FTPConnectionInfo connectionInfo) throws FTPException {
         remoteFsManager.connect(connectionInfo);
         FsDataProvider remoteFsDataProvider =
                 new FsDataProvider(remoteHostTopDir, remoteFsManager);

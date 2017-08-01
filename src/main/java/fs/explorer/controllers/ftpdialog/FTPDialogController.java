@@ -25,14 +25,14 @@ public class FTPDialogController {
         ftpDialog.showAndWaitResult().ifPresent(this::handleInput);
     }
 
-    private void handleInput(FTPDialogData data) {
+    private void handleInput(FTPConnectionInfo connectionInfo) {
         // TODO validate input (emp user and non emp pass -- bad)
         try {
-            fsTypeSwitcher.switchToRemoteFs(data);
+            fsTypeSwitcher.switchToRemoteFs(connectionInfo);
         } catch (FTPException e) {
             statusBarController.setErrorMessage(CONNECTION_FAILED, e.getMessage());
             return;
         }
-        statusBarController.setInfoMessage("Connected to: " + data.getServer());
+        statusBarController.setInfoMessage("Connected to: " + connectionInfo.getHost());
     }
 }

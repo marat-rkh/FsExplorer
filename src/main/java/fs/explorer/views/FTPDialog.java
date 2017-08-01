@@ -1,34 +1,34 @@
 package fs.explorer.views;
 
-import fs.explorer.controllers.ftpdialog.FTPDialogData;
+import fs.explorer.controllers.ftpdialog.FTPConnectionInfo;
 
 import javax.swing.*;
 import java.util.Optional;
 
 public class FTPDialog {
-    private final String TITLE = "Connect to FTP server";
-    private final JTextField server = new JTextField();
-    private final JTextField login = new JTextField();
+    private final String TITLE = "Connect to FTP host";
+    private final JTextField host = new JTextField();
+    private final JTextField username = new JTextField();
     private final JPasswordField password = new JPasswordField();
     private final JComponent[] components;
 
     public FTPDialog() {
         this.components = new JComponent[] {
-                new JLabel("Server"),
-                server,
-                new JLabel("Login"),
-                login,
+                new JLabel("Host"),
+                host,
+                new JLabel("Username"),
+                username,
                 new JLabel("Password"),
                 password
         };
     }
 
-    public Optional<FTPDialogData> showAndWaitResult() {
+    public Optional<FTPConnectionInfo> showAndWaitResult() {
         int result = JOptionPane.showConfirmDialog(
                 null, components, TITLE, JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            return Optional.of(new FTPDialogData(
-                    server.getText(), login.getText(), password.getPassword()));
+            return Optional.of(new FTPConnectionInfo(
+                    host.getText(), username.getText(), password.getPassword()));
         }
         return Optional.empty();
     }

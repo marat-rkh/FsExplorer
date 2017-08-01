@@ -1,6 +1,6 @@
 package fs.explorer.providers;
 
-import fs.explorer.controllers.ftpdialog.FTPDialogData;
+import fs.explorer.controllers.ftpdialog.FTPConnectionInfo;
 import fs.explorer.controllers.ftpdialog.FTPException;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -24,9 +24,9 @@ public class RemoteFsManager implements FsManager {
         ftpClient = new FTPClient();
     }
 
-    public void connect(FTPDialogData ftpDialogData) throws FTPException {
+    public void connect(FTPConnectionInfo connectionInfo) throws FTPException {
         try {
-            ftpClient.connect(ftpDialogData.getServer());
+            ftpClient.connect(connectionInfo.getHost());
             int replyCode = ftpClient.getReplyCode();
             if(!FTPReply.isPositiveCompletion(replyCode)) {
                 ftpClient.disconnect();
@@ -34,12 +34,12 @@ public class RemoteFsManager implements FsManager {
             }
             String user;
             String password;
-            if(ftpDialogData.getLogin().isEmpty()) {
+            if(connectionInfo.getUser().isEmpty()) {
                 user = "anonymous";
                 password = "";
             } else {
-                user = ftpDialogData.getLogin();
-                password = new String(ftpDialogData.getPassword());
+                user = connectionInfo.getUser();
+                password = new String(connectionInfo.getPassword());
             }
             if(!ftpClient.login(user, password)) {
                 ftpClient.disconnect();
