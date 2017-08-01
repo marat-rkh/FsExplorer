@@ -1,7 +1,7 @@
 package fs.explorer.controllers;
 
-import fs.explorer.providers.FsPath;
-import fs.explorer.providers.TreeNodeData;
+import fs.explorer.providers.dirtree.FsPath;
+import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.providers.preview.PreviewProvider;
 import fs.explorer.views.PreviewPane;
 import org.junit.Before;

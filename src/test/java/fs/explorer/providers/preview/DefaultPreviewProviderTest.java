@@ -1,9 +1,9 @@
 package fs.explorer.providers.preview;
 
-import fs.explorer.providers.FsManager;
-import fs.explorer.providers.FsPath;
+import fs.explorer.providers.dirtree.FsManager;
+import fs.explorer.providers.dirtree.FsPath;
 import fs.explorer.providers.TestUtils;
-import fs.explorer.providers.TreeNodeData;
+import fs.explorer.providers.dirtree.TreeNodeData;
 import org.junit.Before;
 import org.junit.Test;
 

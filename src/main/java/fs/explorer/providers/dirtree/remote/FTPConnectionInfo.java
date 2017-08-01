@@ -1,4 +1,4 @@
-package fs.explorer.providers;
+package fs.explorer.providers.dirtree.remote;
 
 public class FTPConnectionInfo {
     private final String host;

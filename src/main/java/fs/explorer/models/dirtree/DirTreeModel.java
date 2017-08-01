@@ -1,6 +1,6 @@
 package fs.explorer.models.dirtree;
 
-import fs.explorer.providers.TreeNodeData;
+import fs.explorer.providers.dirtree.TreeNodeData;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;

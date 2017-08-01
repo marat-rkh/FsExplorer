@@ -1,4 +1,4 @@
-package fs.explorer.providers;
+package fs.explorer.providers.dirtree;
 
 import java.io.IOException;
 import java.util.List;

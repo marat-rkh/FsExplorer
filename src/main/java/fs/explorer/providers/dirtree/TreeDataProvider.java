@@ -1,4 +1,4 @@
-package fs.explorer.providers;
+package fs.explorer.providers.dirtree;
 
 import java.util.List;
 import java.util.function.Consumer;

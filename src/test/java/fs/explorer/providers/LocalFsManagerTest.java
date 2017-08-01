@@ -1,5 +1,7 @@
 package fs.explorer.providers;
 
+import fs.explorer.providers.dirtree.FsPath;
+import fs.explorer.providers.dirtree.LocalFsManager;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

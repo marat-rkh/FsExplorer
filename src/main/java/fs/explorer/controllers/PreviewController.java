@@ -1,6 +1,6 @@
 package fs.explorer.controllers;
 
-import fs.explorer.providers.TreeNodeData;
+import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.providers.preview.PreviewProvider;
 import fs.explorer.utils.FileTypeInfo;
 import fs.explorer.views.PreviewPane;

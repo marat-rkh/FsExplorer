@@ -2,8 +2,10 @@ package fs.explorer.views;
 
 import fs.explorer.controllers.*;
 import fs.explorer.controllers.FTPDialogController;
-import fs.explorer.providers.*;
 import fs.explorer.models.dirtree.DirTreeModel;
+import fs.explorer.providers.dirtree.FsDataProvider;
+import fs.explorer.providers.dirtree.LocalFsManager;
+import fs.explorer.providers.dirtree.remote.RemoteFsManager;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewRenderer;
 import fs.explorer.providers.preview.PreviewRenderer;

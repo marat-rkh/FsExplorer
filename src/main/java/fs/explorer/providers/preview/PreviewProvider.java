@@ -1,6 +1,6 @@
 package fs.explorer.providers.preview;
 
-import fs.explorer.providers.TreeNodeData;
+import fs.explorer.providers.dirtree.TreeNodeData;
 
 import javax.swing.*;
 import java.util.function.Consumer;

@@ -1,4 +1,4 @@
-package fs.explorer.providers;
+package fs.explorer.providers.dirtree;
 
 public final class FsPath {
     // TODO consider replacing this with java.nio.file.Path

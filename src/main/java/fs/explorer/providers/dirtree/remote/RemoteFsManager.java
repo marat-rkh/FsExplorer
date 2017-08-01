@@ -1,5 +1,7 @@
-package fs.explorer.providers;
+package fs.explorer.providers.dirtree.remote;
 
+import fs.explorer.providers.dirtree.FsManager;
+import fs.explorer.providers.dirtree.FsPath;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;

@@ -1,9 +1,7 @@
 package fs.explorer.controllers;
 
-import fs.explorer.controllers.FsTypeSwitcher;
-import fs.explorer.controllers.StatusBarController;
-import fs.explorer.providers.FTPConnectionInfo;
-import fs.explorer.providers.FTPException;
+import fs.explorer.providers.dirtree.remote.FTPConnectionInfo;
+import fs.explorer.providers.dirtree.remote.FTPException;
 import fs.explorer.views.FTPDialog;
 
 public class FTPDialogController {

@@ -1,9 +1,9 @@
 package fs.explorer.controllers;
 
 import fs.explorer.TestUtils;
-import fs.explorer.providers.FsPath;
-import fs.explorer.providers.TreeDataProvider;
-import fs.explorer.providers.TreeNodeData;
+import fs.explorer.providers.dirtree.FsPath;
+import fs.explorer.providers.dirtree.TreeDataProvider;
+import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.views.DirTreePane;
 import org.junit.Before;

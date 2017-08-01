@@ -1,4 +1,4 @@
-package fs.explorer.providers;
+package fs.explorer.providers.dirtree;
 
 public class TreeNodeData {
     private final String label;

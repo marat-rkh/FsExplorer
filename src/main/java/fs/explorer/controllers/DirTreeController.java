@@ -1,7 +1,7 @@
 package fs.explorer.controllers;
 
-import fs.explorer.providers.TreeDataProvider;
-import fs.explorer.providers.TreeNodeData;
+import fs.explorer.providers.dirtree.TreeDataProvider;
+import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.models.dirtree.ExtTreeNodeData;
 import fs.explorer.views.DirTreePane;

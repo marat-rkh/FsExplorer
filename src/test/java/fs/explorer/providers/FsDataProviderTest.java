@@ -1,5 +1,9 @@
 package fs.explorer.providers;
 
+import fs.explorer.providers.dirtree.FsDataProvider;
+import fs.explorer.providers.dirtree.FsManager;
+import fs.explorer.providers.dirtree.FsPath;
+import fs.explorer.providers.dirtree.TreeNodeData;
 import org.junit.Before;
 import org.junit.Test;
 
