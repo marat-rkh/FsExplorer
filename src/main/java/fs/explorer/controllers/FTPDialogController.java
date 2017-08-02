@@ -31,6 +31,11 @@ public class FTPDialogController {
         showAndHandleInput("");
     }
 
+    private void showAndHandleInput(String errorMessage) {
+        ftpDialog.setErrorMessage(errorMessage);
+        ftpDialog.showAndWaitResult().ifPresent(this::handleInput);
+    }
+
     private void handleInput(FTPConnectionInfo connectionInfo) {
         Optional<String> optError = ftpInfoValidator.validate(connectionInfo);
         if(optError.isPresent()) {
@@ -43,10 +48,5 @@ public class FTPDialogController {
                 statusBarController.setErrorMessage(CONNECTION_FAILED, e.getMessage());
             }
         }
-    }
-
-    private void showAndHandleInput(String errorMessage) {
-        ftpDialog.setErrorMessage(errorMessage);
-        ftpDialog.showAndWaitResult().ifPresent(this::handleInput);
     }
 }
