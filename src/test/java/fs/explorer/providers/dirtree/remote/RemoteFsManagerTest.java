@@ -79,6 +79,25 @@ public class RemoteFsManagerTest {
     }
 
     @Test
+    public void disconnectsEvenIfNotConnected() {
+        try {
+            remoteFsManager.disconnect();
+        } catch (FTPException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void reconnectsEvenIfNotConnected() {
+        try {
+            remoteFsManager.reconnect(rebexTestServer());
+            remoteFsManager.disconnect();
+        } catch (FTPException e) {
+            fail();
+        }
+    }
+
+    @Test
     public void readsTextFile() throws FTPException {
         try {
             remoteFsManager.connect(rebexTestServer());

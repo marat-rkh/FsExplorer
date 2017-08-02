@@ -90,7 +90,7 @@ public class RemoteFsManager implements FsManager {
     }
 
     private void doConnect(FTPConnectionInfo connectionInfo) throws FTPException {
-        if (ftpClient.isConnected()) {
+        if(ftpClient.isConnected()) {
             throw new FTPException("already connected");
         }
         try {
@@ -98,7 +98,7 @@ public class RemoteFsManager implements FsManager {
             login(connectionInfo);
             configureClient();
         } catch (IOException e) {
-            if (ftpClient.isConnected()) {
+            if(ftpClient.isConnected()) {
                 try {
                     ftpClient.disconnect();
                 } catch (IOException ioe) {
@@ -110,12 +110,12 @@ public class RemoteFsManager implements FsManager {
     }
 
     private void doDisconnect() throws FTPException {
-        try {
-            ftpClient.logout();
-        } catch (IOException e) {
-            throw new FTPException("failed to logout");
-        } finally {
-            if (ftpClient.isConnected()) {
+        if(ftpClient.isConnected()) {
+            try {
+                ftpClient.logout();
+            } catch (IOException e) {
+                throw new FTPException("failed to logout");
+            } finally {
                 try {
                     ftpClient.disconnect();
                 } catch (IOException ioe) {
