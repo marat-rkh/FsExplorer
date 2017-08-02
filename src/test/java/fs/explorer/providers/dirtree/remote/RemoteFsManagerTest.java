@@ -23,7 +23,7 @@ public class RemoteFsManagerTest {
     }
 
     @Test
-    public void connectsToAndDisconnectsFromFTPServer() throws FTPException {
+    public void connectsToAndDisconnectsFromFTPServer() {
         try {
             remoteFsManager.connect(rebexTestServer());
             remoteFsManager.disconnect();
@@ -33,7 +33,7 @@ public class RemoteFsManagerTest {
     }
 
     @Test
-    public void connectsToAndDisconnectsWithAnonymousUser() throws FTPException {
+    public void connectsToAndDisconnectsWithAnonymousUser() {
         try {
             remoteFsManager.connect(tele2TestServer());
             remoteFsManager.disconnect();
@@ -43,7 +43,7 @@ public class RemoteFsManagerTest {
     }
 
     @Test
-    public void connectsToAndDisconnectsWithAnonymousUserImplicitly() throws FTPException {
+    public void connectsToAndDisconnectsWithAnonymousUserImplicitly() {
         try {
             remoteFsManager.connect(tele2TestServerNoCredintails());
             remoteFsManager.disconnect();
@@ -61,6 +61,17 @@ public class RemoteFsManagerTest {
         }
         remoteFsManager.connect(tele2TestServer());
         try {
+            remoteFsManager.disconnect();
+        } catch (FTPException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void reconnects() {
+        try {
+            remoteFsManager.connect(tele2TestServerNoCredintails());
+            remoteFsManager.reconnect(rebexTestServer());
             remoteFsManager.disconnect();
         } catch (FTPException e) {
             fail();

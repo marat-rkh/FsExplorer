@@ -36,8 +36,7 @@ public class FsTypeSwitcher {
     }
 
     public void switchToRemoteFs(FTPConnectionInfo connectionInfo) throws FTPException {
-        remoteFsManager.disconnect();
-        remoteFsManager.connect(connectionInfo);
+        remoteFsManager.reconnect(connectionInfo);
         FsDataProvider remoteFsDataProvider =
                 new FsDataProvider(remoteHostTopDir, remoteFsManager);
         dirTreeController.resetDataProvider(remoteFsDataProvider);

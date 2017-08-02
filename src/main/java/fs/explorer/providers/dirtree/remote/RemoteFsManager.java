@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// @ThreadSafe
 public class RemoteFsManager implements FsManager {
     private final FTPClient ftpClient;
 
@@ -25,39 +26,22 @@ public class RemoteFsManager implements FsManager {
     }
 
     public void connect(FTPConnectionInfo connectionInfo) throws FTPException {
-        if(ftpClient.isConnected()) {
-            throw new FTPException("already connected");
-        }
-        try {
-            makeConnection(connectionInfo);
-            login(connectionInfo);
-            configureClient();
-        } catch(IOException e) {
-            if(ftpClient.isConnected()) {
-                try {
-                    ftpClient.disconnect();
-                } catch(IOException ioe) {
-                    // do nothing
-                }
-            }
-            throw new FTPException(e.getMessage());
+        synchronized(ftpClient) {
+            doConnect(connectionInfo);
         }
     }
 
     // TODO add to resource cleanup
     public void disconnect() throws FTPException {
-        try {
-            ftpClient.logout();
-        } catch (IOException e) {
-            throw new FTPException("failed to logout");
-        } finally {
-            if(ftpClient.isConnected()) {
-                try {
-                    ftpClient.disconnect();
-                } catch(IOException ioe) {
-                    // do nothing
-                }
-            }
+        synchronized(ftpClient) {
+            doDisconnect();
+        }
+    }
+
+    public void reconnect(FTPConnectionInfo connectionInfo) throws FTPException {
+        synchronized(ftpClient) {
+            doDisconnect();
+            doConnect(connectionInfo);
         }
     }
 
@@ -67,8 +51,10 @@ public class RemoteFsManager implements FsManager {
             throw new IOException("bad file path");
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        if(!ftpClient.retrieveFile(filePath.getPath(), baos)) {
-            throw new IOException("read failed");
+        synchronized(ftpClient) {
+            if (!ftpClient.retrieveFile(filePath.getPath(), baos)) {
+                throw new IOException("read failed");
+            }
         }
         return baos.toByteArray();
     }
@@ -85,7 +71,10 @@ public class RemoteFsManager implements FsManager {
         if(pathStr == null) {
             throw new IOException("bad directory path");
         }
-        FTPFile[] entries = ftpClient.listFiles(pathStr);
+        FTPFile[] entries = null;
+        synchronized(ftpClient) {
+            entries = ftpClient.listFiles(pathStr);
+        }
         if(entries == null) {
             throw new IOException("failed to list entries");
         }
@@ -97,6 +86,42 @@ public class RemoteFsManager implements FsManager {
             }).collect(Collectors.toList());
         } catch (InvalidPathException e) {
             throw new IOException("malformed path");
+        }
+    }
+
+    private void doConnect(FTPConnectionInfo connectionInfo) throws FTPException {
+        if (ftpClient.isConnected()) {
+            throw new FTPException("already connected");
+        }
+        try {
+            makeConnection(connectionInfo);
+            login(connectionInfo);
+            configureClient();
+        } catch (IOException e) {
+            if (ftpClient.isConnected()) {
+                try {
+                    ftpClient.disconnect();
+                } catch (IOException ioe) {
+                    // do nothing
+                }
+            }
+            throw new FTPException(e.getMessage());
+        }
+    }
+
+    private void doDisconnect() throws FTPException {
+        try {
+            ftpClient.logout();
+        } catch (IOException e) {
+            throw new FTPException("failed to logout");
+        } finally {
+            if (ftpClient.isConnected()) {
+                try {
+                    ftpClient.disconnect();
+                } catch (IOException ioe) {
+                    // do nothing
+                }
+            }
         }
     }
 

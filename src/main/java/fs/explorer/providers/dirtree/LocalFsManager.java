@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// @ThreadSafe
 public class LocalFsManager implements FsManager {
     @Override
     public byte[] readFile(FsPath fsPath) throws IOException {

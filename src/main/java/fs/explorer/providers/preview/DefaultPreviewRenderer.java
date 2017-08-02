@@ -3,6 +3,7 @@ package fs.explorer.providers.preview;
 import javax.swing.*;
 import java.util.Optional;
 
+// @ThreadSafe
 public class DefaultPreviewRenderer implements PreviewRenderer {
     public JTextArea renderText(TextPreviewData data) {
         if(data == null) {
