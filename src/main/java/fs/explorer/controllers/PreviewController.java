@@ -5,12 +5,16 @@ import fs.explorer.providers.preview.PreviewProvider;
 import fs.explorer.utils.FileTypeInfo;
 import fs.explorer.views.PreviewPane;
 
+import javax.swing.*;
+
 public class PreviewController {
     private final PreviewPane previewPane;
     private final PreviewProvider previewProvider;
     private final StatusBarController statusBarController;
 
-    private static final String PREVIEW_FAILED = "Preview rendering failed";
+    private static final String LOADING_PREVIEW = "Loading preview...";
+    private static final String PREVIEW_LOADED = "Preview loaded";
+    private static final String PREVIEW_FAILED = "Preview not loaded";
     private static final String INTERNAL_ERROR = "internal error";
 
     public PreviewController(
@@ -34,12 +38,25 @@ public class PreviewController {
         }
         String path = nodeData.getFsPath().getPath();
         if (FileTypeInfo.isTextFile(path)) {
+            statusBarController.setProgressMessage(LOADING_PREVIEW);
             previewProvider.getTextPreview(
-                    nodeData, previewPane::updatePreview, this::handlePreviewError);
+                    nodeData,
+                    preview -> handlePreview(path, preview),
+                    this::handlePreviewError
+            );
         } else if (FileTypeInfo.isImageFile(path)) {
+            statusBarController.setProgressMessage(LOADING_PREVIEW);
             previewProvider.getImagePreview(
-                    nodeData, previewPane::updatePreview, this::handlePreviewError);
+                    nodeData,
+                    preview -> handlePreview(path, preview),
+                    this::handlePreviewError
+            );
         }
+    }
+
+    private void handlePreview(String path, JComponent preview) {
+        previewPane.updatePreview(preview);
+        statusBarController.setInfoMessage(PREVIEW_LOADED, path);
     }
 
     private void handlePreviewError(String errorMessage) {

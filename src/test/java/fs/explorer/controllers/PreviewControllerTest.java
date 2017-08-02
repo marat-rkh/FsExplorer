@@ -31,7 +31,9 @@ public class PreviewControllerTest {
     public void updatesTextFilePreview() {
         previewController.updatePreview(nodeData("/some/dir/file.txt", /*isDir*/false));
         verify(previewProvider).getTextPreview(any(), any(), any());
+        verify(statusBarController).setProgressMessage(any());
         verify(previewPane).updatePreview(any());
+        verify(statusBarController).setInfoMessage(any(), any());
         verify(statusBarController, never()).setErrorMessage(any(), any());
         verify(statusBarController, never()).setErrorMessage(any());
     }
@@ -40,7 +42,9 @@ public class PreviewControllerTest {
     public void updatesImageFilePreview() {
         previewController.updatePreview(nodeData("/some/dir/file.jpg", /*isDir*/false));
         verify(previewProvider).getImagePreview(any(), any(), any());
+        verify(statusBarController).setProgressMessage(any());
         verify(previewPane).updatePreview(any());
+        verify(statusBarController).setInfoMessage(any(), any());
         verify(statusBarController, never()).setErrorMessage(any(), any());
         verify(statusBarController, never()).setErrorMessage(any());
     }
