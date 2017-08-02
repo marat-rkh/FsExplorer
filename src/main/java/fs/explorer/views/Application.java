@@ -2,6 +2,7 @@ package fs.explorer.views;
 
 import fs.explorer.controllers.*;
 import fs.explorer.controllers.FTPDialogController;
+import fs.explorer.controllers.FTPInfoValidator;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.providers.dirtree.FsDataProvider;
 import fs.explorer.providers.dirtree.LocalFsManager;
@@ -67,6 +68,7 @@ public class Application {
             StatusBarController statusBarController
     ) {
         FTPDialog ftpDialog = new FTPDialog();
+        FTPInfoValidator ftpInfoValidator = new FTPInfoValidator();
         RemoteFsManager remoteFsManager = new RemoteFsManager();
         FsTypeSwitcher fsTypeSwitcher = new FsTypeSwitcher(
                 dirTreeController,
@@ -75,8 +77,8 @@ public class Application {
                 localFsManager,
                 remoteFsManager
         );
-        FTPDialogController ftpDialogController =
-                new FTPDialogController(ftpDialog, fsTypeSwitcher, statusBarController);
+        FTPDialogController ftpDialogController = new FTPDialogController(
+                ftpDialog, ftpInfoValidator, fsTypeSwitcher, statusBarController);
         MenuBarController controller =
                 new MenuBarController(fsTypeSwitcher, ftpDialogController);
         return new MenuBar(controller);

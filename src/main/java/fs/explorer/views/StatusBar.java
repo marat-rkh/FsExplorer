@@ -1,5 +1,7 @@
 package fs.explorer.views;
 
+import fs.explorer.utils.CustomColors;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,7 +10,7 @@ public class StatusBar {
 
     public StatusBar(String idleMessage) {
         label = new JLabel(idleMessage);
-        label.setForeground(Color.GREEN);
+        label.setForeground(CustomColors.DARK_GREEN);
     }
 
     public void setText(String message) {

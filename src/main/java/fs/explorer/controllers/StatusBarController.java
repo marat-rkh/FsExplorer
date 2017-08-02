@@ -1,5 +1,6 @@
 package fs.explorer.controllers;
 
+import fs.explorer.utils.CustomColors;
 import fs.explorer.views.StatusBar;
 
 import java.awt.*;
@@ -13,7 +14,11 @@ public class StatusBarController {
 
     public void setInfoMessage(String msg) {
         statusBar.setText(msg);
-        statusBar.setTextColor(Color.GREEN);
+        statusBar.setTextColor(CustomColors.DARK_GREEN);
+    }
+
+    public void setInfoMessage(String msg, String optionalDetail) {
+        setInfoMessage(fullMessage(msg, optionalDetail));
     }
 
     public void setProgressMessage(String msg) {
@@ -27,10 +32,14 @@ public class StatusBarController {
     }
 
     public void setErrorMessage(String msg, String optionalDetail) {
+        setErrorMessage(fullMessage(msg, optionalDetail));
+    }
+
+    private String fullMessage(String msg, String optionalDetail) {
         String fullMessage = msg;
         if(optionalDetail != null && !optionalDetail.isEmpty()) {
             fullMessage += ": " + optionalDetail;
         }
-        setErrorMessage(fullMessage);
+        return fullMessage;
     }
 }
