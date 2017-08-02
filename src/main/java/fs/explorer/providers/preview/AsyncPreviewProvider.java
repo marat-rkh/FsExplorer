@@ -22,6 +22,7 @@ public class AsyncPreviewProvider implements PreviewProvider {
             Consumer<JComponent> onComplete,
             Consumer<String> onFail
     ) {
+        // TODO handle RejectedExecutionException
         executor.execute(() ->
             previewProvider.getTextPreview(
                 data,
@@ -37,6 +38,7 @@ public class AsyncPreviewProvider implements PreviewProvider {
             Consumer<JComponent> onComplete,
             Consumer<String> onFail
     ) {
+        // TODO handle RejectedExecutionException
         executor.execute(() ->
             previewProvider.getImagePreview(
                 data,

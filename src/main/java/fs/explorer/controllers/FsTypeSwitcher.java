@@ -13,6 +13,8 @@ public class FsTypeSwitcher {
     private final LocalFsManager localFsManager;
     private final RemoteFsManager remoteFsManager;
 
+    private AsyncFsDataProvider asyncRemoteFsDataProvider;
+
     private static final FsPath remoteHostTopDir =
             new FsPath("/", /*isDirectory*/true, "/");
 
@@ -31,15 +33,27 @@ public class FsTypeSwitcher {
     }
 
     public void switchToLocalFs() {
+        disposeCurrentRemoteFsDataProvider();
         dirTreeController.resetDataProvider(localFsDataProvider);
         previewProvider.resetFsManager(localFsManager);
     }
 
     public void switchToRemoteFs(FTPConnectionInfo connectionInfo) throws FTPException {
         remoteFsManager.reconnect(connectionInfo);
-        FsDataProvider remoteFsDataProvider =
-                new FsDataProvider(remoteHostTopDir, remoteFsManager);
-        dirTreeController.resetDataProvider(remoteFsDataProvider);
+        disposeCurrentRemoteFsDataProvider();
+        asyncRemoteFsDataProvider = new AsyncFsDataProvider(
+                new FsDataProvider(remoteHostTopDir, remoteFsManager)
+        );
+        dirTreeController.resetDataProvider(asyncRemoteFsDataProvider);
         previewProvider.resetFsManager(remoteFsManager);
+    }
+
+    // TODO add to resource cleanup
+    public void disposeCurrentRemoteFsDataProvider() {
+        if(asyncRemoteFsDataProvider != null) {
+            // TODO this `shutdown` should be done in background thread
+            asyncRemoteFsDataProvider.shutdown();
+            asyncRemoteFsDataProvider = null;
+        }
     }
 }

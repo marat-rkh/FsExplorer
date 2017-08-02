@@ -7,9 +7,13 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/**
+ * This class is thread safe if instances of FsManager
+ * used with it (passed to constructors or methods) are thread safe.
+ */
 public class FsDataProvider implements TreeDataProvider {
-    private FsPath topDir;
-    private FsManager fsManager;
+    private final FsPath topDir;
+    private final FsManager fsManager;
 
     private static final String INTERNAL_ERROR = "internal error";
     private static final String DATA_READ_ERROR = "data read error";

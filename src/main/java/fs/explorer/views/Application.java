@@ -4,8 +4,10 @@ import fs.explorer.controllers.*;
 import fs.explorer.controllers.FTPDialogController;
 import fs.explorer.controllers.FTPInfoValidator;
 import fs.explorer.models.dirtree.DirTreeModel;
+import fs.explorer.providers.dirtree.AsyncFsDataProvider;
 import fs.explorer.providers.dirtree.FsDataProvider;
 import fs.explorer.providers.dirtree.LocalFsManager;
+import fs.explorer.providers.dirtree.TreeDataProvider;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
 import fs.explorer.providers.preview.AsyncPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
@@ -35,6 +37,8 @@ public class Application {
 
         FsDataProvider localFsDataProvider =
                 new FsDataProvider(OSInfo.getRootFsPath(), localFsManager);
+        AsyncFsDataProvider asyncLocalFsDataProvider =
+                new AsyncFsDataProvider(localFsDataProvider);
 
         DirTreeModel dirTreeModel = new DirTreeModel();
         DirTreePane dirTreePane = new DirTreePane(dirTreeModel.getInnerTreeModel());
@@ -43,7 +47,7 @@ public class Application {
                 dirTreeModel,
                 previewController,
                 statusBarController,
-                localFsDataProvider
+                asyncLocalFsDataProvider
         );
         dirTreePane.setController(dirTreeController);
 
@@ -51,7 +55,7 @@ public class Application {
                 dirTreeController,
                 previewProvider,
                 localFsManager,
-                localFsDataProvider,
+                asyncLocalFsDataProvider,
                 statusBarController
         );
         this.mainWindow = new MainWindow(
@@ -66,7 +70,7 @@ public class Application {
             DirTreeController dirTreeController,
             DefaultPreviewProvider previewProvider,
             LocalFsManager localFsManager,
-            FsDataProvider localFsDataProvider,
+            TreeDataProvider localFsDataProvider,
             StatusBarController statusBarController
     ) {
         FTPDialog ftpDialog = new FTPDialog();
