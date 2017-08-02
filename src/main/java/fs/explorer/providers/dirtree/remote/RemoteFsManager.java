@@ -26,30 +26,9 @@ public class RemoteFsManager implements FsManager {
 
     public void connect(FTPConnectionInfo connectionInfo) throws FTPException {
         try {
-            ftpClient.connect(connectionInfo.getHost());
-            int replyCode = ftpClient.getReplyCode();
-            if(!FTPReply.isPositiveCompletion(replyCode)) {
-                ftpClient.disconnect();
-                throw new FTPException("connection failed");
-            }
-            String user;
-            String password;
-            if(connectionInfo.getUser().isEmpty()) {
-                user = "anonymous";
-                password = "";
-            } else {
-                user = connectionInfo.getUser();
-                password = new String(connectionInfo.getPassword());
-            }
-            if(!ftpClient.login(user, password)) {
-                ftpClient.disconnect();
-                throw new FTPException("login failed");
-            }
-            if(!ftpClient.setFileType(FTP.BINARY_FILE_TYPE)) {
-                ftpClient.disconnect();
-                throw new FTPException("connection config failed");
-            }
-            ftpClient.setControlKeepAliveTimeout(KEEP_ALIVE_TIMEOUT_SECONDS);
+            makeConnection(connectionInfo);
+            login(connectionInfo);
+            configureClient();
         } catch(IOException e) {
             if(ftpClient.isConnected()) {
                 try {
@@ -85,12 +64,17 @@ public class RemoteFsManager implements FsManager {
             throw new IOException("bad file path");
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ftpClient.retrieveFile(filePath.getPath(), baos);
+        if(!ftpClient.retrieveFile(filePath.getPath(), baos)) {
+            throw new IOException("read failed");
+        }
         return baos.toByteArray();
     }
 
     @Override
     public List<FsPath> list(FsPath directoryPath) throws IOException {
+        if(directoryPath == null) {
+            throw new IOException("bad directory path");
+        }
         if(!directoryPath.isDirectory()) {
             throw new IOException("not a directory");
         }
@@ -111,5 +95,36 @@ public class RemoteFsManager implements FsManager {
         } catch (InvalidPathException e) {
             throw new IOException("malformed path");
         }
+    }
+
+    private void makeConnection(FTPConnectionInfo connectionInfo)
+            throws IOException, FTPException {
+        ftpClient.connect(connectionInfo.getHost());
+        int replyCode = ftpClient.getReplyCode();
+        if(!FTPReply.isPositiveCompletion(replyCode)) {
+            ftpClient.disconnect();
+            throw new FTPException("connection failed");
+        }
+    }
+
+    private void login(FTPConnectionInfo connectionInfo) throws IOException, FTPException {
+        String user = connectionInfo.getUser();
+        String password = new String(connectionInfo.getPassword());
+        if(user.isEmpty() && password.isEmpty()) {
+            user = "anonymous";
+            password = "";
+        }
+        if(!ftpClient.login(user, password)) {
+            ftpClient.disconnect();
+            throw new FTPException("login failed");
+        }
+    }
+
+    private void configureClient() throws IOException, FTPException {
+        if(!ftpClient.setFileType(FTP.BINARY_FILE_TYPE)) {
+            ftpClient.disconnect();
+            throw new FTPException("connection configureClient failed");
+        }
+        ftpClient.setControlKeepAliveTimeout(KEEP_ALIVE_TIMEOUT_SECONDS);
     }
 }

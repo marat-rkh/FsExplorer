@@ -1,7 +1,5 @@
 package fs.explorer.providers.dirtree;
 
-import fs.explorer.providers.dirtree.FsPath;
-import fs.explorer.providers.dirtree.LocalFsManager;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -12,8 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
 
 public class LocalFsManagerTest {
     private LocalFsManager localFsManager = new LocalFsManager();
@@ -25,6 +23,16 @@ public class LocalFsManagerTest {
         FsPath fsPath = testFsPath("/testdirs/home/my-text.txt", /*isDir*/false, "");
         byte[] data = localFsManager.readFile(fsPath);
         assertEquals("some text", new String(data));
+    }
+
+    @Test(expected = IOException.class)
+    public void failsToReadOnNullFsPath() throws URISyntaxException, IOException {
+        localFsManager.readFile(null);
+    }
+
+    @Test(expected = IOException.class)
+    public void failsToReadOnNullPath() throws URISyntaxException, IOException {
+        localFsManager.readFile(new FsPath(null, /*isDirectory*/true, ""));
     }
 
     @Test(expected = IOException.class)
@@ -68,8 +76,26 @@ public class LocalFsManagerTest {
     }
 
     @Test(expected = IOException.class)
-    public void failsToListEntriesOnBadPath() throws URISyntaxException, IOException {
+    public void failsToListEntriesOnNullFsPath() throws IOException {
+        localFsManager.list(null);
+    }
+
+    @Test(expected = IOException.class)
+    public void failsToListEntriesOnNullPath() throws IOException, URISyntaxException {
+        localFsManager.list(new FsPath(null, /*isDirectory*/true, ""));
+    }
+
+    @Test(expected = IOException.class)
+    public void failsToListEntriesOnInvalidPath() throws URISyntaxException, IOException {
         FsPath fsPath = new FsPath("---===---", /*isDirectory*/true, "");
+        localFsManager.readFile(fsPath);
+    }
+
+    @Test(expected = IOException.class)
+    public void failsToListEntriesOnNonExistingPath() throws URISyntaxException, IOException {
+        FsPath testDirPath = testFsPath("/testdirs", /*isDir*/true, "");
+        String nonExistingPath = Paths.get(testDirPath.getPath(), "/home123").toString();
+        FsPath fsPath = new FsPath(nonExistingPath, /*isDir*/true, "");
         localFsManager.readFile(fsPath);
     }
 
