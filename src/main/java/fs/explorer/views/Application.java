@@ -7,6 +7,7 @@ import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.providers.dirtree.FsDataProvider;
 import fs.explorer.providers.dirtree.LocalFsManager;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
+import fs.explorer.providers.preview.AsyncPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewRenderer;
 import fs.explorer.providers.preview.PreviewRenderer;
@@ -28,8 +29,9 @@ public class Application {
         PreviewPane previewPane = new PreviewPane();
         DefaultPreviewProvider previewProvider =
                 new DefaultPreviewProvider(localFsManager, previewRenderer);
+        AsyncPreviewProvider asyncPreviewProvider = new AsyncPreviewProvider(previewProvider);
         PreviewController previewController =
-                new PreviewController(previewPane, previewProvider, statusBarController);
+                new PreviewController(previewPane, asyncPreviewProvider, statusBarController);
 
         FsDataProvider localFsDataProvider =
                 new FsDataProvider(OSInfo.getRootFsPath(), localFsManager);
