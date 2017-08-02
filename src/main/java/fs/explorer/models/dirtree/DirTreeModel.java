@@ -4,6 +4,8 @@ import fs.explorer.providers.dirtree.TreeNodeData;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +33,16 @@ public class DirTreeModel {
 
     public ExtTreeNodeData getExtNodeData(DefaultMutableTreeNode node) {
         return (ExtTreeNodeData) node.getUserObject();
+    }
+
+    public boolean containsNode(DefaultMutableTreeNode node) {
+        TreeNode[] nodes = node.getPath();
+        if(nodes == null || nodes.length == 0) {
+            return false;
+        }
+        TreeNode farthestParent = nodes[0];
+        // we use reference equality intentionally here
+        return farthestParent == root;
     }
 
     public void removeAllChildren(DefaultMutableTreeNode parent) {
