@@ -216,6 +216,59 @@ public class DirTreeControllerTest {
         verify(statusBarController).setErrorMessage(any(), any());
     }
 
+    @Test
+    public void doesNothingOnExpansionIfNodeIsNotInModel1() {
+        setupTestDirTreeModel();
+        DefaultMutableTreeNode dir2 = TestUtils.getChild(dirTreeModel, 0, 1);
+        dirTreeModel.removeAllChildren(dirTreeModel.getRoot());
+        DirTreeModel spiedModel = changeDirTreeModelToSpied();
+        dirTreeController.handleTreeExpansion(expansionEvent(dir2));
+
+        verify(dirTreeController.getTreeDataProvider()).getNodesFor(any(), any(), any());
+        verify(spiedModel).containsNode(dir2);
+        verify(spiedModel, never()).removeAllChildren(any());
+        verify(spiedModel, never()).addNullDirChild(any(), any());
+        verify(spiedModel, never()).addFileChild(any(), any());
+        verify(spiedModel, never()).addFakeChild(any(), any());
+        verify(dirTreePane, never()).expandPath(any());
+    }
+
+    @Test
+    public void doesNothingOnExpansionIfNodeIsNotInModel2() {
+        setUpFailingDataProvider();
+        setupTestDirTreeModel();
+        DefaultMutableTreeNode dir2 = TestUtils.getChild(dirTreeModel, 0, 1);
+        dirTreeModel.removeAllChildren(dirTreeModel.getRoot());
+        DirTreeModel spiedModel = changeDirTreeModelToSpied();
+        dirTreeController.handleTreeExpansion(expansionEvent(dir2));
+
+        verify(dirTreeController.getTreeDataProvider()).getNodesFor(any(), any(), any());
+        verify(spiedModel).containsNode(dir2);
+        verify(spiedModel, never()).removeAllChildren(any());
+        verify(spiedModel, never()).addNullDirChild(any(), any());
+        verify(spiedModel, never()).addFileChild(any(), any());
+        verify(spiedModel, never()).addFakeChild(any(), any());
+        verify(dirTreePane, never()).expandPath(any());
+    }
+
+    @Test
+    public void doesNothingOnExpansionIfNodeIsNotInModel3() {
+        setupTestDirTreeModel();
+        DefaultMutableTreeNode dir2 = TestUtils.getChild(dirTreeModel, 0, 1);
+        DefaultMutableTreeNode dir1 = TestUtils.getChild(dirTreeModel, 0);
+        dirTreeModel.removeAllChildren(dir1);
+        DirTreeModel spiedModel = changeDirTreeModelToSpied();
+        dirTreeController.handleTreeExpansion(expansionEvent(dir2));
+
+        verify(dirTreeController.getTreeDataProvider()).getNodesFor(any(), any(), any());
+        verify(spiedModel).containsNode(dir2);
+        verify(spiedModel, never()).removeAllChildren(any());
+        verify(spiedModel, never()).addNullDirChild(any(), any());
+        verify(spiedModel, never()).addFileChild(any(), any());
+        verify(spiedModel, never()).addFakeChild(any(), any());
+        verify(dirTreePane, never()).expandPath(any());
+    }
+
     private TreeDataProvider makeTestDataProvider() {
         TestDataProvider provider = spy(new TestDataProvider());
         provider.setTestTopNode(nodeData("/", /*isDirectory*/true));
@@ -258,6 +311,18 @@ public class DirTreeControllerTest {
         dirTreeModel.getExtNodeData(dir1).setStatus(Status.LOADED);
         dirTreeModel.addFileChild(dir1, nodeData("file1", /*isDirectory*/false));
         dirTreeModel.addNullDirChild(dir1, nodeData("dir2", /*isDirectory*/true));
+    }
+
+    private DirTreeModel changeDirTreeModelToSpied() {
+        DirTreeModel spiedModel = spy(dirTreeModel);
+        dirTreeController = new DirTreeController(
+                dirTreePane,
+                spiedModel,
+                previewController,
+                statusBarController,
+                dirTreeController.getTreeDataProvider()
+        );
+        return spiedModel;
     }
 
     private void checkTestDirTreeModelNotChanged() {

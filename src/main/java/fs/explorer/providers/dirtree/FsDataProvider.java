@@ -11,6 +11,7 @@ public class FsDataProvider implements TreeDataProvider {
     private FsPath topDir;
     private FsManager fsManager;
 
+    private static final String INTERNAL_ERROR = "internal error";
     private static final String DATA_READ_ERROR = "data read error";
 
     public FsDataProvider(FsPath topDir, FsManager fsManager) {
@@ -31,7 +32,7 @@ public class FsDataProvider implements TreeDataProvider {
     ) {
         FsPath nodeFsPath = node.getFsPath();
         if(!nodeFsPath.isDirectory()) {
-            onFail.accept("");
+            onFail.accept(INTERNAL_ERROR);
             return;
         }
         try {

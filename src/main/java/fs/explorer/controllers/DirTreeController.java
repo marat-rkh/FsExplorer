@@ -88,6 +88,9 @@ public class DirTreeController {
     private Consumer<List<TreeNodeData>> contentsInserter(
             DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
         return contents -> {
+            if(!dirTreeModel.containsNode(node)) {
+                return;
+            }
             dirTreeModel.removeAllChildren(node);
             if(contents.isEmpty()) {
                 dirTreeModel.addFakeChild(node, "<empty>");
@@ -108,6 +111,9 @@ public class DirTreeController {
     private Consumer<String> loadContentsErrorHandler(
             DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
         return errorMessage -> {
+            if(!dirTreeModel.containsNode(node)) {
+                return;
+            }
             dirTreeModel.removeAllChildren(node);
             dirTreeModel.addFakeChild(node, "<error>");
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, errorMessage);
