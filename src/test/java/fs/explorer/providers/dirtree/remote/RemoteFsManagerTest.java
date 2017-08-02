@@ -52,6 +52,21 @@ public class RemoteFsManagerTest {
         }
     }
 
+    @Test(expected = FTPException.class)
+    public void failsOnRepeatedConnect() throws FTPException {
+        try {
+            remoteFsManager.connect(tele2TestServerNoCredintails());
+        } catch (FTPException e) {
+            fail();
+        }
+        remoteFsManager.connect(tele2TestServer());
+        try {
+            remoteFsManager.disconnect();
+        } catch (FTPException e) {
+            fail();
+        }
+    }
+
     @Test
     public void readsTextFile() throws FTPException {
         try {

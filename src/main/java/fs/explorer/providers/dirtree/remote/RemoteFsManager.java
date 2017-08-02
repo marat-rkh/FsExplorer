@@ -25,6 +25,9 @@ public class RemoteFsManager implements FsManager {
     }
 
     public void connect(FTPConnectionInfo connectionInfo) throws FTPException {
+        if(ftpClient.isConnected()) {
+            throw new FTPException("already connected");
+        }
         try {
             makeConnection(connectionInfo);
             login(connectionInfo);
