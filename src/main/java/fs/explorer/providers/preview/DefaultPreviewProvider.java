@@ -7,8 +7,12 @@ import javax.swing.*;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+/**
+ * This class is thread safe if instances of FsManager and PreviewRenderer
+ * used with it (passed to constructors or methods) are thread safe.
+ */
 public class DefaultPreviewProvider implements PreviewProvider {
-    private FsManager fsManager;
+    private volatile FsManager fsManager;
     private final PreviewRenderer previewRenderer;
 
     private static final String FILE_READ_FAILED = "failed to read file";
