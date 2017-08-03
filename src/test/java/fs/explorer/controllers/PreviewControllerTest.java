@@ -1,6 +1,7 @@
 package fs.explorer.controllers;
 
 import fs.explorer.providers.dirtree.FsPath;
+import fs.explorer.providers.dirtree.FsPath.TargetType;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.providers.preview.PreviewProvider;
 import fs.explorer.views.PreviewPane;
@@ -103,7 +104,8 @@ public class PreviewControllerTest {
     }
 
     private static TreeNodeData nodeData(String path, boolean isDir) {
-        return new TreeNodeData("", new FsPath(path, isDir, ""));
+        TargetType targetType = isDir ? TargetType.DIRECTORY : TargetType.FILE;
+        return new TreeNodeData("", new FsPath(path, targetType, ""));
     }
 
     private static class TestPreviewProvider implements PreviewProvider {

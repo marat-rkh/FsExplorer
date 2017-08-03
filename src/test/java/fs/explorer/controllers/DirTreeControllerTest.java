@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static fs.explorer.models.dirtree.ExtTreeNodeData.*;
+import static fs.explorer.providers.dirtree.FsPath.TargetType;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -336,7 +337,8 @@ public class DirTreeControllerTest {
     }
 
     private static TreeNodeData nodeData(String label, boolean isDirectory) {
-        return new TreeNodeData(label, new FsPath("", isDirectory, ""));
+        TargetType targetType = isDirectory ? TargetType.DIRECTORY : TargetType.FILE;
+        return new TreeNodeData(label, new FsPath("", targetType, ""));
     }
 
     private TreeExpansionEvent expansionEvent(DefaultMutableTreeNode node) {

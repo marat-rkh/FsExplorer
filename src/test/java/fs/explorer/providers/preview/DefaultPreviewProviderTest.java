@@ -3,6 +3,7 @@ package fs.explorer.providers.preview;
 import fs.explorer.providers.dirtree.FsManager;
 import fs.explorer.providers.dirtree.FsPath;
 import fs.explorer.providers.TestUtils;
+import fs.explorer.providers.dirtree.FsPath.TargetType;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import org.junit.Before;
 import org.junit.Test;
@@ -135,5 +136,5 @@ public class DefaultPreviewProviderTest {
     }
 
     private static TreeNodeData nodeData =
-            new TreeNodeData("", new FsPath("/some/path", /*isDir*/false, ""));
+            new TreeNodeData("", new FsPath("/some/path", TargetType.FILE, ""));
 }

@@ -1,5 +1,6 @@
 package fs.explorer.providers.dirtree;
 
+import fs.explorer.providers.dirtree.FsPath.TargetType;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -32,7 +33,7 @@ public class LocalFsManagerTest {
 
     @Test(expected = IOException.class)
     public void failsToReadOnNullPath() throws URISyntaxException, IOException {
-        localFsManager.readFile(new FsPath(null, /*isDirectory*/true, ""));
+        localFsManager.readFile(new FsPath(null, TargetType.DIRECTORY, ""));
     }
 
     @Test(expected = IOException.class)
@@ -82,12 +83,12 @@ public class LocalFsManagerTest {
 
     @Test(expected = IOException.class)
     public void failsToListEntriesOnNullPath() throws IOException, URISyntaxException {
-        localFsManager.list(new FsPath(null, /*isDirectory*/true, ""));
+        localFsManager.list(new FsPath(null, TargetType.DIRECTORY, ""));
     }
 
     @Test(expected = IOException.class)
     public void failsToListEntriesOnInvalidPath() throws URISyntaxException, IOException {
-        FsPath fsPath = new FsPath("---===---", /*isDirectory*/true, "");
+        FsPath fsPath = new FsPath("---===---", TargetType.DIRECTORY, "");
         localFsManager.readFile(fsPath);
     }
 
@@ -95,9 +96,11 @@ public class LocalFsManagerTest {
     public void failsToListEntriesOnNonExistingPath() throws URISyntaxException, IOException {
         FsPath testDirPath = testFsPath("/testdirs", /*isDir*/true, "");
         String nonExistingPath = Paths.get(testDirPath.getPath(), "/home123").toString();
-        FsPath fsPath = new FsPath(nonExistingPath, /*isDir*/true, "");
+        FsPath fsPath = new FsPath(nonExistingPath, TargetType.DIRECTORY, "");
         localFsManager.readFile(fsPath);
     }
+
+    // TODO test archives
 
     private FsPath testFsPath(
             String relativePath,
@@ -105,7 +108,8 @@ public class LocalFsManagerTest {
             String lastComponent
     ) throws URISyntaxException {
         Path dirPath = Paths.get(getClass().getResource(relativePath).toURI());
-        return new FsPath(dirPath.toString(), /*isDirectory*/isDir, lastComponent);
+        TargetType targetType = isDir ? TargetType.DIRECTORY : TargetType.FILE;
+        return new FsPath(dirPath.toString(), targetType, lastComponent);
     }
 
 }

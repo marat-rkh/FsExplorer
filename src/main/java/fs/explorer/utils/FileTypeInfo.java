@@ -38,12 +38,18 @@ public class FileTypeInfo {
         IMG_FILE_EXTENSIONS.add("tiff");
     }
 
+    private static final String ZIP_EXTENSION = "zip";
+
     public static boolean isTextFile(String path) {
         return TEXT_FILE_EXTENSIONS.contains(getExtension(path));
     }
 
     public static boolean isImageFile(String path) {
         return IMG_FILE_EXTENSIONS.contains(getExtension(path));
+    }
+
+    public static boolean isZipArchive(String path) {
+        return ZIP_EXTENSION.equals(getExtension(path));
     }
 
     // TODO there are better alternatives, see:

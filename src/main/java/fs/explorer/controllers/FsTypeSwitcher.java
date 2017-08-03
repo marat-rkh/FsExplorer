@@ -17,7 +17,7 @@ public class FsTypeSwitcher implements Disposable {
     private AsyncFsDataProvider asyncRemoteFsDataProvider;
 
     private static final FsPath remoteHostTopDir =
-            new FsPath("/", /*isDirectory*/true, "/");
+            new FsPath("/", FsPath.TargetType.DIRECTORY, "/");
 
     public FsTypeSwitcher(
             DirTreeController dirTreeController,

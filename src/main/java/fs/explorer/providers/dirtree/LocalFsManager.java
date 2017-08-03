@@ -1,5 +1,7 @@
 package fs.explorer.providers.dirtree;
 
+import fs.explorer.utils.FileTypeInfo;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -42,6 +44,15 @@ public class LocalFsManager implements FsManager {
     private static FsPath toFsPath(Path path) {
         Path fileName = path.getFileName();
         String lastComponent = fileName == null ? "" : fileName.toString();
-        return new FsPath(path.toString(), Files.isDirectory(path), lastComponent);
+        String pathStr = path.toString();
+        FsPath.TargetType targetType = null;
+        if(Files.isDirectory(path)) {
+            targetType = FsPath.TargetType.DIRECTORY;
+        } else if(FileTypeInfo.isZipArchive(pathStr)) {
+            targetType = FsPath.TargetType.ZIP_ARCHIEVE;
+        } else {
+            targetType = FsPath.TargetType.FILE;
+        }
+        return new FsPath(pathStr, targetType, lastComponent);
     }
 }

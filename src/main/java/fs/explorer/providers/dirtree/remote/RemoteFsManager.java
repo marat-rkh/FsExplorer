@@ -3,6 +3,7 @@ package fs.explorer.providers.dirtree.remote;
 import fs.explorer.providers.dirtree.FsManager;
 import fs.explorer.providers.dirtree.FsPath;
 import fs.explorer.utils.Disposable;
+import fs.explorer.utils.FileTypeInfo;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -82,7 +83,15 @@ public class RemoteFsManager implements FsManager, Disposable {
             return Arrays.stream(entries).map(e -> {
                 String lastComponent = e.getName();
                 String path = Paths.get(pathStr, lastComponent).toString();
-                return new FsPath(path, /*isDirectory*/e.isDirectory(), lastComponent);
+                FsPath.TargetType targetType = null;
+                if(e.isDirectory()) {
+                    targetType = FsPath.TargetType.DIRECTORY;
+                } else if(FileTypeInfo.isZipArchive(path)) {
+                    targetType = FsPath.TargetType.ZIP_ARCHIEVE;
+                } else {
+                    targetType = FsPath.TargetType.FILE;
+                }
+                return new FsPath(path, targetType, lastComponent);
             }).collect(Collectors.toList());
         } catch (InvalidPathException e) {
             throw new IOException("malformed path");

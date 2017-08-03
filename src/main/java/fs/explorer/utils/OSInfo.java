@@ -19,9 +19,9 @@ public class OSInfo {
 
     public static FsPath getRootFsPath() {
         if(OSInfo.isWindows()) {
-            return new FsPath("C:\\", /*isDirectory*/true, "C:\\");
+            return new FsPath("C:\\", FsPath.TargetType.DIRECTORY, "C:\\");
         } else if(OSInfo.isMac() || OSInfo.isUnix()) {
-            return new FsPath("/", /*isDirectory*/true, "/");
+            return new FsPath("/", FsPath.TargetType.DIRECTORY, "/");
         } else {
             throw new IllegalStateException("Unsupported OS");
         }

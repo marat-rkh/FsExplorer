@@ -2,6 +2,7 @@ package fs.explorer.providers.dirtree.remote;
 
 import fs.explorer.TestEnvironment;
 import fs.explorer.providers.dirtree.FsPath;
+import fs.explorer.providers.dirtree.FsPath.TargetType;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
@@ -277,6 +278,8 @@ public class RemoteFsManagerTest {
         }
     }
 
+    // TODO test archives
+
     private static FTPConnectionInfo rebexTestServer() {
         return new FTPConnectionInfo("test.rebex.net", "demo", "password".toCharArray());
     }
@@ -290,6 +293,7 @@ public class RemoteFsManagerTest {
     }
 
     private static FsPath testFsPath(String path, boolean isDir, String lastComponent) {
-        return new FsPath(path, isDir, lastComponent);
+        TargetType targetType = isDir ? TargetType.DIRECTORY : TargetType.FILE;
+        return new FsPath(path, targetType, lastComponent);
     }
 }

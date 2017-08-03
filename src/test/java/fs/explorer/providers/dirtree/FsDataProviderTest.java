@@ -1,10 +1,7 @@
 package fs.explorer.providers.dirtree;
 
 import fs.explorer.providers.TestUtils;
-import fs.explorer.providers.dirtree.FsDataProvider;
-import fs.explorer.providers.dirtree.FsManager;
-import fs.explorer.providers.dirtree.FsPath;
-import fs.explorer.providers.dirtree.TreeNodeData;
+import fs.explorer.providers.dirtree.FsPath.TargetType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class FsDataProviderTest {
@@ -26,7 +24,7 @@ public class FsDataProviderTest {
     @Before
     public void setUp() throws URISyntaxException, IOException {
         fsManager = mock(FsManager.class);
-        topDir = new FsPath("/some/dir", /*isDirectory*/true, "dir");
+        topDir = new FsPath("/some/dir", TargetType.DIRECTORY, "dir");
         fsDataProvider = new FsDataProvider(topDir, fsManager);
     }
 
@@ -86,7 +84,7 @@ public class FsDataProviderTest {
     @Test
     public void correctsNodeLabelOnFsPathWithEmptyLastComponent() throws IOException {
         when(fsManager.list(any())).thenReturn(Collections.singletonList(
-                new FsPath("", /*isDirectory*/true, "")
+                new FsPath("", TargetType.DIRECTORY, "")
         ));
         CapturingConsumer<List<TreeNodeData>> onComplete = spy(new CapturingConsumer<>());
         Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
@@ -104,11 +102,11 @@ public class FsDataProviderTest {
 
     private void setUpTestDirs() throws IOException {
         List<FsPath> paths = Arrays.asList(
-                new FsPath("/home/documents", /*isDirectory*/true, "documents"),
-                new FsPath("/home/music", /*isDirectory*/true, "music"),
-                new FsPath("/home/pics", /*isDirectory*/true, "pics"),
-                new FsPath("/home/my-text.txt", /*isDirectory*/false, "my-text.txt"),
-                new FsPath("/home/draft.txt", /*isDirectory*/false, "draft.txt")
+                new FsPath("/home/documents", TargetType.DIRECTORY, "documents"),
+                new FsPath("/home/music", TargetType.DIRECTORY, "music"),
+                new FsPath("/home/pics", TargetType.DIRECTORY, "pics"),
+                new FsPath("/home/my-text.txt", TargetType.FILE, "my-text.txt"),
+                new FsPath("/home/draft.txt", TargetType.FILE, "draft.txt")
         );
         Collections.shuffle(paths);
         when(fsManager.list(any())).thenReturn(paths);
@@ -128,7 +126,8 @@ public class FsDataProviderTest {
     }
 
     private static TreeNodeData nodeData(boolean isDir) {
-        return new TreeNodeData("", new FsPath("", isDir, ""));
+        TargetType targetType = isDir ? TargetType.DIRECTORY : TargetType.FILE;
+        return new TreeNodeData("", new FsPath("", targetType, ""));
     }
 
     private static class CapturingConsumer<T> implements Consumer<T> {
