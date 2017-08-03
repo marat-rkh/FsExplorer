@@ -8,6 +8,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+// TODO make Disposable
 public class AsyncFsDataProvider implements TreeDataProvider {
     private final FsDataProvider fsDataProvider;
     private final ExecutorService executor = Executors.newCachedThreadPool();
@@ -42,7 +43,6 @@ public class AsyncFsDataProvider implements TreeDataProvider {
         }
     }
 
-    // TODO add to resource cleanup
     public void shutdown() {
         executor.shutdown();
         try {

@@ -1,7 +1,11 @@
 package fs.explorer.views;
 
+import fs.explorer.controllers.MainWindowController;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 public final class MainWindow {
     private final int WINDOW_WIDTH = 640;
@@ -24,9 +28,18 @@ public final class MainWindow {
         frame.getContentPane().add(mainPane, BorderLayout.CENTER);
     }
 
+    public void setController(MainWindowController controller) {
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new MainWindowListener(controller));
+    }
+
     public void show() {
         frame.pack();
         frame.setVisible(true);
+    }
+
+    public void setCursor(Cursor cursor) {
+        frame.setCursor(cursor);
     }
 
     private JSplitPane createMainPane(
@@ -50,5 +63,36 @@ public final class MainWindow {
         mainAndStatusBar.setOneTouchExpandable(true);
         mainAndStatusBar.setDividerLocation(9 * WINDOW_HEIGHT / 10);
         return mainAndStatusBar;
+    }
+
+    private static class MainWindowListener implements WindowListener {
+        private final MainWindowController mainWindowController;
+
+        private MainWindowListener(MainWindowController mainWindowController) {
+            this.mainWindowController = mainWindowController;
+        }
+
+        @Override
+        public void windowOpened(WindowEvent e) {}
+
+        @Override
+        public void windowClosing(WindowEvent e) {
+            mainWindowController.handleWindowClosing();
+        }
+
+        @Override
+        public void windowClosed(WindowEvent e) {}
+
+        @Override
+        public void windowIconified(WindowEvent e) {}
+
+        @Override
+        public void windowDeiconified(WindowEvent e) {}
+
+        @Override
+        public void windowActivated(WindowEvent e) {}
+
+        @Override
+        public void windowDeactivated(WindowEvent e) {}
     }
 }

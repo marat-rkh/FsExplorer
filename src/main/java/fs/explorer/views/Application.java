@@ -51,35 +51,13 @@ public class Application {
         );
         dirTreePane.setController(dirTreeController);
 
-        MenuBar menuBar = createMenuBar(
-                dirTreeController,
-                previewProvider,
-                localFsManager,
-                asyncLocalFsDataProvider,
-                statusBarController
-        );
-        this.mainWindow = new MainWindow(
-                "FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
-    }
-
-    public void run() {
-        SwingUtilities.invokeLater(mainWindow::show);
-    }
-
-    private MenuBar createMenuBar(
-            DirTreeController dirTreeController,
-            DefaultPreviewProvider previewProvider,
-            LocalFsManager localFsManager,
-            TreeDataProvider localFsDataProvider,
-            StatusBarController statusBarController
-    ) {
         FTPDialog ftpDialog = new FTPDialog();
         FTPInfoValidator ftpInfoValidator = new FTPInfoValidator();
         RemoteFsManager remoteFsManager = new RemoteFsManager();
         FsTypeSwitcher fsTypeSwitcher = new FsTypeSwitcher(
                 dirTreeController,
                 previewProvider,
-                localFsDataProvider,
+                asyncLocalFsDataProvider,
                 localFsManager,
                 remoteFsManager
         );
@@ -87,6 +65,21 @@ public class Application {
                 ftpDialog, ftpInfoValidator, fsTypeSwitcher, statusBarController);
         MenuBarController controller =
                 new MenuBarController(fsTypeSwitcher, ftpDialogController);
-        return new MenuBar(controller);
+        MenuBar menuBar = new MenuBar(controller);
+
+        mainWindow = new MainWindow("FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
+        MainWindowController mainWindowController = new MainWindowController(
+                mainWindow,
+                statusBarController,
+                asyncPreviewProvider,
+                asyncLocalFsDataProvider,
+                fsTypeSwitcher,
+                remoteFsManager
+        );
+        mainWindow.setController(mainWindowController);
+    }
+
+    public void run() {
+        SwingUtilities.invokeLater(mainWindow::show);
     }
 }

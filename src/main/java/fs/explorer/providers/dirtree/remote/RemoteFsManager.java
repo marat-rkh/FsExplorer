@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO make Disposable
 // @ThreadSafe
 public class RemoteFsManager implements FsManager {
     private final FTPClient ftpClient;
@@ -31,7 +32,6 @@ public class RemoteFsManager implements FsManager {
         }
     }
 
-    // TODO add to resource cleanup
     public void disconnect() throws FTPException {
         synchronized(ftpClient) {
             doDisconnect();

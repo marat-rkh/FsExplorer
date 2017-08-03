@@ -6,6 +6,7 @@ import fs.explorer.providers.dirtree.remote.FTPException;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
 
+// TODO make Disposable
 public class FsTypeSwitcher {
     private final DirTreeController dirTreeController;
     private final DefaultPreviewProvider previewProvider;
@@ -48,7 +49,6 @@ public class FsTypeSwitcher {
         previewProvider.resetFsManager(remoteFsManager);
     }
 
-    // TODO add to resource cleanup
     public void disposeCurrentRemoteFsDataProvider() {
         if(asyncRemoteFsDataProvider != null) {
             // TODO this `shutdown` should be done in background thread

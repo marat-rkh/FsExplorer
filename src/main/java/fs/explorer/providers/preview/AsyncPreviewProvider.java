@@ -9,6 +9,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+// TODO make Disposable
 public class AsyncPreviewProvider implements PreviewProvider {
     private final PreviewProvider previewProvider;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -57,7 +58,6 @@ public class AsyncPreviewProvider implements PreviewProvider {
         }
     }
 
-    // TODO add to resource cleanup
     public void shutdown() {
         executor.shutdown();
         try {
