@@ -5,9 +5,9 @@ import fs.explorer.providers.dirtree.remote.FTPConnectionInfo;
 import fs.explorer.providers.dirtree.remote.FTPException;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
+import fs.explorer.utils.Disposable;
 
-// TODO make Disposable
-public class FsTypeSwitcher {
+public class FsTypeSwitcher implements Disposable {
     private final DirTreeController dirTreeController;
     private final DefaultPreviewProvider previewProvider;
     private final TreeDataProvider localFsDataProvider;
@@ -55,5 +55,10 @@ public class FsTypeSwitcher {
             asyncRemoteFsDataProvider.shutdown();
             asyncRemoteFsDataProvider = null;
         }
+    }
+
+    @Override
+    public void dispose() {
+        disposeCurrentRemoteFsDataProvider();
     }
 }

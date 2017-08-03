@@ -7,20 +7,23 @@ import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.providers.dirtree.AsyncFsDataProvider;
 import fs.explorer.providers.dirtree.FsDataProvider;
 import fs.explorer.providers.dirtree.LocalFsManager;
-import fs.explorer.providers.dirtree.TreeDataProvider;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
 import fs.explorer.providers.preview.AsyncPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewRenderer;
 import fs.explorer.providers.preview.PreviewRenderer;
+import fs.explorer.utils.Disposable;
 import fs.explorer.utils.OSInfo;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Application {
     private final MainWindow mainWindow;
 
     public Application() {
+        List<Disposable> disposables = new ArrayList<>();
         LocalFsManager localFsManager = new LocalFsManager();
 
         StatusBar statusBar = new StatusBar("Ready");
@@ -32,6 +35,7 @@ public class Application {
         DefaultPreviewProvider previewProvider =
                 new DefaultPreviewProvider(localFsManager, previewRenderer);
         AsyncPreviewProvider asyncPreviewProvider = new AsyncPreviewProvider(previewProvider);
+        disposables.add(asyncPreviewProvider);
         PreviewController previewController =
                 new PreviewController(previewPane, asyncPreviewProvider, statusBarController);
 
@@ -39,6 +43,7 @@ public class Application {
                 new FsDataProvider(OSInfo.getRootFsPath(), localFsManager);
         AsyncFsDataProvider asyncLocalFsDataProvider =
                 new AsyncFsDataProvider(localFsDataProvider);
+        disposables.add(asyncLocalFsDataProvider);
 
         DirTreeModel dirTreeModel = new DirTreeModel();
         DirTreePane dirTreePane = new DirTreePane(dirTreeModel.getInnerTreeModel());
@@ -54,6 +59,7 @@ public class Application {
         FTPDialog ftpDialog = new FTPDialog();
         FTPInfoValidator ftpInfoValidator = new FTPInfoValidator();
         RemoteFsManager remoteFsManager = new RemoteFsManager();
+        disposables.add(remoteFsManager);
         FsTypeSwitcher fsTypeSwitcher = new FsTypeSwitcher(
                 dirTreeController,
                 previewProvider,
@@ -61,6 +67,7 @@ public class Application {
                 localFsManager,
                 remoteFsManager
         );
+        disposables.add(fsTypeSwitcher);
         FTPDialogController ftpDialogController = new FTPDialogController(
                 ftpDialog, ftpInfoValidator, fsTypeSwitcher, statusBarController);
         MenuBarController controller =
@@ -71,10 +78,7 @@ public class Application {
         MainWindowController mainWindowController = new MainWindowController(
                 mainWindow,
                 statusBarController,
-                asyncPreviewProvider,
-                asyncLocalFsDataProvider,
-                fsTypeSwitcher,
-                remoteFsManager
+                disposables
         );
         mainWindow.setController(mainWindowController);
     }

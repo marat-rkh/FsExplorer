@@ -1,5 +1,7 @@
 package fs.explorer.providers.dirtree;
 
+import fs.explorer.utils.Disposable;
+
 import javax.swing.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -8,8 +10,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-// TODO make Disposable
-public class AsyncFsDataProvider implements TreeDataProvider {
+public class AsyncFsDataProvider implements TreeDataProvider, Disposable {
     private final FsDataProvider fsDataProvider;
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -56,5 +57,10 @@ public class AsyncFsDataProvider implements TreeDataProvider {
             executor.shutdownNow();
             Thread.currentThread().interrupt();
         }
+    }
+
+    @Override
+    public void dispose() {
+        shutdown();
     }
 }

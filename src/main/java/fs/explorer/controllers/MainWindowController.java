@@ -1,47 +1,34 @@
 package fs.explorer.controllers;
 
-import fs.explorer.providers.dirtree.AsyncFsDataProvider;
-import fs.explorer.providers.dirtree.remote.FTPException;
-import fs.explorer.providers.dirtree.remote.RemoteFsManager;
-import fs.explorer.providers.preview.AsyncPreviewProvider;
+import fs.explorer.utils.Disposable;
 import fs.explorer.views.MainWindow;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class MainWindowController {
     private final MainWindow mainWindow;
     private final StatusBarController statusBarController;
-
-    private final AsyncPreviewProvider asyncPreviewProvider;
-    private final AsyncFsDataProvider asyncLocalFsDataProvider;
-    private final FsTypeSwitcher fsTypeSwitcher;
-    private final RemoteFsManager remoteFsManager;
+    private final List<Disposable> resources;
 
     private static final String CLOSING_APP = "Closing application...";
 
     public MainWindowController(
             MainWindow mainWindow,
             StatusBarController statusBarController,
-            // TODO all these classes should implement Disposable and be passed as List
-            AsyncPreviewProvider asyncPreviewProvider,
-            AsyncFsDataProvider asyncLocalFsDataProvider,
-            FsTypeSwitcher fsTypeSwitcher,
-            RemoteFsManager remoteFsManager
+            List<Disposable> resources
     ) {
         this.mainWindow = mainWindow;
         this.statusBarController = statusBarController;
-        this.asyncPreviewProvider = asyncPreviewProvider;
-        this.asyncLocalFsDataProvider = asyncLocalFsDataProvider;
-        this.fsTypeSwitcher = fsTypeSwitcher;
-        this.remoteFsManager = remoteFsManager;
+        this.resources = resources;
     }
 
     public void handleWindowClosing() {
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
-                cleanupResources();
+                resources.forEach(Disposable::dispose);
                 return null;
             }
 
@@ -53,16 +40,5 @@ public class MainWindowController {
         statusBarController.setProgressMessage(CLOSING_APP);
         mainWindow.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         worker.execute();
-    }
-
-    private void cleanupResources() {
-        asyncPreviewProvider.shutdown();
-        asyncLocalFsDataProvider.shutdown();
-        fsTypeSwitcher.disposeCurrentRemoteFsDataProvider();
-        try {
-            remoteFsManager.disconnect();
-        } catch (FTPException e) {
-            // do nothing
-        }
     }
 }

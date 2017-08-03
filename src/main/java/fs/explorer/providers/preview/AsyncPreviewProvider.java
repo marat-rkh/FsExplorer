@@ -1,6 +1,7 @@
 package fs.explorer.providers.preview;
 
 import fs.explorer.providers.dirtree.TreeNodeData;
+import fs.explorer.utils.Disposable;
 
 import javax.swing.*;
 import java.util.concurrent.ExecutorService;
@@ -9,8 +10,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-// TODO make Disposable
-public class AsyncPreviewProvider implements PreviewProvider {
+public class AsyncPreviewProvider implements PreviewProvider, Disposable {
     private final PreviewProvider previewProvider;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -71,5 +71,10 @@ public class AsyncPreviewProvider implements PreviewProvider {
             executor.shutdownNow();
             Thread.currentThread().interrupt();
         }
+    }
+
+    @Override
+    public void dispose() {
+        shutdown();
     }
 }

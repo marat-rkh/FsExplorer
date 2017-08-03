@@ -2,6 +2,7 @@ package fs.explorer.providers.dirtree.remote;
 
 import fs.explorer.providers.dirtree.FsManager;
 import fs.explorer.providers.dirtree.FsPath;
+import fs.explorer.utils.Disposable;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -15,9 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO make Disposable
 // @ThreadSafe
-public class RemoteFsManager implements FsManager {
+public class RemoteFsManager implements FsManager, Disposable {
     private final FTPClient ftpClient;
 
     private static final long KEEP_ALIVE_TIMEOUT_SECONDS = 150;
@@ -86,6 +86,15 @@ public class RemoteFsManager implements FsManager {
             }).collect(Collectors.toList());
         } catch (InvalidPathException e) {
             throw new IOException("malformed path");
+        }
+    }
+
+    @Override
+    public void dispose() {
+        try {
+            disconnect();
+        } catch (FTPException e) {
+            // do nothing
         }
     }
 
