@@ -34,25 +34,10 @@ public class LocalFsManager implements FsManager {
         }
         try {
             return Files.list(Paths.get(pathStr))
-                    .map(LocalFsManager::toFsPath)
+                    .map(FsPath::fromPath)
                     .collect(Collectors.toList());
         } catch (InvalidPathException e) {
             throw new IOException("malformed directory path");
         }
-    }
-
-    private static FsPath toFsPath(Path path) {
-        Path fileName = path.getFileName();
-        String lastComponent = fileName == null ? "" : fileName.toString();
-        String pathStr = path.toString();
-        FsPath.TargetType targetType = null;
-        if(Files.isDirectory(path)) {
-            targetType = FsPath.TargetType.DIRECTORY;
-        } else if(FileTypeInfo.isZipArchive(pathStr)) {
-            targetType = FsPath.TargetType.ZIP_ARCHIEVE;
-        } else {
-            targetType = FsPath.TargetType.FILE;
-        }
-        return new FsPath(pathStr, targetType, lastComponent);
     }
 }

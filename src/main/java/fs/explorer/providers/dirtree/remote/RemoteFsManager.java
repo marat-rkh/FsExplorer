@@ -87,7 +87,7 @@ public class RemoteFsManager implements FsManager, Disposable {
                 if(e.isDirectory()) {
                     targetType = FsPath.TargetType.DIRECTORY;
                 } else if(FileTypeInfo.isZipArchive(path)) {
-                    targetType = FsPath.TargetType.ZIP_ARCHIEVE;
+                    targetType = FsPath.TargetType.ZIP_ARCHIVE;
                 } else {
                     targetType = FsPath.TargetType.FILE;
                 }

@@ -1,5 +1,10 @@
 package fs.explorer.providers.dirtree;
 
+import fs.explorer.utils.FileTypeInfo;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 public final class FsPath {
     private final String path;
     private final TargetType targetType;
@@ -7,7 +12,7 @@ public final class FsPath {
 
     public enum TargetType {
         DIRECTORY,
-        ZIP_ARCHIEVE,
+        ZIP_ARCHIVE,
         FILE
     }
 
@@ -54,4 +59,22 @@ public final class FsPath {
 
     @Override
     public String toString() { return path; }
+
+    public static FsPath fromPath(Path path) {
+        if(path == null) {
+            return null;
+        }
+        Path fileName = path.getFileName();
+        String lastComponent = fileName == null ? "" : fileName.toString();
+        String pathStr = path.toString();
+        FsPath.TargetType targetType = null;
+        if(Files.isDirectory(path)) {
+            targetType = FsPath.TargetType.DIRECTORY;
+        } else if(FileTypeInfo.isZipArchive(pathStr)) {
+            targetType = FsPath.TargetType.ZIP_ARCHIVE;
+        } else {
+            targetType = FsPath.TargetType.FILE;
+        }
+        return new FsPath(pathStr, targetType, lastComponent);
+    }
 }
