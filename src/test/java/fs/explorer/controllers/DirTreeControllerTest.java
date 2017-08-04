@@ -6,6 +6,7 @@ import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.path.PathContainer;
 import fs.explorer.providers.dirtree.path.PathContainerUtils;
+import fs.explorer.providers.dirtree.path.TargetType;
 import fs.explorer.views.DirTreePane;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +21,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static fs.explorer.models.dirtree.ExtTreeNodeData.*;
-import static fs.explorer.providers.dirtree.path.FsPath.TargetType;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 

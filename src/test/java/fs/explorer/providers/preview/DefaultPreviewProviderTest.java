@@ -3,8 +3,8 @@ package fs.explorer.providers.preview;
 import fs.explorer.providers.dirtree.FsManager;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.TestUtils;
-import fs.explorer.providers.dirtree.path.FsPath.TargetType;
 import fs.explorer.providers.dirtree.TreeNodeData;
+import fs.explorer.providers.dirtree.path.TargetType;
 import org.junit.Before;
 import org.junit.Test;
 

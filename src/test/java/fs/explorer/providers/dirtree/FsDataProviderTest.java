@@ -1,8 +1,9 @@
 package fs.explorer.providers.dirtree;
 
 import fs.explorer.providers.TestUtils;
+import fs.explorer.providers.dirtree.archives.ArchivesManager;
 import fs.explorer.providers.dirtree.path.FsPath;
-import fs.explorer.providers.dirtree.path.FsPath.TargetType;
+import fs.explorer.providers.dirtree.path.TargetType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,13 +22,15 @@ import static org.mockito.Mockito.*;
 public class FsDataProviderTest {
     private FsPath topDir;
     private FsManager fsManager;
+    private ArchivesManager archivesManager;
     private FsDataProvider fsDataProvider;
 
     @Before
     public void setUp() throws URISyntaxException, IOException {
         fsManager = mock(FsManager.class);
+        archivesManager = mock(ArchivesManager.class);
         topDir = new FsPath("/some/dir", TargetType.DIRECTORY, "dir");
-        fsDataProvider = new FsDataProvider(topDir, fsManager);
+        fsDataProvider = new FsDataProvider(topDir, fsManager, archivesManager);
     }
 
     @Test

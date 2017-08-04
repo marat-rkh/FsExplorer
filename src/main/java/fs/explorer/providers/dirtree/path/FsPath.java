@@ -10,12 +10,6 @@ public final class FsPath {
     private final TargetType targetType;
     private final String lastComponent;
 
-    public enum TargetType {
-        DIRECTORY,
-        ZIP_ARCHIVE,
-        FILE
-    }
-
     public FsPath(String path, TargetType targetType, String lastComponent) {
         this.path = path;
         this.targetType = targetType;
@@ -67,13 +61,13 @@ public final class FsPath {
         Path fileName = path.getFileName();
         String lastComponent = fileName == null ? "" : fileName.toString();
         String pathStr = path.toString();
-        FsPath.TargetType targetType = null;
+        TargetType targetType = null;
         if(Files.isDirectory(path)) {
-            targetType = FsPath.TargetType.DIRECTORY;
+            targetType = TargetType.DIRECTORY;
         } else if(FileTypeInfo.isZipArchive(pathStr)) {
-            targetType = FsPath.TargetType.ZIP_ARCHIVE;
+            targetType = TargetType.ZIP_ARCHIVE;
         } else {
-            targetType = FsPath.TargetType.FILE;
+            targetType = TargetType.FILE;
         }
         return new FsPath(pathStr, targetType, lastComponent);
     }

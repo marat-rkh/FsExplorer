@@ -2,6 +2,7 @@ package fs.explorer.providers.dirtree.remote;
 
 import fs.explorer.providers.dirtree.FsManager;
 import fs.explorer.providers.dirtree.path.FsPath;
+import fs.explorer.providers.dirtree.path.TargetType;
 import fs.explorer.utils.Disposable;
 import fs.explorer.utils.FileTypeInfo;
 import org.apache.commons.net.ftp.FTP;
@@ -83,13 +84,13 @@ public class RemoteFsManager implements FsManager, Disposable {
             return Arrays.stream(entries).map(e -> {
                 String lastComponent = e.getName();
                 String path = Paths.get(pathStr, lastComponent).toString();
-                FsPath.TargetType targetType = null;
+                TargetType targetType = null;
                 if(e.isDirectory()) {
-                    targetType = FsPath.TargetType.DIRECTORY;
+                    targetType = TargetType.DIRECTORY;
                 } else if(FileTypeInfo.isZipArchive(path)) {
-                    targetType = FsPath.TargetType.ZIP_ARCHIVE;
+                    targetType = TargetType.ZIP_ARCHIVE;
                 } else {
-                    targetType = FsPath.TargetType.FILE;
+                    targetType = TargetType.FILE;
                 }
                 return new FsPath(path, targetType, lastComponent);
             }).collect(Collectors.toList());

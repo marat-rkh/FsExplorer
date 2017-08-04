@@ -1,7 +1,9 @@
 package fs.explorer.controllers;
 
 import fs.explorer.providers.dirtree.*;
+import fs.explorer.providers.dirtree.archives.ArchivesManager;
 import fs.explorer.providers.dirtree.path.FsPath;
+import fs.explorer.providers.dirtree.path.TargetType;
 import fs.explorer.providers.dirtree.remote.FTPConnectionInfo;
 import fs.explorer.providers.dirtree.remote.FTPException;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
@@ -14,24 +16,27 @@ public class FsTypeSwitcher implements Disposable {
     private final TreeDataProvider localFsDataProvider;
     private final LocalFsManager localFsManager;
     private final RemoteFsManager remoteFsManager;
+    private final ArchivesManager archivesManager;
 
     private AsyncFsDataProvider asyncRemoteFsDataProvider;
 
     private static final FsPath remoteHostTopDir =
-            new FsPath("/", FsPath.TargetType.DIRECTORY, "/");
+            new FsPath("/", TargetType.DIRECTORY, "/");
 
     public FsTypeSwitcher(
             DirTreeController dirTreeController,
             DefaultPreviewProvider previewProvider,
             TreeDataProvider localFsDataProvider,
             LocalFsManager localFsManager,
-            RemoteFsManager remoteFsManager
+            RemoteFsManager remoteFsManager,
+            ArchivesManager archivesManager
     ) {
         this.dirTreeController = dirTreeController;
         this.previewProvider = previewProvider;
         this.localFsDataProvider = localFsDataProvider;
         this.localFsManager = localFsManager;
         this.remoteFsManager = remoteFsManager;
+        this.archivesManager = archivesManager;
     }
 
     public void switchToLocalFs() {
@@ -44,7 +49,7 @@ public class FsTypeSwitcher implements Disposable {
         remoteFsManager.reconnect(connectionInfo);
         disposeCurrentRemoteFsDataProvider();
         asyncRemoteFsDataProvider = new AsyncFsDataProvider(
-                new FsDataProvider(remoteHostTopDir, remoteFsManager)
+                new FsDataProvider(remoteHostTopDir, remoteFsManager, archivesManager)
         );
         dirTreeController.resetDataProvider(asyncRemoteFsDataProvider);
         previewProvider.resetFsManager(remoteFsManager);

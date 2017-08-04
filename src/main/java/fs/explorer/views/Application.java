@@ -7,6 +7,7 @@ import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.providers.dirtree.AsyncFsDataProvider;
 import fs.explorer.providers.dirtree.FsDataProvider;
 import fs.explorer.providers.dirtree.LocalFsManager;
+import fs.explorer.providers.dirtree.archives.ArchivesManager;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
 import fs.explorer.providers.preview.AsyncPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
@@ -25,6 +26,7 @@ public class Application {
     public Application() {
         List<Disposable> disposables = new ArrayList<>();
         LocalFsManager localFsManager = new LocalFsManager();
+        ArchivesManager archivesManager = new ArchivesManager();
 
         StatusBar statusBar = new StatusBar("Ready");
         StatusBarController statusBarController = new StatusBarController(statusBar);
@@ -40,7 +42,7 @@ public class Application {
                 new PreviewController(previewPane, asyncPreviewProvider, statusBarController);
 
         FsDataProvider localFsDataProvider =
-                new FsDataProvider(OSInfo.getRootFsPath(), localFsManager);
+                new FsDataProvider(OSInfo.getRootFsPath(), localFsManager, archivesManager);
         AsyncFsDataProvider asyncLocalFsDataProvider =
                 new AsyncFsDataProvider(localFsDataProvider);
         disposables.add(asyncLocalFsDataProvider);
@@ -65,7 +67,8 @@ public class Application {
                 previewProvider,
                 asyncLocalFsDataProvider,
                 localFsManager,
-                remoteFsManager
+                remoteFsManager,
+                archivesManager
         );
         disposables.add(fsTypeSwitcher);
         FTPDialogController ftpDialogController = new FTPDialogController(

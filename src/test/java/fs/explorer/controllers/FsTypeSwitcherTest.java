@@ -3,6 +3,7 @@ package fs.explorer.controllers;
 import fs.explorer.providers.dirtree.FsManager;
 import fs.explorer.providers.dirtree.LocalFsManager;
 import fs.explorer.providers.dirtree.TreeDataProvider;
+import fs.explorer.providers.dirtree.archives.ArchivesManager;
 import fs.explorer.providers.dirtree.remote.FTPConnectionInfo;
 import fs.explorer.providers.dirtree.remote.FTPException;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
@@ -25,6 +26,7 @@ public class FsTypeSwitcherTest {
     private TreeDataProvider localFsDataProvider;
     private LocalFsManager localFsManager;
     private RemoteFsManager remoteFsManager;
+    private ArchivesManager archivesManager;
 
     @Before
     public void setUp() {
@@ -33,13 +35,15 @@ public class FsTypeSwitcherTest {
         localFsDataProvider = mock(TreeDataProvider.class);
         localFsManager = mock(LocalFsManager.class);
         remoteFsManager = mock(RemoteFsManager.class);
+        // TODO test manipulations with archivesManager
+        archivesManager = mock(ArchivesManager.class);
         fsTypeSwitcher = spy(new FsTypeSwitcher(
                 dirTreeController,
                 previewProvider,
                 localFsDataProvider,
                 localFsManager,
-                remoteFsManager
-        ));
+                remoteFsManager,
+                archivesManager));
     }
 
     @Test

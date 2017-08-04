@@ -1,5 +1,6 @@
 package fs.explorer.providers.dirtree.path;
 
+// TODO move these methods to TreeNodeData
 public class PathContainerUtils {
     public static boolean isDirectoryPath(PathContainer path) {
         if(path.isFsPath()) {

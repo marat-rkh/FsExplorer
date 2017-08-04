@@ -2,6 +2,7 @@ package fs.explorer.models.dirtree;
 
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.TreeNodeData;
+import fs.explorer.providers.dirtree.path.TargetType;
 
 public class ExtTreeNodeData {
     private final TreeNodeData nodeData;
@@ -39,7 +40,7 @@ public class ExtTreeNodeData {
     }
 
     public static ExtTreeNodeData fakeNodeData(String text) {
-        TreeNodeData nodeData = new TreeNodeData(text, new FsPath("", FsPath.TargetType.FILE, ""));
+        TreeNodeData nodeData = new TreeNodeData(text, new FsPath("", TargetType.FILE, ""));
         return new ExtTreeNodeData(nodeData, Status.LOADED, Type.FAKE);
     }
 
