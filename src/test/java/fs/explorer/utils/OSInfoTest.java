@@ -1,6 +1,6 @@
 package fs.explorer.utils;
 
-import fs.explorer.providers.dirtree.FsPath;
+import fs.explorer.providers.dirtree.path.FsPath;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

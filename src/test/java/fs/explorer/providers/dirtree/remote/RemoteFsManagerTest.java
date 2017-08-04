@@ -1,8 +1,8 @@
 package fs.explorer.providers.dirtree.remote;
 
 import fs.explorer.TestEnvironment;
-import fs.explorer.providers.dirtree.FsPath;
-import fs.explorer.providers.dirtree.FsPath.TargetType;
+import fs.explorer.providers.dirtree.path.FsPath;
+import fs.explorer.providers.dirtree.path.FsPath.TargetType;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;

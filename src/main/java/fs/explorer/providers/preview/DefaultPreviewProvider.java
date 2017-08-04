@@ -1,6 +1,7 @@
 package fs.explorer.providers.preview;
 
 import fs.explorer.providers.dirtree.FsManager;
+import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.TreeNodeData;
 
 import javax.swing.*;
@@ -79,8 +80,12 @@ public class DefaultPreviewProvider implements PreviewProvider {
     }
 
     private byte[] readContents(TreeNodeData data) {
+        if(!data.getPath().isFsPath()) {
+            return null;
+        }
+        FsPath dataFsPath = data.getPath().asFsPath();
         try {
-            return fsManager.readFile(data.getFsPath());
+            return fsManager.readFile(dataFsPath);
         } catch (IOException e) {
             return null;
         }

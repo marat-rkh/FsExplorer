@@ -1,10 +1,11 @@
 package fs.explorer.controllers;
 
 import fs.explorer.TestUtils;
-import fs.explorer.providers.dirtree.FsPath;
-import fs.explorer.providers.dirtree.TreeDataProvider;
-import fs.explorer.providers.dirtree.TreeNodeData;
+import fs.explorer.providers.dirtree.*;
 import fs.explorer.models.dirtree.DirTreeModel;
+import fs.explorer.providers.dirtree.path.FsPath;
+import fs.explorer.providers.dirtree.path.PathContainer;
+import fs.explorer.providers.dirtree.path.PathContainerUtils;
 import fs.explorer.views.DirTreePane;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static fs.explorer.models.dirtree.ExtTreeNodeData.*;
-import static fs.explorer.providers.dirtree.FsPath.TargetType;
+import static fs.explorer.providers.dirtree.path.FsPath.TargetType;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -53,7 +54,7 @@ public class DirTreeControllerTest {
         List<DefaultMutableTreeNode> chs = dirTreeModel.getChildren(dirTreeModel.getRoot());
         assertEquals(1, chs.size());
         assertEquals("/", getLabel(chs.get(0)));
-        assertTrue(getFsPath(chs.get(0)).isDirectory());
+        assertTrue(isDirectoryNode(chs.get(0)));
 
         ArgumentCaptor<TreePath> captor = ArgumentCaptor.forClass(TreePath.class);
         verify(dirTreePane).expandPath(captor.capture());
@@ -362,8 +363,9 @@ public class DirTreeControllerTest {
         return dirTreeModel.getExtNodeData(node).getStatus();
     }
 
-    private FsPath getFsPath(DefaultMutableTreeNode node) {
-        return dirTreeModel.getExtNodeData(node).getNodeData().getFsPath();
+    private boolean isDirectoryNode(DefaultMutableTreeNode node) {
+        PathContainer path = dirTreeModel.getExtNodeData(node).getNodeData().getPath();
+        return PathContainerUtils.isDirectoryPath(path);
     }
 
     private static class TestDataProvider implements TreeDataProvider {

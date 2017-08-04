@@ -1,4 +1,4 @@
-package fs.explorer.providers.dirtree;
+package fs.explorer.providers.dirtree.path;
 
 import fs.explorer.utils.FileTypeInfo;
 

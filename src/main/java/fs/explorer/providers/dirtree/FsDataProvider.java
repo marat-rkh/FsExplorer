@@ -1,5 +1,7 @@
 package fs.explorer.providers.dirtree;
 
+import fs.explorer.providers.dirtree.path.FsPath;
+
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -34,18 +36,24 @@ public class FsDataProvider implements TreeDataProvider {
             Consumer<List<TreeNodeData>> onComplete,
             Consumer<String> onFail
     ) {
-        FsPath nodeFsPath = node.getFsPath();
+        if(!node.getPath().isFsPath()) {
+            onFail.accept(INTERNAL_ERROR);
+            return;
+        }
+        FsPath nodeFsPath = node.getPath().asFsPath();
         if(!nodeFsPath.isDirectory()) {
             onFail.accept(INTERNAL_ERROR);
             return;
         }
         try {
             List<FsPath> entries = fsManager.list(nodeFsPath);
-            Map<Boolean, List<TreeNodeData>> data = entries.stream()
-                    .map(FsDataProvider::toTreeNodeData)
-                    .collect(Collectors.partitioningBy(d -> d.getFsPath().isDirectory()));
-            List<TreeNodeData> dirsData = data.get(true);
-            List<TreeNodeData> filesData = data.get(false);
+            // TODO too much streams
+            Map<Boolean, List<FsPath>> data = entries.stream()
+                    .collect(Collectors.partitioningBy(FsPath::isDirectory));
+            List<TreeNodeData> dirsData = data.get(true).stream()
+                    .map(FsDataProvider::toTreeNodeData).collect(Collectors.toList());
+            List<TreeNodeData> filesData = data.get(false).stream()
+                    .map(FsDataProvider::toTreeNodeData).collect(Collectors.toList());
             dirsData.sort(Comparator.comparing(TreeNodeData::getLabel));
             filesData.sort(Comparator.comparing(TreeNodeData::getLabel));
             dirsData.addAll(filesData);

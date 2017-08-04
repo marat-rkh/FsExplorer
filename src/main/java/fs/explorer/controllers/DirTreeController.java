@@ -1,5 +1,6 @@
 package fs.explorer.controllers;
 
+import fs.explorer.providers.dirtree.path.PathContainerUtils;
 import fs.explorer.providers.dirtree.TreeDataProvider;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
@@ -96,7 +97,7 @@ public class DirTreeController {
                 dirTreeModel.addFakeChild(node, "<empty>");
             } else {
                 for(TreeNodeData nodeData : contents) {
-                    if(nodeData.getFsPath().isDirectory()) {
+                    if(PathContainerUtils.isDirectoryPath(nodeData.getPath())) {
                         dirTreeModel.addNullDirChild(node, nodeData);
                     } else {
                         dirTreeModel.addFileChild(node, nodeData);

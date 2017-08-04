@@ -1,7 +1,8 @@
 package fs.explorer.providers.dirtree;
 
 import fs.explorer.providers.TestUtils;
-import fs.explorer.providers.dirtree.FsPath.TargetType;
+import fs.explorer.providers.dirtree.path.FsPath;
+import fs.explorer.providers.dirtree.path.FsPath.TargetType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,6 +15,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class FsDataProviderTest {
@@ -35,8 +37,7 @@ public class FsDataProviderTest {
 
         verify(onCompete).accept(any());
         TreeNodeData topNodeData = onCompete.getValue();
-        assertEquals("dir", topNodeData.getLabel());
-        assertEquals(topDir, topNodeData.getFsPath());
+        checkFsPathNodeData("dir", "/some/dir", /*isDir*/true, "dir", topNodeData);
     }
 
     @Test
@@ -50,12 +51,14 @@ public class FsDataProviderTest {
         assertNotNull(nodes);
         assertEquals(5, nodes.size());
         // sorted directories come first
-        checkNodeData("documents", "/home/documents", /*isDir*/true, "documents", nodes.get(0));
-        checkNodeData("music", "/home/music", /*isDir*/true, "music", nodes.get(1));
-        checkNodeData("pics", "/home/pics", /*isDir*/true, "pics", nodes.get(2));
+        checkFsPathNodeData("documents", "/home/documents", /*isDir*/true, "documents",
+                nodes.get(0));
+        checkFsPathNodeData("music", "/home/music", /*isDir*/true, "music", nodes.get(1));
+        checkFsPathNodeData("pics", "/home/pics", /*isDir*/true, "pics", nodes.get(2));
         // then go sorted files
-        checkNodeData("draft.txt", "/home/draft.txt", /*isDir*/false, "draft.txt", nodes.get(3));
-        checkNodeData("my-text.txt", "/home/my-text.txt", /*isDir*/false, "my-text.txt",
+        checkFsPathNodeData("draft.txt", "/home/draft.txt", /*isDir*/false, "draft.txt",
+                nodes.get(3));
+        checkFsPathNodeData("my-text.txt", "/home/my-text.txt", /*isDir*/false, "my-text.txt",
                 nodes.get(4));
         verify(onFail, never()).accept(any());
     }
@@ -93,7 +96,7 @@ public class FsDataProviderTest {
         List<TreeNodeData> nodes = onComplete.getValue();
         assertNotNull(nodes);
         assertEquals(1, nodes.size());
-        checkNodeData("?", "", /*isDir*/true, "", nodes.get(0));
+        checkFsPathNodeData("?", "", /*isDir*/true, "", nodes.get(0));
         verify(onFail, never()).accept(any());
     }
 
@@ -112,7 +115,7 @@ public class FsDataProviderTest {
         when(fsManager.list(any())).thenReturn(paths);
     }
 
-    private static void checkNodeData(
+    private static void checkFsPathNodeData(
             String label,
             String path,
             boolean isDir,
@@ -120,9 +123,11 @@ public class FsDataProviderTest {
             TreeNodeData actual
     ) {
         assertEquals(label, actual.getLabel());
-        assertEquals(path, actual.getFsPath().getPath());
-        assertEquals(isDir, actual.getFsPath().isDirectory());
-        assertEquals(lastComponent, actual.getFsPath().getLastComponent());
+        assertTrue(actual.getPath().isFsPath());
+        FsPath actualPath = actual.getPath().asFsPath();
+        assertEquals(path, actualPath.getPath());
+        assertEquals(isDir, actualPath.isDirectory());
+        assertEquals(lastComponent, actualPath.getLastComponent());
     }
 
     private static TreeNodeData nodeData(boolean isDir) {

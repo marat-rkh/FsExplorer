@@ -1,7 +1,7 @@
 package fs.explorer.controllers;
 
-import fs.explorer.providers.dirtree.FsPath;
-import fs.explorer.providers.dirtree.FsPath.TargetType;
+import fs.explorer.providers.dirtree.path.FsPath;
+import fs.explorer.providers.dirtree.path.FsPath.TargetType;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.providers.preview.PreviewProvider;
 import fs.explorer.views.PreviewPane;
@@ -30,7 +30,8 @@ public class PreviewControllerTest {
 
     @Test
     public void updatesTextFilePreview() {
-        previewController.updatePreview(nodeData("/some/dir/file.txt", /*isDir*/false));
+        TreeNodeData testData = nodeData("/some/dir/file.txt", /*isDir*/false, "file.txt");
+        previewController.updatePreview(testData);
         verify(previewProvider).getTextPreview(any(), any(), any());
         verify(statusBarController).setProgressMessage(any());
         verify(previewPane).updatePreview(any());
@@ -41,7 +42,8 @@ public class PreviewControllerTest {
 
     @Test
     public void updatesImageFilePreview() {
-        previewController.updatePreview(nodeData("/some/dir/file.jpg", /*isDir*/false));
+        TreeNodeData testData = nodeData("/some/dir/file.jpg", /*isDir*/false, "file.jpg");
+        previewController.updatePreview(testData);
         verify(previewProvider).getImagePreview(any(), any(), any());
         verify(statusBarController).setProgressMessage(any());
         verify(previewPane).updatePreview(any());
@@ -52,7 +54,7 @@ public class PreviewControllerTest {
 
     @Test
     public void doesNotUpdatePreviewOnDirectory() {
-        previewController.updatePreview(nodeData("/some/dir", /*isDir*/true));
+        previewController.updatePreview(nodeData("/some/dir", /*isDir*/true, "dir"));
         verify(previewProvider, never()).getTextPreview(any(), any(), any());
         verify(previewProvider, never()).getImagePreview(any(), any(), any());
         verify(previewPane, never()).updatePreview(any());
@@ -62,7 +64,8 @@ public class PreviewControllerTest {
 
     @Test
     public void doesNotUpdatePreviewOnUnsupportedFileType() {
-        previewController.updatePreview(nodeData("/some/dir/file.psd", /*isDir*/false));
+        TreeNodeData testData = nodeData("/some/dir/file.psd", /*isDir*/false, "file.psd");
+        previewController.updatePreview(testData);
         verify(previewProvider, never()).getTextPreview(any(), any(), any());
         verify(previewProvider, never()).getImagePreview(any(), any(), any());
         verify(previewPane, never()).updatePreview(any());
@@ -82,7 +85,8 @@ public class PreviewControllerTest {
     @Test
     public void failsToUpdateTextPreviewOnProviderError() {
         setUpFailingProvider();
-        previewController.updatePreview(nodeData("/some/dir/file.txt", /*isDir*/false));
+        TreeNodeData testData = nodeData("/some/dir/file.txt", /*isDir*/false, "file.txt");
+        previewController.updatePreview(testData);
         verify(previewProvider).getTextPreview(any(), any(), any());
         verify(previewPane).showDefaultPreview();
         verify(statusBarController).setErrorMessage(any(), any());
@@ -91,7 +95,8 @@ public class PreviewControllerTest {
     @Test
     public void failsToUpdateImagePreviewOnProviderError() {
         setUpFailingProvider();
-        previewController.updatePreview(nodeData("/some/dir/file.jpg", /*isDir*/false));
+        TreeNodeData testData = nodeData("/some/dir/file.jpg", /*isDir*/false, "file.jpg");
+        previewController.updatePreview(testData);
         verify(previewProvider).getImagePreview(any(), any(), any());
         verify(previewPane).showDefaultPreview();
         verify(statusBarController).setErrorMessage(any(), any());
@@ -103,9 +108,9 @@ public class PreviewControllerTest {
                 new PreviewController(previewPane, previewProvider, statusBarController);
     }
 
-    private static TreeNodeData nodeData(String path, boolean isDir) {
+    private static TreeNodeData nodeData(String path, boolean isDir, String lastComponent) {
         TargetType targetType = isDir ? TargetType.DIRECTORY : TargetType.FILE;
-        return new TreeNodeData("", new FsPath(path, targetType, ""));
+        return new TreeNodeData("", new FsPath(path, targetType, lastComponent));
     }
 
     private static class TestPreviewProvider implements PreviewProvider {

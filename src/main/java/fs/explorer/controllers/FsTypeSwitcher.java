@@ -1,6 +1,7 @@
 package fs.explorer.controllers;
 
 import fs.explorer.providers.dirtree.*;
+import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.remote.FTPConnectionInfo;
 import fs.explorer.providers.dirtree.remote.FTPException;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;

@@ -1,17 +1,20 @@
 package fs.explorer.providers.dirtree;
 
+import fs.explorer.providers.dirtree.path.FsPath;
+import fs.explorer.providers.dirtree.path.PathContainer;
+
 public class TreeNodeData {
     private final String label;
-    private final FsPath fsPath;
+    private final PathContainer path;
 
     public TreeNodeData(String label, FsPath fsPath) {
         this.label = label;
-        this.fsPath = fsPath;
+        this.path = new PathContainer(fsPath);
     }
 
     public String getLabel() { return label; }
 
-    public FsPath getFsPath() { return fsPath; }
+    public PathContainer getPath() { return path; }
 
     @Override
     public String toString() {

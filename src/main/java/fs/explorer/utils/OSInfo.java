@@ -1,6 +1,6 @@
 package fs.explorer.utils;
 
-import fs.explorer.providers.dirtree.FsPath;
+import fs.explorer.providers.dirtree.path.FsPath;
 
 public class OSInfo {
     private static String osName = System.getProperty("os.name").toLowerCase();
