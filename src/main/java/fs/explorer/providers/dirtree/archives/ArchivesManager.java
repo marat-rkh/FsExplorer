@@ -10,22 +10,22 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 // @ThreadSafe
 public class ArchivesManager implements Disposable {
-    private final ConcurrentMap<FsPath, ArchiveData> archives = new ConcurrentHashMap<>();
+    private final ConcurrentMap<FsPath, ArchiveData> archives;
+    private final ArchivesReader archivesReader;
     private final Path archiveCacheDirectory;
 
     private static final String ARCHIVE_CACHE_PREFIX = "ArchiveCache";
     private static final String EXTRACTED_SUB_ARCHIVE_PREFIX = "SubArchive";
 
-    public ArchivesManager() throws IOException {
+    public ArchivesManager(ArchivesReader archivesReader) throws IOException {
+        this.archives = new ConcurrentHashMap<>();
+        this.archivesReader = archivesReader;
         this.archiveCacheDirectory = Files.createTempDirectory(ARCHIVE_CACHE_PREFIX);
     }
 
@@ -92,38 +92,18 @@ public class ArchivesManager implements Disposable {
 
     private ArchiveData tryMakeArchive(
             FsPath archivePath, boolean isTopLevel, FsManager fsManager) {
-        try (
-                ZipInputStream zis = openArchiveStream(archivePath, isTopLevel, fsManager)
-        ) {
-            List<ZipEntry> zipEntries = new ArrayList<>();
-            ZipEntry entry = null;
-            while((entry = zis.getNextEntry()) != null) {
-                zipEntries.add(entry);
+        try {
+            ZipArchive zipArchive = null;
+            if(isTopLevel) {
+                // only fsManager knows where to find top level archives
+                zipArchive = archivesReader.readEntries(archivePath, fsManager);
+            } else {
+                // we extracted this archive so we know it is on local FS
+                zipArchive = archivesReader.readEntries(archivePath);
             }
-            return new ArchiveData(new ZipArchive(archivePath, zipEntries), isTopLevel);
-        } catch (IOException | IllegalArgumentException e) {
-            // IllegalArgumentException exception is thrown
-            // when zip entries have non default encoding we use here
-            // TODO add custom encodings support
+            return new ArchiveData(zipArchive, isTopLevel);
+        } catch (IOException e) {
             return null;
-        }
-    }
-
-    private ZipInputStream openArchiveStream(
-            FsPath archivePath,
-            boolean isTopLevel,
-            FsManager fsManager
-    ) throws IOException {
-        if(isTopLevel) {
-            // only fsManager knows where to find top level archives
-            byte[] contents = fsManager.readFile(archivePath);
-            ByteArrayInputStream bais = new ByteArrayInputStream(contents);
-            return new ZipInputStream(bais);
-        } else {
-            // we extracted this archive so we know it is on local FS
-            FileInputStream fis = new FileInputStream(archivePath.getPath());
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            return new ZipInputStream(bis);
         }
     }
 
@@ -137,48 +117,23 @@ public class ArchivesManager implements Disposable {
         Path subArchiveFile = Paths.get(
                 subArchiveDirectory.toString(), entryPath.getLastComponent());
         FsPath archivePath = entryPath.getArchivePath();
-        try(
-                ZipInputStream zis =
-                        openArchiveStream(archivePath, archiveData.isTopLevel(), fsManager);
-                FileOutputStream fos = new FileOutputStream(subArchiveFile.toFile())
-        ) {
-            boolean entryFound = extractZipEntry(entryPath.getEntryPath(), zis, fos);
-            if(!entryFound) {
-                String message = "zip entry not found, archive " +
-                        entryPath.getArchivePath().getPath() + ", entry " +
-                        entryPath.getEntryPath();
-                throw new IOException(message);
-            }
-            return FsPath.fromPath(subArchiveFile);
-        }
-    }
+        String entryName = entryPath.getEntryPath();
+        FsPath destinationPath = FsPath.fromPath(subArchiveFile);
 
-    private boolean extractZipEntry(
-            String entryName,
-            ZipInputStream zis,
-            FileOutputStream fos
-    ) throws IOException {
         boolean entryFound = false;
-        ZipEntry zipEntry = null;
-        try {
-            while ((zipEntry = zis.getNextEntry()) != null) {
-                if (zipEntry.getName().equals(entryName)) {
-                    entryFound = true;
-                    byte[] buffer = new byte[8192];
-                    int len;
-                    while ((len = zis.read(buffer)) != -1) {
-                        fos.write(buffer, 0, len);
-                    }
-                    break;
-                }
-            }
-        } catch (IllegalArgumentException e) {
-            // IllegalArgumentException exception is thrown
-            // when zip entries have non default encoding we use here
-            // TODO add custom encodings support
-            throw new IOException("failed to decode zip file");
+        if(archiveData.isTopLevel()) {
+            // only fsManager knows where to find top level archives
+            entryFound = archivesReader.extractEntry(
+                    archivePath, entryName, destinationPath, fsManager);
+        } else {
+            // we extracted this archive so we know it is on local FS
+            entryFound = archivesReader.extractEntry(
+                    archivePath, entryName, destinationPath);
         }
-        return entryFound;
+        if(!entryFound) {
+            throw new IOException("zip entry not found - " + entryPath);
+        }
+        return destinationPath;
     }
 
     private static class ArchiveData {

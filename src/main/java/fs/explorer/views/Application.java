@@ -8,6 +8,7 @@ import fs.explorer.providers.dirtree.AsyncFsDataProvider;
 import fs.explorer.providers.dirtree.FsDataProvider;
 import fs.explorer.providers.dirtree.LocalFsManager;
 import fs.explorer.providers.dirtree.archives.ArchivesManager;
+import fs.explorer.providers.dirtree.archives.ArchivesReader;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
 import fs.explorer.providers.preview.AsyncPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
@@ -27,8 +28,11 @@ public class Application {
     // TODO decide how to handle this exception
     public Application() throws IOException {
         List<Disposable> disposables = new ArrayList<>();
+
         LocalFsManager localFsManager = new LocalFsManager();
-        ArchivesManager archivesManager = new ArchivesManager();
+
+        ArchivesReader archivesReader = new ArchivesReader();
+        ArchivesManager archivesManager = new ArchivesManager(archivesReader);
         disposables.add(archivesManager);
 
         StatusBar statusBar = new StatusBar("Ready");
