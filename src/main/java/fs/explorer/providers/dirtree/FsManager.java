@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface FsManager {
+    // TODO consider version returning InputStream
     byte[] readFile(FsPath filePath) throws IOException;
     List<FsPath> list(FsPath directoryPath) throws IOException;
 }

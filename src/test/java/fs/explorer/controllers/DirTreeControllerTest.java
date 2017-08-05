@@ -271,6 +271,8 @@ public class DirTreeControllerTest {
         verify(dirTreePane, never()).expandPath(any());
     }
 
+    // TODO test zip archives
+
     private TreeDataProvider makeTestDataProvider() {
         TestDataProvider provider = spy(new TestDataProvider());
         provider.setTestTopNode(nodeData("/", /*isDirectory*/true));

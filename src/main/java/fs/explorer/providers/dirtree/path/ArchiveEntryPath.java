@@ -3,13 +3,13 @@ package fs.explorer.providers.dirtree.path;
 import java.util.Objects;
 
 public final class ArchiveEntryPath {
-    private final String archivePath;
+    private final FsPath archivePath;
     private final String entryPath;
     private final TargetType targetType;
     private final String lastComponent;
 
     public ArchiveEntryPath(
-            String archivePath,
+            FsPath archivePath,
             String entryPath,
             TargetType targetType,
             String lastComponent
@@ -24,7 +24,7 @@ public final class ArchiveEntryPath {
         return targetType == TargetType.DIRECTORY;
     }
 
-    public String getArchivePath() { return archivePath; }
+    public FsPath getArchivePath() { return archivePath; }
 
     public String getEntryPath() { return entryPath; }
 

@@ -5,6 +5,7 @@ import fs.explorer.providers.dirtree.TreeDataProvider;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.models.dirtree.ExtTreeNodeData;
+import fs.explorer.providers.dirtree.path.TargetType;
 import fs.explorer.views.DirTreePane;
 
 import javax.swing.event.TreeExpansionEvent;
@@ -97,7 +98,9 @@ public class DirTreeController {
                 dirTreeModel.addFakeChild(node, "<empty>");
             } else {
                 for(TreeNodeData nodeData : contents) {
-                    if(PathContainerUtils.isDirectoryPath(nodeData.getPath())) {
+                    TargetType targetType =
+                            PathContainerUtils.getPathTargetType(nodeData.getPath());
+                    if(targetType == TargetType.DIRECTORY || targetType == TargetType.ZIP_ARCHIVE) {
                         dirTreeModel.addNullDirChild(node, nodeData);
                     } else {
                         dirTreeModel.addFileChild(node, nodeData);

@@ -21,4 +21,14 @@ public class PathContainerUtils {
             throw new IllegalStateException("unexpected PathContainer state");
         }
     }
+
+    public static TargetType getPathTargetType(PathContainer path) {
+        if(path.isFsPath()) {
+            return path.asFsPath().getTargetType();
+        } else if(path.isArchiveEntryPath()) {
+            return path.asArchiveEntryPath().getTargetType();
+        } else {
+            throw new IllegalStateException("unexpected PathContainer state");
+        }
+    }
 }

@@ -17,16 +17,19 @@ import fs.explorer.utils.Disposable;
 import fs.explorer.utils.OSInfo;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Application {
     private final MainWindow mainWindow;
 
-    public Application() {
+    // TODO decide how to handle this exception
+    public Application() throws IOException {
         List<Disposable> disposables = new ArrayList<>();
         LocalFsManager localFsManager = new LocalFsManager();
         ArchivesManager archivesManager = new ArchivesManager();
+        disposables.add(archivesManager);
 
         StatusBar statusBar = new StatusBar("Ready");
         StatusBarController statusBarController = new StatusBarController(statusBar);

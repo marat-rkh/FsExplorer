@@ -69,7 +69,7 @@ public class FsDataProvider implements TreeDataProvider {
             onComplete.accept(groupAndSort(data));
         } else if(targetType == TargetType.ZIP_ARCHIVE) {
             archivesManager.addArchiveIfAbsent(path, fsManager);
-            List<ArchiveEntryPath> entries = archivesManager.listArchive(path);
+            List<ArchiveEntryPath> entries = archivesManager.listArchive(path, fsManager);
             if(entries == null) {
                 onFail.accept(INTERNAL_ERROR);
                 return;
@@ -90,7 +90,7 @@ public class FsDataProvider implements TreeDataProvider {
     ) throws IOException {
         TargetType targetType = path.getTargetType();
         if(targetType == TargetType.DIRECTORY || targetType == TargetType.ZIP_ARCHIVE) {
-            List<ArchiveEntryPath> entries = archivesManager.listSubEntry(path);
+            List<ArchiveEntryPath> entries = archivesManager.listSubEntry(path, fsManager);
             if(entries == null) {
                 onFail.accept(INTERNAL_ERROR);
                 return;
