@@ -114,6 +114,8 @@ public class ZipArchiveTest {
         assertEquals(0, entries.size());
     }
 
+    // TODO test listAllEntries
+
     private void setUpHomeZip() throws URISyntaxException, IOException {
         archivePath = testZipPath("/zips/home.zip", "home.zip");
         zipArchive = new ZipArchive(archivePath, TestUtils.readZipEntries(archivePath));

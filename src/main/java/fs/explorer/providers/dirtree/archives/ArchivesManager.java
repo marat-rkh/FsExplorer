@@ -123,11 +123,11 @@ public class ArchivesManager implements Disposable {
         boolean entryFound = false;
         if(archiveData.isTopLevel()) {
             // only fsManager knows where to find top level archives
-            entryFound = archivesReader.extractEntry(
+            entryFound = archivesReader.extractEntryFile(
                     archivePath, entryName, destinationPath, fsManager);
         } else {
             // we extracted this archive so we know it is on local FS
-            entryFound = archivesReader.extractEntry(
+            entryFound = archivesReader.extractEntryFile(
                     archivePath, entryName, destinationPath);
         }
         if(!entryFound) {

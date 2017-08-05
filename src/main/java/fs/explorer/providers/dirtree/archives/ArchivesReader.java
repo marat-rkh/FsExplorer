@@ -10,6 +10,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ArchivesReader {
+    private static final int BUFFER_SIZE = 8192;
+
     public ZipArchive readEntries(FsPath archivePath) throws IOException {
         return readEntries(archivePath, null);
     }
@@ -33,15 +35,15 @@ public class ArchivesReader {
         }
     }
 
-    public boolean extractEntry(
+    public boolean extractEntryFile(
             FsPath archivePath,
             String entryName,
             FsPath destinationPath
     ) throws IOException {
-        return extractEntry(archivePath, entryName, destinationPath, null);
+        return extractEntryFile(archivePath, entryName, destinationPath, null);
     }
 
-    public boolean extractEntry(
+    public boolean extractEntryFile(
             FsPath archivePath,
             String entryName,
             FsPath destinationPath,
@@ -54,12 +56,15 @@ public class ArchivesReader {
             boolean entryFound = false;
             ZipEntry zipEntry = null;
             try {
-                while ((zipEntry = zis.getNextEntry()) != null) {
-                    if (zipEntry.getName().equals(entryName)) {
+                while((zipEntry = zis.getNextEntry()) != null) {
+                    if(zipEntry.getName().equals(entryName)) {
+                        if(zipEntry.isDirectory()) {
+                            throw new IOException("failed to extract entry directory");
+                        }
                         entryFound = true;
-                        byte[] buffer = new byte[8192];
+                        byte[] buffer = new byte[BUFFER_SIZE];
                         int len;
-                        while ((len = zis.read(buffer)) != -1) {
+                        while((len = zis.read(buffer)) != -1) {
                             fos.write(buffer, 0, len);
                         }
                         break;

@@ -50,6 +50,12 @@ public class ZipArchive {
                 .collect(Collectors.toList());
     }
 
+    public List<ZipEntry> listAllEntries() {
+        return entries.stream()
+                .map(ExtZipEntry::getZipEntry)
+                .collect(Collectors.toList());
+    }
+
     private static ExtZipEntry toExtZipEntry(ZipEntry entry) {
         int nameComponentsCount = Paths.get(entry.getName()).getNameCount();
         return new ExtZipEntry(entry, nameComponentsCount);
