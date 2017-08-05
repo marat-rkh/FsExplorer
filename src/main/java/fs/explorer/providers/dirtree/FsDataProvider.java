@@ -40,6 +40,10 @@ public class FsDataProvider implements TreeDataProvider {
             Consumer<List<TreeNodeData>> onComplete,
             Consumer<String> onFail
     ) {
+        if(node == null || node.getPath() == null) {
+            onFail.accept(INTERNAL_ERROR);
+            return;
+        }
         try {
             PathContainer path = node.getPath();
             if(path.isFsPath()) {
@@ -51,7 +55,7 @@ public class FsDataProvider implements TreeDataProvider {
                 onFail.accept(INTERNAL_ERROR);
             }
         } catch (IOException e) {
-            onFail.accept(DATA_READ_ERROR);
+            onFail.accept(DATA_READ_ERROR + " - " + node.pathToString());
         }
     }
 
@@ -63,6 +67,10 @@ public class FsDataProvider implements TreeDataProvider {
         TargetType targetType = path.getTargetType();
         if(targetType == TargetType.DIRECTORY) {
             List<FsPath> entries = fsManager.list(path);
+            if(entries == null) {
+                onFail.accept(INTERNAL_ERROR);
+                return;
+            }
             List<TreeNodeData> data = entries.stream()
                     .map(FsDataProvider::toTreeNodeData)
                     .collect(Collectors.toList());

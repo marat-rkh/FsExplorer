@@ -57,4 +57,14 @@ public class TreeNodeData {
             throw new IllegalStateException("unexpected PathContainer state");
         }
     }
+
+    public String pathToString() {
+        if(path.isFsPath()) {
+            return path.asFsPath().toString();
+        } else if(path.isArchiveEntryPath()) {
+            return path.asArchiveEntryPath().toString();
+        } else {
+            throw new IllegalStateException("unexpected PathContainer state");
+        }
+    }
 }
