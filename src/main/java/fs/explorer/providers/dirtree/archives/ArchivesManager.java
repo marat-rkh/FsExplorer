@@ -30,6 +30,9 @@ public class ArchivesManager implements Disposable {
 
     public ZipArchive addArchiveIfAbsent(
             FsPath archivePath, FsManager fsManager) throws IOException {
+        if(archivePath.getTargetType() != TargetType.ZIP_ARCHIVE) {
+            throw new IOException("not a zip archive");
+        }
         ArchiveData archiveData = addArchiveIfAbsent(
                 archivePath, /*isTopLevel*/true, fsManager);
         return archiveData.getZipArchive();
@@ -42,7 +45,7 @@ public class ArchivesManager implements Disposable {
     public List<ArchiveEntryPath> listArchive(
             FsPath archivePath, FsManager fsManager) throws IOException {
         ArchiveData archiveData = archives.get(archivePath);
-        if (archiveData == null) {
+        if(archiveData == null) {
             return null;
         }
         return archiveData.getZipArchive().listRoot();

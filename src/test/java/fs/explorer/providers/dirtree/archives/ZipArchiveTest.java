@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static fs.explorer.providers.dirtree.archives.TestUtils.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -135,13 +136,5 @@ public class ZipArchiveTest {
             String relativePath, String lastComponent) throws URISyntaxException {
         Path dirPath = Paths.get(getClass().getResource(relativePath).toURI());
         return new FsPath(dirPath.toString(), TargetType.ZIP_ARCHIVE, lastComponent);
-    }
-
-    private ArchiveEntryPath dirPath(FsPath archivePath, String entryPath, String lastComponent) {
-        return new ArchiveEntryPath(archivePath, entryPath, TargetType.DIRECTORY, lastComponent);
-    }
-
-    private ArchiveEntryPath filePath(FsPath archivePath, String entryPath, String lastComponent) {
-        return new ArchiveEntryPath(archivePath, entryPath, TargetType.FILE, lastComponent);
     }
 }

@@ -1,6 +1,8 @@
 package fs.explorer.providers.dirtree.archives;
 
+import fs.explorer.providers.dirtree.path.ArchiveEntryPath;
 import fs.explorer.providers.dirtree.path.FsPath;
+import fs.explorer.providers.dirtree.path.TargetType;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -24,5 +26,23 @@ public class TestUtils {
             }
             return zipEntries;
         }
+    }
+
+    public static ArchiveEntryPath dirPath(
+            FsPath archivePath, String entryPath, String lastComponent) {
+        return new ArchiveEntryPath(
+                archivePath, entryPath, TargetType.DIRECTORY, lastComponent);
+    }
+
+    public static ArchiveEntryPath filePath(
+            FsPath archivePath, String entryPath, String lastComponent) {
+        return new ArchiveEntryPath(
+                archivePath, entryPath, TargetType.FILE, lastComponent);
+    }
+
+    public static ArchiveEntryPath zipPath(
+            FsPath archivePath, String entryPath, String lastComponent) {
+        return new ArchiveEntryPath(
+                archivePath, entryPath, TargetType.ZIP_ARCHIVE, lastComponent);
     }
 }

@@ -68,6 +68,24 @@ public class ArchivesReaderTest {
         assertEquals(0, archive.listAllEntries().size());
     }
 
+    // TODO this should throw exception instead
+    // Current behaviour is due to ZipInputStream
+    // that cannot detect corrupted zip files
+    @Test
+    public void readsNonZipFilesAsEmpty() throws URISyntaxException, IOException {
+        FsPath path = testDataPath("/testdirs/home/draft.txt", TargetType.FILE, "draft.txt");
+        ZipArchive archive =
+            archivesReader.readEntries(path);
+        assertNotNull(archive);
+        assertEquals(0, archive.listAllEntries().size());
+    }
+
+    @Test(expected = IOException.class)
+    public void failsToReadEntriesOfDirectory() throws URISyntaxException, IOException {
+        FsPath path = testDataPath("/testdirs/home", TargetType.DIRECTORY, "home");
+        archivesReader.readEntries(path);
+    }
+
     @Test(expected = IOException.class)
     public void failsToReadNonExistingFile() throws URISyntaxException, IOException {
         FsPath fsPath = new FsPath("/zips/no-such.zip", TargetType.ZIP_ARCHIVE, "no-such.zip");
@@ -153,8 +171,16 @@ public class ArchivesReaderTest {
 
     private FsPath testZipPath(
             String relativePath, String lastComponent) throws URISyntaxException {
+        return testDataPath(relativePath, TargetType.ZIP_ARCHIVE, lastComponent);
+    }
+
+    private FsPath testDataPath(
+            String relativePath,
+            TargetType targetType,
+            String lastComponent
+    ) throws URISyntaxException {
         Path dirPath = Paths.get(getClass().getResource(relativePath).toURI());
-        return new FsPath(dirPath.toString(), TargetType.ZIP_ARCHIVE, lastComponent);
+        return new FsPath(dirPath.toString(), targetType, lastComponent);
     }
 
     private FsPath tmpDestinationFile(String name) throws URISyntaxException {
