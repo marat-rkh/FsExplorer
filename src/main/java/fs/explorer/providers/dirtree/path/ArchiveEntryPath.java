@@ -56,4 +56,17 @@ public final class ArchiveEntryPath {
         res = 13 * res + Objects.hashCode(lastComponent);
         return res;
     }
+
+    @Override
+    public String toString() {
+        String prefix = archivePath == null ? "-" : archivePath.getPath();
+        if(prefix == null) {
+            prefix = "-";
+        }
+        String path = entryPath;
+        if(path == null) {
+            path = "-";
+        }
+        return prefix + ":" + path;
+    }
 }

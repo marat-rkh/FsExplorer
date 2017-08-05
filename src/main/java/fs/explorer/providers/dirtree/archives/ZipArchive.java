@@ -31,7 +31,7 @@ public class ZipArchive {
     }
 
     public List<ArchiveEntryPath> list(ArchiveEntryPath entryPath) {
-        if(!entryPath.getArchivePath().equals(path)) {
+        if(!path.equals(entryPath.getArchivePath())) {
             return null;
         }
         Optional<ExtZipEntry> optExtEntry = entries.stream()
