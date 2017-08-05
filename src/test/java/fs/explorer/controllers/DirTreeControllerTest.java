@@ -4,8 +4,6 @@ import fs.explorer.TestUtils;
 import fs.explorer.providers.dirtree.*;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.providers.dirtree.path.FsPath;
-import fs.explorer.providers.dirtree.path.PathContainer;
-import fs.explorer.providers.dirtree.path.PathContainerUtils;
 import fs.explorer.providers.dirtree.path.TargetType;
 import fs.explorer.views.DirTreePane;
 import org.junit.Before;
@@ -366,8 +364,7 @@ public class DirTreeControllerTest {
     }
 
     private boolean isDirectoryNode(DefaultMutableTreeNode node) {
-        PathContainer path = dirTreeModel.getExtNodeData(node).getNodeData().getPath();
-        return PathContainerUtils.isDirectoryPath(path);
+        return dirTreeModel.getExtNodeData(node).getNodeData().pathTargetIsDirectory();
     }
 
     private static class TestDataProvider implements TreeDataProvider {

@@ -1,6 +1,5 @@
 package fs.explorer.controllers;
 
-import fs.explorer.providers.dirtree.path.PathContainerUtils;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.providers.preview.PreviewProvider;
 import fs.explorer.utils.FileTypeInfo;
@@ -34,10 +33,10 @@ public class PreviewController {
             previewPane.showDefaultPreview();
             return;
         }
-        if(PathContainerUtils.isDirectoryPath(nodeData.getPath())) {
+        if(nodeData.pathTargetIsDirectory()) {
             return;
         }
-        String lastComponent = PathContainerUtils.getPathLastComponent(nodeData.getPath());
+        String lastComponent = nodeData.getPathLastComponent();
         if (FileTypeInfo.isTextFile(lastComponent)) {
             statusBarController.setProgressMessage(LOADING_PREVIEW);
             previewProvider.getTextPreview(

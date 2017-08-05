@@ -1,6 +1,5 @@
 package fs.explorer.controllers;
 
-import fs.explorer.providers.dirtree.path.PathContainerUtils;
 import fs.explorer.providers.dirtree.TreeDataProvider;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
@@ -98,9 +97,9 @@ public class DirTreeController {
                 dirTreeModel.addFakeChild(node, "<empty>");
             } else {
                 for(TreeNodeData nodeData : contents) {
-                    TargetType targetType =
-                            PathContainerUtils.getPathTargetType(nodeData.getPath());
-                    if(targetType == TargetType.DIRECTORY || targetType == TargetType.ZIP_ARCHIVE) {
+                    TargetType targetType = nodeData.getPathTargetType();
+                    if(targetType == TargetType.DIRECTORY ||
+                            targetType == TargetType.ZIP_ARCHIVE) {
                         dirTreeModel.addNullDirChild(node, nodeData);
                     } else {
                         dirTreeModel.addFileChild(node, nodeData);

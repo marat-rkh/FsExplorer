@@ -123,8 +123,7 @@ public class FsDataProvider implements TreeDataProvider {
     private List<TreeNodeData> groupAndSort(List<TreeNodeData> data) {
         // TODO simplify
         Map<Boolean, List<TreeNodeData>> grouped = data.stream()
-                .collect(Collectors.partitioningBy(d ->
-                        PathContainerUtils.isDirectoryPath(d.getPath())));
+                .collect(Collectors.partitioningBy(TreeNodeData::pathTargetIsDirectory));
         List<TreeNodeData> dirsData = grouped.get(true);
         List<TreeNodeData> filesData = grouped.get(false);
         dirsData.sort(Comparator.comparing(TreeNodeData::getLabel));
