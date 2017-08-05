@@ -5,11 +5,10 @@ import fs.explorer.providers.dirtree.path.ArchiveEntryPath;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.path.TargetType;
 import fs.explorer.utils.Disposable;
+import fs.explorer.utils.FsUtils;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -68,13 +67,17 @@ public class ArchivesManager implements Disposable {
         }
     }
 
-    public void clearCache() {
-        // TODO delete archiveCacheDirectory
+    public void clearCache() throws IOException {
+        FsUtils.deleteDirectoryRecursively(archiveCacheDirectory);
     }
 
     @Override
     public void dispose() {
-        clearCache();
+        try {
+            clearCache();
+        } catch (IOException e) {
+            // do nothing
+        }
     }
 
     private ArchiveData addArchiveIfAbsent(

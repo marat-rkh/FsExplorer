@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+// @ThreadSafe
 public class ArchivesReader {
     private static final int BUFFER_SIZE = 8192;
 
