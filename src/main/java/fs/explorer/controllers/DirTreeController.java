@@ -19,7 +19,10 @@ public class DirTreeController {
     private final DirTreeModel dirTreeModel;
     private final PreviewController previewController;
     private final StatusBarController statusBarController;
+
     private TreeDataProvider treeDataProvider;
+
+    private DefaultMutableTreeNode lastSelectedNode;
 
     private static final String DATA_PROVIDER_ERROR = "Failed to load data";
     private static final String INTERNAL_ERROR = "internal error";
@@ -65,9 +68,10 @@ public class DirTreeController {
 
     public void handleTreeSelection(
             TreeSelectionEvent e, DefaultMutableTreeNode lastSelectedNode) {
-        if (lastSelectedNode == null) {
+        if(lastSelectedNode == null) {
             return;
         }
+        this.lastSelectedNode = lastSelectedNode;
         ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(lastSelectedNode);
         if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
             previewController.updatePreview(extNodeData.getNodeData());
@@ -91,12 +95,32 @@ public class DirTreeController {
         }
     }
 
+    public void reloadLastSelectedNode() {
+        if(lastSelectedNode == null) {
+            return;
+        }
+        ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(lastSelectedNode);
+        ExtTreeNodeData.Status status = extNodeData.getStatus();
+        if(
+                extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
+                (status == ExtTreeNodeData.Status.NULL || status == ExtTreeNodeData.Status.LOADED)
+        ) {
+            TargetType targetType = extNodeData.getNodeData().getPathTargetType();
+            // TODO support reload for zip archives
+            if(targetType == TargetType.DIRECTORY) {
+                loadContents(lastSelectedNode, extNodeData);
+            } else if(targetType == TargetType.FILE) {
+                previewController.updatePreview(extNodeData.getNodeData());
+            }
+        }
+    }
+
     private void loadContents(DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
-        extNodeData.setStatus(ExtTreeNodeData.Status.LOADING);
         if(treeDataProvider == null) {
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
             return;
         }
+        extNodeData.setStatus(ExtTreeNodeData.Status.LOADING);
         treeDataProvider.getNodesFor(
                 extNodeData.getNodeData(),
                 contentsInserter(node, extNodeData),

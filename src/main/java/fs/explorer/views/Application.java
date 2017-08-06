@@ -4,8 +4,6 @@ import fs.explorer.controllers.*;
 import fs.explorer.controllers.FTPDialogController;
 import fs.explorer.controllers.FTPInfoValidator;
 import fs.explorer.models.dirtree.DirTreeModel;
-import fs.explorer.providers.dirtree.AsyncFsDataProvider;
-import fs.explorer.providers.dirtree.FsDataProvider;
 import fs.explorer.providers.dirtree.local.LocalFsManager;
 import fs.explorer.providers.dirtree.archives.ArchivesManager;
 import fs.explorer.providers.dirtree.archives.ArchivesReader;
@@ -15,7 +13,6 @@ import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewRenderer;
 import fs.explorer.providers.preview.PreviewRenderer;
 import fs.explorer.utils.Disposable;
-import fs.explorer.utils.OSInfo;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -73,7 +70,7 @@ public class Application {
         FTPDialogController ftpDialogController = new FTPDialogController(
                 ftpDialog, ftpInfoValidator, fsTypeSwitcher, statusBarController);
         MenuBarController controller =
-                new MenuBarController(fsTypeSwitcher, ftpDialogController);
+                new MenuBarController(fsTypeSwitcher, ftpDialogController, dirTreeController);
         MenuBar menuBar = new MenuBar(controller);
 
         mainWindow = new MainWindow("FsExplorer", menuBar, statusBar, dirTreePane, previewPane);

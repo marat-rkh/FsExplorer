@@ -10,12 +10,14 @@ public class MenuBarControllerTest {
     private MenuBarController controller;
     private FsTypeSwitcher fsTypeSwitcher;
     private FTPDialogController ftpDialogController;
+    private DirTreeController dirTreeController;
 
     @Before
     public void setUp() {
         fsTypeSwitcher = mock(FsTypeSwitcher.class);
         ftpDialogController = mock(FTPDialogController.class);
-        controller = new MenuBarController(fsTypeSwitcher, ftpDialogController);
+        dirTreeController = mock(DirTreeController.class);
+        controller = new MenuBarController(fsTypeSwitcher, ftpDialogController, dirTreeController);
     }
 
     @Test
