@@ -67,7 +67,7 @@ public class DirTreeControllerTest {
 
         ArgumentCaptor<TreeNodeData> captor = ArgumentCaptor.forClass(TreeNodeData.class);
         verify(previewController).updatePreview(captor.capture());
-        assertEquals(dirTreeModel.getExtNodeData(dir1).getNodeData(), captor.getValue());
+        assertTrue(dirTreeModel.getExtNodeData(dir1).getNodeData() == captor.getValue());
     }
 
     @Test
@@ -78,7 +78,7 @@ public class DirTreeControllerTest {
 
         ArgumentCaptor<TreeNodeData> captor = ArgumentCaptor.forClass(TreeNodeData.class);
         verify(previewController).updatePreview(captor.capture());
-        assertEquals(dirTreeModel.getExtNodeData(file1).getNodeData(), captor.getValue());
+        assertTrue(dirTreeModel.getExtNodeData(file1).getNodeData() == captor.getValue());
     }
 
     @Test
@@ -269,15 +269,31 @@ public class DirTreeControllerTest {
         verify(dirTreePane, never()).expandPath(any());
     }
 
-    // TODO test zip archives
+    @Test
+    public void createsNullDirNodesForLoadedZipArchives() {
+        setupTestDirTreeModel();
+        setUpTestProviderWithZipArchives();
+        DefaultMutableTreeNode dir2 = TestUtils.getChild(dirTreeModel, 0, 1);
+        dirTreeController.handleTreeExpansion(expansionEvent(dir2));
+
+        verify(dirTreeController.getTreeDataProvider()).getNodesFor(any(), any(), any());
+
+        List<DefaultMutableTreeNode> chs = dirTreeModel.getChildren(dir2);
+        assertEquals(3, chs.size());
+        assertEquals("newDir", getLabel(chs.get(0)));
+        assertEquals("newArch1.zip", getLabel(chs.get(1)));
+        assertTrue(chs.get(1).getAllowsChildren());
+        assertEquals("newArch2.zip", getLabel(chs.get(2)));
+        assertTrue(chs.get(2).getAllowsChildren());
+    }
 
     private TreeDataProvider makeTestDataProvider() {
         TestDataProvider provider = spy(new TestDataProvider());
-        provider.setTestTopNode(nodeData("/", /*isDirectory*/true));
+        provider.setTestTopNode(nodeData("/", TargetType.DIRECTORY));
         provider.setTestNodes(Arrays.asList(
-                nodeData("newDir1", /*isDirectory*/true),
-                nodeData("newDir2", /*isDirectory*/true),
-                nodeData("newFile1", /*isDirectory*/false)
+                nodeData("newDir1", TargetType.DIRECTORY),
+                nodeData("newDir2", TargetType.DIRECTORY),
+                nodeData("newFile1", TargetType.FILE)
         ));
         return provider;
     }
@@ -305,14 +321,30 @@ public class DirTreeControllerTest {
         );
     }
 
+    private void setUpTestProviderWithZipArchives() {
+        TestDataProvider provider = spy(new TestDataProvider());
+        provider.setTestNodes(Arrays.asList(
+                nodeData("newDir", TargetType.DIRECTORY),
+                nodeData("newArch1.zip", TargetType.ZIP_ARCHIVE),
+                nodeData("newArch2.zip", TargetType.ZIP_ARCHIVE)
+        ));
+        dirTreeController = new DirTreeController(
+                dirTreePane,
+                dirTreeModel,
+                previewController,
+                statusBarController,
+                provider
+        );
+    }
+
     private void setupTestDirTreeModel() {
         dirTreeModel.removeAllChildren(dirTreeModel.getRoot());
         DefaultMutableTreeNode dir1 = dirTreeModel.addNullDirChild(
-                dirTreeModel.getRoot(), nodeData("dir1", /*isDirectory*/true));
+                dirTreeModel.getRoot(), nodeData("dir1", TargetType.DIRECTORY));
         dirTreeModel.removeAllChildren(dir1);
         dirTreeModel.getExtNodeData(dir1).setStatus(Status.LOADED);
-        dirTreeModel.addFileChild(dir1, nodeData("file1", /*isDirectory*/false));
-        dirTreeModel.addNullDirChild(dir1, nodeData("dir2", /*isDirectory*/true));
+        dirTreeModel.addFileChild(dir1, nodeData("file1", TargetType.FILE));
+        dirTreeModel.addNullDirChild(dir1, nodeData("dir2", TargetType.DIRECTORY));
     }
 
     private DirTreeModel changeDirTreeModelToSpied() {
@@ -337,8 +369,7 @@ public class DirTreeControllerTest {
         assertEquals(Type.FAKE, getType(nodes.get(4)));
     }
 
-    private static TreeNodeData nodeData(String label, boolean isDirectory) {
-        TargetType targetType = isDirectory ? TargetType.DIRECTORY : TargetType.FILE;
+    private static TreeNodeData nodeData(String label, TargetType targetType) {
         return new TreeNodeData(label, new FsPath("", targetType, ""));
     }
 
