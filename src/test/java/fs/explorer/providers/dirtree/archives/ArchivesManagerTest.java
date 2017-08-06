@@ -216,4 +216,44 @@ public class ArchivesManagerTest {
                 archivesManager.listSubEntry(dirPath(otherPath, "data/", "data"), fsManager);
         assertNull(entries);
     }
+
+    @Test
+    public void readsEntry() throws IOException {
+        FsPath archivePath = new FsPath("/some/arch.zip", TargetType.ZIP_ARCHIVE, "arch.zip");
+        ZipArchive testArchive = new ZipArchive(archivePath, Collections.emptyList());
+        when(archivesReader.readEntries(any(), same(fsManager))).thenReturn(testArchive);
+        archivesManager.addArchiveIfAbsent(archivePath, fsManager);
+
+        when(archivesReader.readEntryFile(any(), any(), any(), any())).thenReturn(true);
+        byte[] contents = archivesManager.readEntry(filePath(archivePath, "", ""), fsManager);
+
+        assertNotNull(contents);
+    }
+
+    @Test
+    public void doesNotReadEntryWhenArchiveNotAdded() throws IOException {
+        FsPath archivePath = new FsPath("/some/arch.zip", TargetType.ZIP_ARCHIVE, "arch.zip");
+        ZipArchive testArchive = new ZipArchive(archivePath, Collections.emptyList());
+        when(archivesReader.readEntries(any(), same(fsManager))).thenReturn(testArchive);
+        archivesManager.addArchiveIfAbsent(archivePath, fsManager);
+
+        when(archivesReader.readEntryFile(any(), any(), any(), any())).thenReturn(true);
+        FsPath otherArch = new FsPath("/other/arch.zip", TargetType.ZIP_ARCHIVE, "arch.zip");
+        byte[] contents = archivesManager.readEntry(filePath(otherArch, "", ""), fsManager);
+
+        assertNull(contents);
+    }
+
+    @Test
+    public void doesNotReadNonExistingEntry() throws IOException {
+        FsPath archivePath = new FsPath("/some/arch.zip", TargetType.ZIP_ARCHIVE, "arch.zip");
+        ZipArchive testArchive = new ZipArchive(archivePath, Collections.emptyList());
+        when(archivesReader.readEntries(any(), same(fsManager))).thenReturn(testArchive);
+        archivesManager.addArchiveIfAbsent(archivePath, fsManager);
+
+        when(archivesReader.readEntryFile(any(), any(), any(), any())).thenReturn(false);
+        byte[] contents = archivesManager.readEntry(filePath(archivePath, "", ""), fsManager);
+
+        assertNull(contents);
+    }
 }
