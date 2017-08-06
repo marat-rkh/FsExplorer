@@ -51,8 +51,28 @@ public class ArchivesReader {
             FsManager fsManager
     ) throws IOException {
         try(
-                ZipInputStream zis = openArchiveStream(archivePath, fsManager);
                 FileOutputStream fos = new FileOutputStream(destinationPath.getPath())
+        ) {
+            return readEntryFile(archivePath, entryName, fos, fsManager);
+        }
+    }
+
+    public boolean readEntryFile(
+            FsPath archivePath,
+            String entryName,
+            OutputStream destination
+    ) throws IOException {
+        return readEntryFile(archivePath, entryName, destination, null);
+    }
+
+    public boolean readEntryFile(
+            FsPath archivePath,
+            String entryName,
+            OutputStream destination,
+            FsManager fsManager
+    ) throws IOException {
+        try(
+                ZipInputStream zis = openArchiveStream(archivePath, fsManager);
         ) {
             boolean entryFound = false;
             ZipEntry zipEntry = null;
@@ -66,7 +86,7 @@ public class ArchivesReader {
                         byte[] buffer = new byte[BUFFER_SIZE];
                         int len;
                         while((len = zis.read(buffer)) != -1) {
-                            fos.write(buffer, 0, len);
+                            destination.write(buffer, 0, len);
                         }
                         break;
                     }

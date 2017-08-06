@@ -70,6 +70,28 @@ public class ArchivesManager implements Disposable {
         }
     }
 
+    public byte[] readEntry(
+            ArchiveEntryPath entryPath, FsManager fsManager) throws IOException {
+        FsPath archivePath = entryPath.getArchivePath();
+        ArchiveData archiveData = archives.get(archivePath);
+        if(archiveData == null) {
+            return null;
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        boolean entryFound = false;
+        if(archiveData.isTopLevel()) {
+            entryFound = archivesReader.readEntryFile(
+                    archivePath, entryPath.getEntryPath(), baos, fsManager);
+        } else {
+            entryFound = archivesReader.readEntryFile(
+                    archivePath, entryPath.getEntryPath(), baos);
+        }
+        if(!entryFound) {
+            return null;
+        }
+        return baos.toByteArray();
+    }
+
     public void clearCache() throws IOException {
         FsUtils.deleteDirectoryRecursively(archiveCacheDirectory);
     }

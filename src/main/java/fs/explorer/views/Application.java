@@ -42,7 +42,7 @@ public class Application {
 
         PreviewPane previewPane = new PreviewPane();
         DefaultPreviewProvider previewProvider =
-                new DefaultPreviewProvider(localFsManager, previewRenderer);
+                new DefaultPreviewProvider(localFsManager, archivesManager, previewRenderer);
         AsyncPreviewProvider asyncPreviewProvider = new AsyncPreviewProvider(previewProvider);
         disposables.add(asyncPreviewProvider);
         PreviewController previewController =
