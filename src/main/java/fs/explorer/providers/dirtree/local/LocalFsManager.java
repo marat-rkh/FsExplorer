@@ -3,7 +3,10 @@ package fs.explorer.providers.dirtree.local;
 import fs.explorer.providers.dirtree.FsManager;
 import fs.explorer.providers.dirtree.path.FsPath;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
@@ -12,12 +15,27 @@ import java.util.stream.Collectors;
 
 // @ThreadSafe
 public class LocalFsManager implements FsManager {
+    private static final int BUFFER_SIZE = 8196;
+
     @Override
     public byte[] readFile(FsPath fsPath) throws IOException {
         if(fsPath == null || fsPath.getPath() == null) {
             throw new IOException("bad file path");
         }
-        return Files.readAllBytes(Paths.get(fsPath.getPath()));
+        try(
+                FileInputStream fis = new FileInputStream(fsPath.getPath());
+                ByteArrayOutputStream baos = new ByteArrayOutputStream()
+        ) {
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int len = 0;
+            while((len = fis.read(buffer)) != -1) {
+                baos.write(buffer, 0, len);
+                if(Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedIOException();
+                }
+            }
+            return baos.toByteArray();
+        }
     }
 
     @Override

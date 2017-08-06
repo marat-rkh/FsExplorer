@@ -4,15 +4,14 @@ import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.utils.Disposable;
 
 import javax.swing.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
+// @NotThreadSafe
 public class AsyncPreviewProvider implements PreviewProvider, Disposable {
     private final PreviewProvider previewProvider;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private Future<?> currentTask;
 
     private static final String INTERNAL_ERROR = "internal error";
 
@@ -26,17 +25,13 @@ public class AsyncPreviewProvider implements PreviewProvider, Disposable {
             Consumer<JComponent> onComplete,
             Consumer<String> onFail
     ) {
-        try {
-            executor.execute(() ->
-                previewProvider.getTextPreview(
-                    data,
-                    arg -> SwingUtilities.invokeLater(() -> onComplete.accept(arg)),
-                    arg -> SwingUtilities.invokeLater(() -> onFail.accept(arg))
-                )
-            );
-        } catch (RejectedExecutionException e) {
-            onFail.accept(INTERNAL_ERROR);
-        }
+        runAsync(onFail, () ->
+            previewProvider.getTextPreview(
+                data,
+                arg -> SwingUtilities.invokeLater(() -> onComplete.accept(arg)),
+                arg -> SwingUtilities.invokeLater(() -> onFail.accept(arg))
+            )
+        );
     }
 
     @Override
@@ -45,27 +40,20 @@ public class AsyncPreviewProvider implements PreviewProvider, Disposable {
             Consumer<JComponent> onComplete,
             Consumer<String> onFail
     ) {
-        try {
-            executor.execute(() ->
-                previewProvider.getImagePreview(
-                    data,
-                    arg -> SwingUtilities.invokeLater(() -> onComplete.accept(arg)),
-                    arg -> SwingUtilities.invokeLater(() -> onFail.accept(arg))
-                )
-            );
-        } catch (RejectedExecutionException e) {
-            onFail.accept(INTERNAL_ERROR);
-        }
+        runAsync(onFail, () ->
+            previewProvider.getImagePreview(
+                data,
+                arg -> SwingUtilities.invokeLater(() -> onComplete.accept(arg)),
+                arg -> SwingUtilities.invokeLater(() -> onFail.accept(arg))
+            )
+        );
     }
 
-    public void shutdown() {
-        executor.shutdown();
+    public void shutdownNow() {
+        executor.shutdownNow();
         try {
             if(!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-                if(!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                    // failed to shutdown
-                }
+                // failed to shutdown
             }
         } catch (InterruptedException e) {
             executor.shutdownNow();
@@ -75,6 +63,17 @@ public class AsyncPreviewProvider implements PreviewProvider, Disposable {
 
     @Override
     public void dispose() {
-        shutdown();
+        shutdownNow();
+    }
+
+    private void runAsync(Consumer<String> onFail, Runnable getPreviewTask) {
+        try {
+            if(currentTask != null) {
+                currentTask.cancel(/*mayInterruptIfRunning*/true);
+            }
+            currentTask = executor.submit(getPreviewTask);
+        } catch (RejectedExecutionException e) {
+            onFail.accept(INTERNAL_ERROR);
+        }
     }
 }

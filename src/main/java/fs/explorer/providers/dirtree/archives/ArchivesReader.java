@@ -26,6 +26,9 @@ public class ArchivesReader {
             ZipEntry entry = null;
             while((entry = zis.getNextEntry()) != null) {
                 zipEntries.add(entry);
+                if(Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedIOException();
+                }
             }
             return new ZipArchive(archivePath, zipEntries);
         } catch (IllegalArgumentException e) {
@@ -87,8 +90,14 @@ public class ArchivesReader {
                         int len;
                         while((len = zis.read(buffer)) != -1) {
                             destination.write(buffer, 0, len);
+                            if(Thread.currentThread().isInterrupted()) {
+                                throw new InterruptedIOException();
+                            }
                         }
                         break;
+                    }
+                    if(Thread.currentThread().isInterrupted()) {
+                        throw new InterruptedIOException();
                     }
                 }
             } catch (IllegalArgumentException e) {

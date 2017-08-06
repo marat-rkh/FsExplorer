@@ -10,8 +10,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -23,6 +22,7 @@ public class RemoteFsManager implements FsManager, Disposable {
     private final FTPClient ftpClient;
 
     private static final long KEEP_ALIVE_TIMEOUT_SECONDS = 150;
+    private static final int BUFFER_SIZE = 8192;
 
     public RemoteFsManager() {
         ftpClient = new FTPClient();
@@ -54,8 +54,23 @@ public class RemoteFsManager implements FsManager, Disposable {
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         synchronized(ftpClient) {
-            if (!ftpClient.retrieveFile(filePath.getPath(), baos)) {
-                throw new IOException("read failed");
+            try (
+                    InputStream is = ftpClient.retrieveFileStream(filePath.getPath())
+            ) {
+                if(is == null) {
+                    throw new IOException("failed to read remote file");
+                }
+                byte[] buffer = new byte[BUFFER_SIZE];
+                int len = 0;
+                while((len = is.read(buffer)) != -1) {
+                    baos.write(buffer, 0, len);
+                    if(Thread.currentThread().isInterrupted()) {
+                        throw new InterruptedIOException();
+                    }
+                }
+            }
+            if(!ftpClient.completePendingCommand()) {
+                throw new IOException("failed to finish remote file read");
             }
         }
         return baos.toByteArray();
