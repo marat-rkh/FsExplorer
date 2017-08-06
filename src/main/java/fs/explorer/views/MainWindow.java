@@ -60,8 +60,9 @@ public final class MainWindow {
                 treeAndPreview,
                 statusBar.asJComponent()
         );
-        mainAndStatusBar.setOneTouchExpandable(true);
-        mainAndStatusBar.setDividerLocation(9 * WINDOW_HEIGHT / 10);
+        mainAndStatusBar.setDividerLocation(92 * WINDOW_HEIGHT / 100);
+        mainAndStatusBar.setResizeWeight(1.0);
+        mainAndStatusBar.setEnabled(false);
         return mainAndStatusBar;
     }
 
