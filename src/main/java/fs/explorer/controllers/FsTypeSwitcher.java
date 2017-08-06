@@ -10,62 +10,65 @@ import fs.explorer.providers.dirtree.remote.FTPException;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.utils.Disposable;
+import fs.explorer.utils.OSInfo;
 
+// @NotThreadSafe
 public class FsTypeSwitcher implements Disposable {
     private final DirTreeController dirTreeController;
     private final DefaultPreviewProvider previewProvider;
-    private final TreeDataProvider localFsDataProvider;
     private final LocalFsManager localFsManager;
     private final RemoteFsManager remoteFsManager;
     private final ArchivesManager archivesManager;
 
-    private AsyncFsDataProvider asyncRemoteFsDataProvider;
+    private AsyncFsDataProvider asyncFsDataProvider;
 
+    private static final FsPath localDriveTopDir = OSInfo.getRootFsPath();
     private static final FsPath remoteHostTopDir =
             new FsPath("/", TargetType.DIRECTORY, "/");
 
     public FsTypeSwitcher(
             DirTreeController dirTreeController,
             DefaultPreviewProvider previewProvider,
-            TreeDataProvider localFsDataProvider,
             LocalFsManager localFsManager,
             RemoteFsManager remoteFsManager,
             ArchivesManager archivesManager
     ) {
         this.dirTreeController = dirTreeController;
         this.previewProvider = previewProvider;
-        this.localFsDataProvider = localFsDataProvider;
         this.localFsManager = localFsManager;
         this.remoteFsManager = remoteFsManager;
         this.archivesManager = archivesManager;
     }
 
     public void switchToLocalFs() {
-        disposeCurrentRemoteFsDataProvider();
-        dirTreeController.resetDataProvider(localFsDataProvider);
+        disposeCurrentFsDataProvider();
+        asyncFsDataProvider = new AsyncFsDataProvider(
+                new FsDataProvider(localDriveTopDir, localFsManager, archivesManager)
+        );
+        dirTreeController.resetDataProvider(asyncFsDataProvider);
         previewProvider.resetFsManager(localFsManager);
     }
 
     public void switchToRemoteFs(FTPConnectionInfo connectionInfo) throws FTPException {
         remoteFsManager.reconnect(connectionInfo);
-        disposeCurrentRemoteFsDataProvider();
-        asyncRemoteFsDataProvider = new AsyncFsDataProvider(
+        disposeCurrentFsDataProvider();
+        asyncFsDataProvider = new AsyncFsDataProvider(
                 new FsDataProvider(remoteHostTopDir, remoteFsManager, archivesManager)
         );
-        dirTreeController.resetDataProvider(asyncRemoteFsDataProvider);
+        dirTreeController.resetDataProvider(asyncFsDataProvider);
         previewProvider.resetFsManager(remoteFsManager);
     }
 
-    public void disposeCurrentRemoteFsDataProvider() {
-        if(asyncRemoteFsDataProvider != null) {
-            // TODO this `shutdown` should be done in background thread
-            asyncRemoteFsDataProvider.shutdown();
-            asyncRemoteFsDataProvider = null;
+    public void disposeCurrentFsDataProvider() {
+        if(asyncFsDataProvider != null) {
+            // TODO this `dispose` should be done in background thread
+            asyncFsDataProvider.dispose();
+            asyncFsDataProvider = null;
         }
     }
 
     @Override
     public void dispose() {
-        disposeCurrentRemoteFsDataProvider();
+        disposeCurrentFsDataProvider();
     }
 }

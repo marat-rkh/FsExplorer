@@ -22,6 +22,7 @@ public class DirTreeController {
     private TreeDataProvider treeDataProvider;
 
     private static final String DATA_PROVIDER_ERROR = "Failed to load data";
+    private static final String INTERNAL_ERROR = "internal error";
 
     public DirTreeController(
             DirTreePane dirTreePane,
@@ -37,13 +38,26 @@ public class DirTreeController {
         this.treeDataProvider = defaultDataProvider;
     }
 
+    public DirTreeController(
+            DirTreePane dirTreePane,
+            DirTreeModel dirTreeModel,
+            PreviewController previewController,
+            StatusBarController statusBarController
+    ) {
+        this(dirTreePane, dirTreeModel, previewController, statusBarController, null);
+    }
+
     public TreeDataProvider getTreeDataProvider() { return treeDataProvider; }
 
     public void resetDataProvider(TreeDataProvider treeDataProvider) {
+        if(treeDataProvider == null) {
+            statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
+            return;
+        }
         this.treeDataProvider = treeDataProvider;
         DefaultMutableTreeNode root = dirTreeModel.getRoot();
         dirTreeModel.removeAllChildren(root);
-        treeDataProvider.getTopNode(nodeData -> {
+        this.treeDataProvider.getTopNode(nodeData -> {
             dirTreeModel.addNullDirChild(root, nodeData);
             dirTreePane.expandPath(new TreePath(root.getPath()));
         });
@@ -79,6 +93,10 @@ public class DirTreeController {
 
     private void loadContents(DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
         extNodeData.setStatus(ExtTreeNodeData.Status.LOADING);
+        if(treeDataProvider == null) {
+            statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
+            return;
+        }
         treeDataProvider.getNodesFor(
                 extNodeData.getNodeData(),
                 contentsInserter(node, extNodeData),

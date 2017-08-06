@@ -23,7 +23,6 @@ public class FsTypeSwitcherTest {
     private FsTypeSwitcher fsTypeSwitcher;
     private DirTreeController dirTreeController;
     private DefaultPreviewProvider previewProvider;
-    private TreeDataProvider localFsDataProvider;
     private LocalFsManager localFsManager;
     private RemoteFsManager remoteFsManager;
     private ArchivesManager archivesManager;
@@ -32,25 +31,23 @@ public class FsTypeSwitcherTest {
     public void setUp() {
         dirTreeController = mock(DirTreeController.class);
         previewProvider = mock(DefaultPreviewProvider.class);
-        localFsDataProvider = mock(TreeDataProvider.class);
         localFsManager = mock(LocalFsManager.class);
         remoteFsManager = mock(RemoteFsManager.class);
-        // TODO test manipulations with archivesManager
         archivesManager = mock(ArchivesManager.class);
         fsTypeSwitcher = spy(new FsTypeSwitcher(
                 dirTreeController,
                 previewProvider,
-                localFsDataProvider,
                 localFsManager,
                 remoteFsManager,
-                archivesManager));
+                archivesManager
+        ));
     }
 
     @Test
     public void switchesToLocalFs() {
         fsTypeSwitcher.switchToLocalFs();
-        verify(fsTypeSwitcher).disposeCurrentRemoteFsDataProvider();
-        verify(dirTreeController).resetDataProvider(localFsDataProvider);
+        verify(fsTypeSwitcher).disposeCurrentFsDataProvider();
+        verify(dirTreeController).resetDataProvider(any());
         verify(previewProvider).resetFsManager(localFsManager);
     }
 
@@ -59,7 +56,7 @@ public class FsTypeSwitcherTest {
         FTPConnectionInfo connectionInfo = mock(FTPConnectionInfo.class);
         fsTypeSwitcher.switchToRemoteFs(connectionInfo);
         verify(remoteFsManager).reconnect(connectionInfo);
-        verify(fsTypeSwitcher).disposeCurrentRemoteFsDataProvider();
+        verify(fsTypeSwitcher).disposeCurrentFsDataProvider();
         verify(dirTreeController).resetDataProvider(any());
         verify(previewProvider).resetFsManager(remoteFsManager);
     }
@@ -72,7 +69,7 @@ public class FsTypeSwitcherTest {
             fsTypeSwitcher.switchToRemoteFs(connectionInfo);
             fail();
         } catch (FTPException e) {
-            verify(fsTypeSwitcher, never()).disposeCurrentRemoteFsDataProvider();
+            verify(fsTypeSwitcher, never()).disposeCurrentFsDataProvider();
             verify(dirTreeController, never()).resetDataProvider(any());
             verify(previewProvider, never()).resetFsManager(any());
         }
@@ -83,8 +80,8 @@ public class FsTypeSwitcherTest {
         fsTypeSwitcher.switchToLocalFs();
         fsTypeSwitcher.switchToLocalFs();
         fsTypeSwitcher.switchToLocalFs();
-        verify(fsTypeSwitcher, times(3)).disposeCurrentRemoteFsDataProvider();
-        verify(dirTreeController, times(3)).resetDataProvider(localFsDataProvider);
+        verify(fsTypeSwitcher, times(3)).disposeCurrentFsDataProvider();
+        verify(dirTreeController, times(3)).resetDataProvider(any());
         verify(previewProvider, times(3)).resetFsManager(localFsManager);
     }
 
@@ -96,7 +93,7 @@ public class FsTypeSwitcherTest {
         fsTypeSwitcher.switchToRemoteFs(connectionInfo);
 
         verify(remoteFsManager, times(3)).reconnect(connectionInfo);
-        verify(fsTypeSwitcher, times(3)).disposeCurrentRemoteFsDataProvider();
+        verify(fsTypeSwitcher, times(3)).disposeCurrentFsDataProvider();
         verify(dirTreeController, times(3)).resetDataProvider(any());
         verify(previewProvider, times(3)).resetFsManager(remoteFsManager);
     }
@@ -113,7 +110,7 @@ public class FsTypeSwitcherTest {
         fsTypeSwitcher.switchToRemoteFs(connectionInfo);
 
         verify(remoteFsManager, times(2)).reconnect(connectionInfo);
-        verify(fsTypeSwitcher).disposeCurrentRemoteFsDataProvider();
+        verify(fsTypeSwitcher).disposeCurrentFsDataProvider();
         verify(dirTreeController).resetDataProvider(any());
         verify(previewProvider).resetFsManager(remoteFsManager);
     }
@@ -130,8 +127,8 @@ public class FsTypeSwitcherTest {
         fsTypeSwitcher.switchToLocalFs();
 
         verify(remoteFsManager).reconnect(connectionInfo);
-        verify(fsTypeSwitcher).disposeCurrentRemoteFsDataProvider();
-        verify(dirTreeController).resetDataProvider(localFsDataProvider);
+        verify(fsTypeSwitcher).disposeCurrentFsDataProvider();
+        verify(dirTreeController).resetDataProvider(any());
         verify(previewProvider).resetFsManager(localFsManager);
     }
 
@@ -142,12 +139,12 @@ public class FsTypeSwitcherTest {
         fsTypeSwitcher.switchToRemoteFs(connectionInfo);
         fsTypeSwitcher.switchToLocalFs();
 
-        verify(fsTypeSwitcher, times(3)).disposeCurrentRemoteFsDataProvider();
+        verify(fsTypeSwitcher, times(3)).disposeCurrentFsDataProvider();
 
         ArgumentCaptor<TreeDataProvider> captor1 =
                 ArgumentCaptor.forClass(TreeDataProvider.class);
         verify(dirTreeController, times(3)).resetDataProvider(captor1.capture());
-        assertTrue(captor1.getAllValues().get(2) == localFsDataProvider);
+        assertNotNull(captor1.getAllValues().get(2));
 
         ArgumentCaptor<FsManager> captor2 = ArgumentCaptor.forClass(FsManager.class);
         verify(previewProvider, times(3)).resetFsManager(captor2.capture());
@@ -161,12 +158,12 @@ public class FsTypeSwitcherTest {
         fsTypeSwitcher.switchToLocalFs();
         fsTypeSwitcher.switchToRemoteFs(connectionInfo);
 
-        verify(fsTypeSwitcher, times(3)).disposeCurrentRemoteFsDataProvider();
+        verify(fsTypeSwitcher, times(3)).disposeCurrentFsDataProvider();
 
         ArgumentCaptor<TreeDataProvider> captor1 =
                 ArgumentCaptor.forClass(TreeDataProvider.class);
         verify(dirTreeController, times(3)).resetDataProvider(captor1.capture());
-        assertTrue(captor1.getAllValues().get(2) != localFsDataProvider);
+        assertNotNull(captor1.getAllValues().get(2));
 
         ArgumentCaptor<FsManager> captor2 = ArgumentCaptor.forClass(FsManager.class);
         verify(previewProvider, times(3)).resetFsManager(captor2.capture());
@@ -216,7 +213,7 @@ public class FsTypeSwitcherTest {
             ArgumentCaptor<TreeDataProvider> captor1 =
                     ArgumentCaptor.forClass(TreeDataProvider.class);
             verify(dirTreeController, times(5)).resetDataProvider(captor1.capture());
-            assertTrue(captor1.getAllValues().get(4) == localFsDataProvider);
+            assertNotNull(captor1.getAllValues().get(2));
 
             ArgumentCaptor<FsManager> captor2 = ArgumentCaptor.forClass(FsManager.class);
             verify(previewProvider, times(5)).resetFsManager(captor2.capture());
@@ -225,7 +222,7 @@ public class FsTypeSwitcherTest {
             ArgumentCaptor<TreeDataProvider> captor1 =
                     ArgumentCaptor.forClass(TreeDataProvider.class);
             verify(dirTreeController, times(5)).resetDataProvider(captor1.capture());
-            assertTrue(captor1.getAllValues().get(4) != localFsDataProvider);
+            assertNotNull(captor1.getAllValues().get(2));
 
             ArgumentCaptor<FsManager> captor2 = ArgumentCaptor.forClass(FsManager.class);
             verify(previewProvider, times(5)).resetFsManager(captor2.capture());

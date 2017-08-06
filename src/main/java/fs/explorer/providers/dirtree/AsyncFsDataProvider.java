@@ -44,14 +44,11 @@ public class AsyncFsDataProvider implements TreeDataProvider, Disposable {
         }
     }
 
-    public void shutdown() {
-        executor.shutdown();
+    public void shutdownNow() {
+        executor.shutdownNow();
         try {
             if(!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-                if(!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                    // failed to shutdown
-                }
+                // failed to shutdown
             }
         } catch (InterruptedException e) {
             executor.shutdownNow();
@@ -61,6 +58,6 @@ public class AsyncFsDataProvider implements TreeDataProvider, Disposable {
 
     @Override
     public void dispose() {
-        shutdown();
+        shutdownNow();
     }
 }

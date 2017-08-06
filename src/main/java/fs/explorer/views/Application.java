@@ -48,20 +48,13 @@ public class Application {
         PreviewController previewController =
                 new PreviewController(previewPane, asyncPreviewProvider, statusBarController);
 
-        FsDataProvider localFsDataProvider =
-                new FsDataProvider(OSInfo.getRootFsPath(), localFsManager, archivesManager);
-        AsyncFsDataProvider asyncLocalFsDataProvider =
-                new AsyncFsDataProvider(localFsDataProvider);
-        disposables.add(asyncLocalFsDataProvider);
-
         DirTreeModel dirTreeModel = new DirTreeModel();
         DirTreePane dirTreePane = new DirTreePane(dirTreeModel.getInnerTreeModel());
         DirTreeController dirTreeController = new DirTreeController(
                 dirTreePane,
                 dirTreeModel,
                 previewController,
-                statusBarController,
-                asyncLocalFsDataProvider
+                statusBarController
         );
         dirTreePane.setController(dirTreeController);
 
@@ -72,7 +65,6 @@ public class Application {
         FsTypeSwitcher fsTypeSwitcher = new FsTypeSwitcher(
                 dirTreeController,
                 previewProvider,
-                asyncLocalFsDataProvider,
                 localFsManager,
                 remoteFsManager,
                 archivesManager

@@ -287,6 +287,8 @@ public class DirTreeControllerTest {
         assertTrue(chs.get(2).getAllowsChildren());
     }
 
+    // TODO test with null provider
+
     private TreeDataProvider makeTestDataProvider() {
         TestDataProvider provider = spy(new TestDataProvider());
         provider.setTestTopNode(nodeData("/", TargetType.DIRECTORY));
