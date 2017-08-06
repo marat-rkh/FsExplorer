@@ -7,6 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -61,7 +62,7 @@ public class ArchivesReaderTest {
     // Current behaviour is due to ZipInputStream
     // that cannot detect corrupted zip files
     @Test
-    public void readsCorruptedZipFilesAsEmpty() throws URISyntaxException, IOException {
+    public void readsEntriesOfCorruptedZipFilesAsEmpty() throws URISyntaxException, IOException {
         ZipArchive archive =
                 archivesReader.readEntries(testZipPath("/zips/bad.zip", "bad.zip"));
         assertNotNull(archive);
@@ -72,7 +73,7 @@ public class ArchivesReaderTest {
     // Current behaviour is due to ZipInputStream
     // that cannot detect corrupted zip files
     @Test
-    public void readsNonZipFilesAsEmpty() throws URISyntaxException, IOException {
+    public void readsEntriesOfNonZipFilesAsEmpty() throws URISyntaxException, IOException {
         FsPath path = testDataPath("/testdirs/home/draft.txt", TargetType.FILE, "draft.txt");
         ZipArchive archive =
             archivesReader.readEntries(path);
@@ -87,7 +88,7 @@ public class ArchivesReaderTest {
     }
 
     @Test(expected = IOException.class)
-    public void failsToReadNonExistingFile() throws URISyntaxException, IOException {
+    public void failsToReadEntriesOfNonExistingFile() throws URISyntaxException, IOException {
         FsPath fsPath = new FsPath("/zips/no-such.zip", TargetType.ZIP_ARCHIVE, "no-such.zip");
         archivesReader.readEntries(fsPath);
     }
@@ -166,6 +167,38 @@ public class ArchivesReaderTest {
         List<String> lines = Files.readAllLines(extractedPath);
         assertEquals(1, lines.size());
         assertEquals("draft text", lines.get(0));
+        verify(fsManager).readFile(archive);
+    }
+
+    @Test
+    public void readsEntryFile1() throws URISyntaxException, IOException {
+        FsPath archive = testZipPath("/zips/data.zip", "data.zip");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        boolean entryFound = archivesReader.readEntryFile(archive, "text/descr.txt", baos);
+        assertTrue(entryFound);
+        String contents = new String(baos.toByteArray());
+        assertEquals("textual description", contents);
+    }
+
+    @Test
+    public void readsEntryFile2() throws URISyntaxException, IOException {
+        FsPath archive = testZipPath("/zips/data.zip", "data.zip");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        boolean entryFound = archivesReader.readEntryFile(archive, "drunk.jpg", baos);
+        assertTrue(entryFound);
+        assertTrue(baos.toByteArray().length > 0);
+    }
+
+    @Test
+    public void readsEntryFileViaFsManager() throws URISyntaxException, IOException {
+        FsPath archive = testZipPath("/zips/data.zip", "data.zip");
+        LocalFsManager fsManager = spy(new LocalFsManager());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        boolean entryFound = archivesReader.readEntryFile(
+                archive, "text/descr.txt", baos, fsManager);
+        assertTrue(entryFound);
+        String contents = new String(baos.toByteArray());
+        assertEquals("textual description", contents);
         verify(fsManager).readFile(archive);
     }
 
