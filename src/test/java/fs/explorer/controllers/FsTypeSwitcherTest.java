@@ -1,7 +1,7 @@
 package fs.explorer.controllers;
 
 import fs.explorer.providers.dirtree.FsManager;
-import fs.explorer.providers.dirtree.LocalFsManager;
+import fs.explorer.providers.dirtree.local.LocalFsManager;
 import fs.explorer.providers.dirtree.TreeDataProvider;
 import fs.explorer.providers.dirtree.archives.ArchivesManager;
 import fs.explorer.providers.dirtree.remote.FTPConnectionInfo;

@@ -1,6 +1,6 @@
 package fs.explorer.providers.dirtree.archives;
 
-import fs.explorer.providers.dirtree.LocalFsManager;
+import fs.explorer.providers.dirtree.local.LocalFsManager;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.path.TargetType;
 import org.junit.Rule;

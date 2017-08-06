@@ -1,5 +1,6 @@
-package fs.explorer.providers.dirtree;
+package fs.explorer.providers.dirtree.local;
 
+import fs.explorer.providers.dirtree.local.LocalFsManager;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.path.TargetType;
 import org.junit.Rule;

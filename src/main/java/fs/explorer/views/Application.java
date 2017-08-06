@@ -6,7 +6,7 @@ import fs.explorer.controllers.FTPInfoValidator;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.providers.dirtree.AsyncFsDataProvider;
 import fs.explorer.providers.dirtree.FsDataProvider;
-import fs.explorer.providers.dirtree.LocalFsManager;
+import fs.explorer.providers.dirtree.local.LocalFsManager;
 import fs.explorer.providers.dirtree.archives.ArchivesManager;
 import fs.explorer.providers.dirtree.archives.ArchivesReader;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
