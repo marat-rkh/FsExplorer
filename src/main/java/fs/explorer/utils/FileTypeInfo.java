@@ -30,12 +30,7 @@ public class FileTypeInfo {
         IMG_FILE_EXTENSIONS.add("jpeg");
         IMG_FILE_EXTENSIONS.add("jpg");
         IMG_FILE_EXTENSIONS.add("png");
-        IMG_FILE_EXTENSIONS.add("bmp");
         IMG_FILE_EXTENSIONS.add("gif");
-        IMG_FILE_EXTENSIONS.add("ico");
-        IMG_FILE_EXTENSIONS.add("svg");
-        IMG_FILE_EXTENSIONS.add("tif");
-        IMG_FILE_EXTENSIONS.add("tiff");
     }
 
     private static final String ZIP_EXTENSION = "zip";
