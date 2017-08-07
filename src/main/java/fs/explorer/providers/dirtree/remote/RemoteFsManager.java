@@ -1,6 +1,7 @@
 package fs.explorer.providers.dirtree.remote;
 
 import fs.explorer.providers.dirtree.FsManager;
+import fs.explorer.providers.dirtree.IOFunction;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.path.TargetType;
 import fs.explorer.utils.Disposable;
@@ -49,31 +50,43 @@ public class RemoteFsManager implements FsManager, Disposable {
 
     @Override
     public byte[] readFile(FsPath filePath) throws IOException {
+        return withFileStream(filePath, is -> {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int len = 0;
+            while((len = is.read(buffer)) != -1) {
+                baos.write(buffer, 0, len);
+                if(Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedIOException();
+                }
+            }
+            return baos.toByteArray();
+        });
+    }
+
+    @Override
+    public <R> R withFileStream(
+            FsPath filePath, IOFunction<InputStream, R> streamReader) throws IOException {
         if(filePath == null || filePath.getPath() == null) {
             throw new IOException("bad file path");
         }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         synchronized(ftpClient) {
+            R result = null;
             try (
                     InputStream is = ftpClient.retrieveFileStream(filePath.getPath())
             ) {
                 if(is == null) {
                     throw new IOException("failed to read remote file");
                 }
-                byte[] buffer = new byte[BUFFER_SIZE];
-                int len = 0;
-                while((len = is.read(buffer)) != -1) {
-                    baos.write(buffer, 0, len);
-                    if(Thread.currentThread().isInterrupted()) {
-                        throw new InterruptedIOException();
-                    }
-                }
+                result = streamReader.apply(is);
+                // read the rest or command completion fails
+                skipRest(is);
             }
             if(!ftpClient.completePendingCommand()) {
                 throw new IOException("failed to finish remote file read");
             }
+            return result;
         }
-        return baos.toByteArray();
     }
 
     @Override
@@ -188,5 +201,14 @@ public class RemoteFsManager implements FsManager, Disposable {
             throw new FTPException("connection configureClient failed");
         }
         ftpClient.setControlKeepAliveTimeout(KEEP_ALIVE_TIMEOUT_SECONDS);
+    }
+
+    private void skipRest(InputStream is) throws IOException {
+        byte[] buffer = new byte[BUFFER_SIZE];
+        while(is.read(buffer) != -1) {
+            if(Thread.currentThread().isInterrupted()) {
+                throw new InterruptedIOException();
+            }
+        }
     }
 }

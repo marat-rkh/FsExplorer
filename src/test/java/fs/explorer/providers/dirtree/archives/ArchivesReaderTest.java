@@ -100,7 +100,7 @@ public class ArchivesReaderTest {
         ZipArchive archive = archivesReader.readEntries(archivePath, fsManager);
         assertNotNull(archive);
         assertEquals(11, archive.listAllEntries().size());
-        verify(fsManager).readFile(archivePath);
+        verify(fsManager).withFileStream(same(archivePath), any());
     }
 
     @Test
@@ -167,7 +167,7 @@ public class ArchivesReaderTest {
         List<String> lines = Files.readAllLines(extractedPath);
         assertEquals(1, lines.size());
         assertEquals("draft text", lines.get(0));
-        verify(fsManager).readFile(archive);
+        verify(fsManager).withFileStream(same(archive), any());
     }
 
     @Test
@@ -199,7 +199,7 @@ public class ArchivesReaderTest {
         assertTrue(entryFound);
         String contents = new String(baos.toByteArray());
         assertEquals("textual description", contents);
-        verify(fsManager).readFile(archive);
+        verify(fsManager).withFileStream(same(archive), any());
     }
 
     private FsPath testZipPath(

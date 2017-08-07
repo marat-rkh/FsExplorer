@@ -1,6 +1,7 @@
 package fs.explorer.providers.dirtree.archives;
 
 import fs.explorer.providers.dirtree.FsManager;
+import fs.explorer.providers.dirtree.IOFunction;
 import fs.explorer.providers.dirtree.path.FsPath;
 
 import java.io.*;
@@ -19,9 +20,7 @@ public class ArchivesReader {
 
     public ZipArchive readEntries(
             FsPath archivePath, FsManager fsManager) throws IOException {
-        try (
-                ZipInputStream zis = openArchiveStream(archivePath, fsManager)
-        ) {
+        return withZipStream(archivePath, fsManager, zis -> {
             List<ZipEntry> zipEntries = new ArrayList<>();
             ZipEntry entry = null;
             while((entry = zis.getNextEntry()) != null) {
@@ -31,12 +30,7 @@ public class ArchivesReader {
                 }
             }
             return new ZipArchive(archivePath, zipEntries);
-        } catch (IllegalArgumentException e) {
-            // IllegalArgumentException exception is thrown
-            // when zip entries have non default encoding we use here
-            // TODO add custom encodings support
-            throw new IOException("failed to decode zip file");
-        }
+        });
     }
 
     public boolean extractEntryFile(
@@ -74,54 +68,65 @@ public class ArchivesReader {
             OutputStream destination,
             FsManager fsManager
     ) throws IOException {
-        try(
-                ZipInputStream zis = openArchiveStream(archivePath, fsManager);
-        ) {
+        return withZipStream(archivePath, fsManager, zis -> {
             boolean entryFound = false;
             ZipEntry zipEntry = null;
-            try {
-                while((zipEntry = zis.getNextEntry()) != null) {
-                    if(zipEntry.getName().equals(entryName)) {
-                        if(zipEntry.isDirectory()) {
-                            throw new IOException("failed to extract entry directory");
-                        }
-                        entryFound = true;
-                        byte[] buffer = new byte[BUFFER_SIZE];
-                        int len;
-                        while((len = zis.read(buffer)) != -1) {
-                            destination.write(buffer, 0, len);
-                            if(Thread.currentThread().isInterrupted()) {
-                                throw new InterruptedIOException();
-                            }
-                        }
-                        break;
+            while((zipEntry = zis.getNextEntry()) != null) {
+                if(zipEntry.getName().equals(entryName)) {
+                    if(zipEntry.isDirectory()) {
+                        throw new IOException("failed to extract entry directory");
                     }
-                    if(Thread.currentThread().isInterrupted()) {
-                        throw new InterruptedIOException();
+                    entryFound = true;
+                    byte[] buffer = new byte[BUFFER_SIZE];
+                    int len;
+                    while((len = zis.read(buffer)) != -1) {
+                        destination.write(buffer, 0, len);
+                        if(Thread.currentThread().isInterrupted()) {
+                            throw new InterruptedIOException();
+                        }
                     }
+                    break;
                 }
+                if(Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedIOException();
+                }
+            }
+            return entryFound;
+        });
+    }
+
+    private <R> R withZipStream(
+            FsPath archivePath,
+            FsManager fsManager,
+            IOFunction<ZipInputStream, R> streamReader
+    ) throws IOException {
+        if(fsManager != null) {
+            return fsManager.withFileStream(archivePath, is -> {
+                try {
+                    // we do not close this stream as `is` will also be closed
+                    // but we are not supposed to manage its lifecycle
+                    ZipInputStream zis = new ZipInputStream(is);
+                    return streamReader.apply(zis);
+                } catch (IllegalArgumentException e) {
+                    // IllegalArgumentException exception is thrown
+                    // when zip entries have non default encoding we use here
+                    // TODO add custom encodings support
+                    throw new IOException("failed to decode zip file");
+                }
+            });
+        } else {
+            try(
+                    FileInputStream fis = new FileInputStream(archivePath.getPath());
+                    BufferedInputStream bis = new BufferedInputStream(fis);
+                    ZipInputStream zis = new ZipInputStream(bis)
+            ) {
+                return streamReader.apply(zis);
             } catch (IllegalArgumentException e) {
                 // IllegalArgumentException exception is thrown
                 // when zip entries have non default encoding we use here
                 // TODO add custom encodings support
                 throw new IOException("failed to decode zip file");
             }
-            return entryFound;
-        }
-    }
-
-    private ZipInputStream openArchiveStream(
-            FsPath archivePath,
-            FsManager fsManager
-    ) throws IOException {
-        if(fsManager != null) {
-            byte[] contents = fsManager.readFile(archivePath);
-            ByteArrayInputStream bais = new ByteArrayInputStream(contents);
-            return new ZipInputStream(bais);
-        } else {
-            FileInputStream fis = new FileInputStream(archivePath.getPath());
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            return new ZipInputStream(bis);
         }
     }
 }

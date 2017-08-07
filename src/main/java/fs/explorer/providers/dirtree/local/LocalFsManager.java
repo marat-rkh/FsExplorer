@@ -1,12 +1,10 @@
 package fs.explorer.providers.dirtree.local;
 
 import fs.explorer.providers.dirtree.FsManager;
+import fs.explorer.providers.dirtree.IOFunction;
 import fs.explorer.providers.dirtree.path.FsPath;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InterruptedIOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
@@ -19,13 +17,8 @@ public class LocalFsManager implements FsManager {
 
     @Override
     public byte[] readFile(FsPath fsPath) throws IOException {
-        if(fsPath == null || fsPath.getPath() == null) {
-            throw new IOException("bad file path");
-        }
-        try(
-                FileInputStream fis = new FileInputStream(fsPath.getPath());
-                ByteArrayOutputStream baos = new ByteArrayOutputStream()
-        ) {
+        return withFileStream(fsPath, fis -> {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[BUFFER_SIZE];
             int len = 0;
             while((len = fis.read(buffer)) != -1) {
@@ -35,6 +28,17 @@ public class LocalFsManager implements FsManager {
                 }
             }
             return baos.toByteArray();
+        });
+    }
+
+    @Override
+    public <R> R withFileStream(
+            FsPath fsPath, IOFunction<InputStream, R> streamReader) throws IOException {
+        if(fsPath == null || fsPath.getPath() == null) {
+            throw new IOException("bad file path");
+        }
+        try(FileInputStream fis = new FileInputStream(fsPath.getPath())) {
+            return streamReader.apply(fis);
         }
     }
 
