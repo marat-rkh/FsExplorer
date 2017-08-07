@@ -475,7 +475,6 @@ public class DirTreeControllerTest {
         return event;
     }
 
-    // TODO consider moving this accessors to DirTreeModel
     private String getLabel(DefaultMutableTreeNode node) {
         return dirTreeModel.getExtNodeData(node).getNodeData().getLabel();
     }

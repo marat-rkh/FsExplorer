@@ -4,6 +4,7 @@ import fs.explorer.providers.dirtree.archives.ArchivesManager;
 import fs.explorer.providers.dirtree.path.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -129,11 +130,15 @@ public class FsDataProvider implements TreeDataProvider {
     }
 
     private List<TreeNodeData> groupAndSort(List<TreeNodeData> data) {
-        // TODO simplify
-        Map<Boolean, List<TreeNodeData>> grouped = data.stream()
-                .collect(Collectors.partitioningBy(TreeNodeData::pathTargetIsDirectory));
-        List<TreeNodeData> dirsData = grouped.get(true);
-        List<TreeNodeData> filesData = grouped.get(false);
+        List<TreeNodeData> dirsData = new ArrayList<>();
+        List<TreeNodeData> filesData = new ArrayList<>();
+        for(TreeNodeData d : data) {
+            if(d.pathTargetIsDirectory()) {
+                dirsData.add(d);
+            } else {
+                filesData.add(d);
+            }
+        }
         dirsData.sort(Comparator.comparing(TreeNodeData::getLabel));
         filesData.sort(Comparator.comparing(TreeNodeData::getLabel));
         dirsData.addAll(filesData);
