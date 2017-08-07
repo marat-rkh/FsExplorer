@@ -46,7 +46,7 @@ public class RemoteFsManagerTest {
     @Test
     public void connectsToAndDisconnectsWithAnonymousUserImplicitly() {
         try {
-            remoteFsManager.connect(tele2TestServerNoCredintails());
+            remoteFsManager.connect(tele2TestServerNoCredentials());
             remoteFsManager.disconnect();
         } catch (FTPException e) {
             fail();
@@ -56,7 +56,7 @@ public class RemoteFsManagerTest {
     @Test(expected = FTPException.class)
     public void failsOnRepeatedConnect() throws FTPException {
         try {
-            remoteFsManager.connect(tele2TestServerNoCredintails());
+            remoteFsManager.connect(tele2TestServerNoCredentials());
         } catch (FTPException e) {
             fail();
         }
@@ -71,7 +71,7 @@ public class RemoteFsManagerTest {
     @Test
     public void reconnects() {
         try {
-            remoteFsManager.connect(tele2TestServerNoCredintails());
+            remoteFsManager.connect(tele2TestServerNoCredentials());
             remoteFsManager.reconnect(rebexTestServer());
             remoteFsManager.disconnect();
         } catch (FTPException e) {
@@ -128,10 +128,24 @@ public class RemoteFsManagerTest {
     }
 
     @Test
-    public void readsZipFile() throws FTPException {
+    public void readsZipFile1() throws FTPException {
         try {
             remoteFsManager.connect(tele2TestServer());
             byte[] bytes = remoteFsManager.readFile(testFsPath("/1KB.zip", /*isDir*/false, ""));
+            assertNotNull(bytes);
+            assertTrue(bytes.length > 0);
+        } catch (FTPException | IOException e) {
+            fail();
+        } finally {
+            remoteFsManager.disconnect();
+        }
+    }
+
+    @Test
+    public void readsZipFile2() throws FTPException {
+        try {
+            remoteFsManager.connect(tele2TestServer());
+            byte[] bytes = remoteFsManager.readFile(testFsPath("/10MB.zip", /*isDir*/false, ""));
             assertNotNull(bytes);
             assertTrue(bytes.length > 0);
         } catch (FTPException | IOException e) {
@@ -278,7 +292,39 @@ public class RemoteFsManagerTest {
         }
     }
 
-    // TODO test archives
+    @Test
+    public void withFileStreamProvidesNotNullStream() throws FTPException {
+        try {
+            remoteFsManager.connect(tele2TestServer());
+            remoteFsManager.withFileStream(testFsPath("/1KB.zip", /*isDir*/false, ""), is -> {
+                assertNotNull(is);
+                return null;
+            });
+        } catch (FTPException | IOException e) {
+            fail();
+        } finally {
+            remoteFsManager.disconnect();
+        }
+    }
+
+    @Test
+    public void withFileStreamCanBeCalledMultipleTimes() throws FTPException {
+        try {
+            remoteFsManager.connect(tele2TestServer());
+            remoteFsManager.withFileStream(testFsPath("/1KB.zip", /*isDir*/false, ""), is -> {
+                assertNotNull(is);
+                return null;
+            });
+            remoteFsManager.withFileStream(testFsPath("/512KB.zip", /*isDir*/false, ""), is -> {
+                assertNotNull(is);
+                return null;
+            });
+        } catch (FTPException | IOException e) {
+            fail();
+        } finally {
+            remoteFsManager.disconnect();
+        }
+    }
 
     private static FTPConnectionInfo rebexTestServer() {
         return new FTPConnectionInfo("test.rebex.net", "demo", "password".toCharArray());
@@ -288,7 +334,7 @@ public class RemoteFsManagerTest {
         return new FTPConnectionInfo("speedtest.tele2.net", "anonymous", "".toCharArray());
     }
 
-    private static FTPConnectionInfo tele2TestServerNoCredintails() {
+    private static FTPConnectionInfo tele2TestServerNoCredentials() {
         return new FTPConnectionInfo("speedtest.tele2.net", "", "".toCharArray());
     }
 

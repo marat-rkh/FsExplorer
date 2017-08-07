@@ -1,6 +1,5 @@
 package fs.explorer.providers.dirtree.local;
 
-import fs.explorer.providers.dirtree.local.LocalFsManager;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.path.TargetType;
 import org.junit.Rule;
@@ -26,6 +25,14 @@ public class LocalFsManagerTest {
         FsPath fsPath = testFsPath("/testdirs/home/my-text.txt", /*isDir*/false, "");
         byte[] data = localFsManager.readFile(fsPath);
         assertEquals("some text", new String(data));
+    }
+
+    @Test
+    public void readsZipFile() throws URISyntaxException, IOException {
+        FsPath fsPath = testFsPath("/zips/home.zip", /*isDir*/false, "");
+        byte[] data = localFsManager.readFile(fsPath);
+        assertNotNull(data);
+        assertTrue(data.length > 0);
     }
 
     @Test(expected = IOException.class)
@@ -102,7 +109,14 @@ public class LocalFsManagerTest {
         localFsManager.readFile(fsPath);
     }
 
-    // TODO test archives
+    @Test
+    public void withFileStreamProvidesNonNullStream() throws URISyntaxException, IOException {
+        FsPath fsPath = testFsPath("/testdirs/home/my-text.txt", /*isDir*/false, "");
+        localFsManager.withFileStream(fsPath, is -> {
+            assertNotNull(is);
+            return null;
+        });
+    }
 
     private FsPath testFsPath(
             String relativePath,
