@@ -91,7 +91,7 @@ public class DirTreeController {
         ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(node);
         if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
                 extNodeData.getStatus() == ExtTreeNodeData.Status.NULL) {
-            loadContents(node, extNodeData);
+            reloadContents(node, extNodeData);
         }
     }
 
@@ -108,14 +108,14 @@ public class DirTreeController {
             TargetType targetType = extNodeData.getNodeData().getPathTargetType();
             // TODO support reload for zip archives
             if(targetType == TargetType.DIRECTORY) {
-                loadContents(lastSelectedNode, extNodeData);
+                reloadContents(lastSelectedNode, extNodeData);
             } else if(targetType == TargetType.FILE) {
                 previewController.updatePreview(extNodeData.getNodeData());
             }
         }
     }
 
-    private void loadContents(DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
+    private void reloadContents(DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
         if(treeDataProvider == null) {
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
             return;
