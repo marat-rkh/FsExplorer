@@ -14,9 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static fs.explorer.providers.dirtree.archives.TestUtils.ZipEntryData;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -32,7 +32,7 @@ public class ArchivesReaderTest {
         ZipArchive archive =
                 archivesReader.readEntries(testZipPath("/zips/home.zip", "home.zip"));
         assertNotNull(archive);
-        List<ZipEntryData> data = archive.listAllEntries().stream()
+        List<TestUtils.ZipEntryData> data = archive.listAllEntries().stream()
                 .map(e -> new ZipEntryData(e.getName(), e.isDirectory()))
                 .collect(Collectors.toList());
         assertThat(data, containsInAnyOrder(
@@ -219,40 +219,5 @@ public class ArchivesReaderTest {
     private FsPath tmpDestinationFile(String name) throws URISyntaxException {
         Path path = Paths.get(tmpDir.getRoot().toString(), name);
         return new FsPath(path.toString(), TargetType.FILE, name);
-    }
-
-    private static class ZipEntryData {
-        private final String name;
-        private final boolean isDir;
-
-        private ZipEntryData(String name, boolean isDir) {
-            this.name = name;
-            this.isDir = isDir;
-        }
-
-        public String getName() { return name; }
-
-        public boolean isDir() { return isDir; }
-
-        @Override
-        public boolean equals(Object obj) {
-            if(obj == this) {
-                return true;
-            }
-            if(!(obj instanceof ZipEntryData)) {
-                return false;
-            }
-            ZipEntryData other = (ZipEntryData) obj;
-            return Objects.equals(name, other.name) &&
-                    isDir == other.isDir;
-        }
-
-        @Override
-        public int hashCode() {
-            int res = 17;
-            res = 31 * res + Objects.hashCode(name);
-            res = 31 * res + Boolean.hashCode(isDir);
-            return res;
-        }
     }
 }

@@ -37,14 +37,14 @@ public class PreviewController {
             return;
         }
         String lastComponent = nodeData.getPathLastComponent();
-        if (FileTypeInfo.isTextFile(lastComponent)) {
+        if(FileTypeInfo.isTextFile(lastComponent)) {
             statusBarController.setProgressMessage(LOADING_PREVIEW);
             previewProvider.getTextPreview(
                     nodeData,
                     preview -> handlePreview(lastComponent, preview),
                     this::handlePreviewError
             );
-        } else if (FileTypeInfo.isImageFile(lastComponent)) {
+        } else if(FileTypeInfo.isImageFile(lastComponent)) {
             statusBarController.setProgressMessage(LOADING_PREVIEW);
             previewProvider.getImagePreview(
                     nodeData,

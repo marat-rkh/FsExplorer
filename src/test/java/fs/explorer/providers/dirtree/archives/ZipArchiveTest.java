@@ -10,6 +10,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
 
 import static fs.explorer.providers.dirtree.archives.TestUtils.*;
 import static org.hamcrest.Matchers.*;
@@ -115,7 +117,27 @@ public class ZipArchiveTest {
         assertEquals(0, entries.size());
     }
 
-    // TODO test listAllEntries
+    @Test
+    public void listsAllEntries() throws IOException, URISyntaxException {
+        setUpInsideHomeZip();
+        List<ZipEntry> entries = zipArchive.listAllEntries();
+        assertNotNull(entries);
+        List<ZipEntryData> data = entries.stream()
+                .map(e -> new ZipEntryData(e.getName(), e.isDirectory()))
+                .collect(Collectors.toList());
+        assertThat(data, containsInAnyOrder(
+                new ZipEntryData("pics/", /*isDir*/true),
+                new ZipEntryData("pics/photo.jpg", /*isDir*/false),
+                new ZipEntryData("music/", /*isDir*/true),
+                new ZipEntryData("music/track1.mp3", /*isDir*/false),
+                new ZipEntryData("music/track2.mp3", /*isDir*/false),
+                new ZipEntryData("documents/", /*isDir*/true),
+                new ZipEntryData("documents/books/", /*isDir*/true),
+                new ZipEntryData("documents/books/the-book.pdf", /*isDir*/false),
+                new ZipEntryData("draft.txt", /*isDir*/false),
+                new ZipEntryData("my-text.txt", /*isDir*/false)
+        ));
+    }
 
     private void setUpHomeZip() throws URISyntaxException, IOException {
         archivePath = testZipPath("/zips/home.zip", "home.zip");

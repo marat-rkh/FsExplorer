@@ -88,8 +88,6 @@ public class DirTreeModelTest {
         assertEquals(2, dirTreeModel.getChildren(children.get(1)).size());
     }
 
-    // TODO test addFileChild to addFileChild result
-
     @Test
     public void removesAllChildren() {
         DefaultMutableTreeNode root = dirTreeModel.getRoot();
