@@ -69,8 +69,8 @@ public class Application {
         disposables.add(fsTypeSwitcher);
         FTPDialogController ftpDialogController = new FTPDialogController(
                 ftpDialog, ftpInfoValidator, fsTypeSwitcher, statusBarController);
-        MenuBarController controller =
-                new MenuBarController(fsTypeSwitcher, ftpDialogController, dirTreeController);
+        MenuBarController controller = new MenuBarController(
+                fsTypeSwitcher, ftpDialogController, dirTreeController, statusBarController);
         MenuBar menuBar = new MenuBar(controller);
 
         mainWindow = new MainWindow("FsExplorer", menuBar, statusBar, dirTreePane, previewPane);

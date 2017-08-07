@@ -39,6 +39,10 @@ public class StatusBarController {
         setErrorMessage(fullMessage(msg, optionalDetail));
     }
 
+    public void clear() {
+        statusBar.setText("");
+    }
+
     private String fullMessage(String msg, String optionalDetail) {
         String fullMessage = msg;
         if(optionalDetail != null && !optionalDetail.isEmpty()) {

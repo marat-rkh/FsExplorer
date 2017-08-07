@@ -11,13 +11,16 @@ public class MenuBarControllerTest {
     private FsTypeSwitcher fsTypeSwitcher;
     private FTPDialogController ftpDialogController;
     private DirTreeController dirTreeController;
+    private StatusBarController statusBarController;
 
     @Before
     public void setUp() {
         fsTypeSwitcher = mock(FsTypeSwitcher.class);
         ftpDialogController = mock(FTPDialogController.class);
         dirTreeController = mock(DirTreeController.class);
-        controller = new MenuBarController(fsTypeSwitcher, ftpDialogController, dirTreeController);
+        statusBarController = mock(StatusBarController.class);
+        controller = new MenuBarController(
+                fsTypeSwitcher, ftpDialogController, dirTreeController, statusBarController);
     }
 
     @Test
@@ -27,8 +30,20 @@ public class MenuBarControllerTest {
     }
 
     @Test
+    public void clearsStatusBarOnExploreLocalFilesEvent() throws Exception {
+        controller.handleExploreLocalFiles(null);
+        verify(statusBarController).clear();
+    }
+
+    @Test
     public void showsFTPDialogOnExploreRemoteFilesEvent() throws Exception {
         controller.handleExploreRemoteFiles(null);
         verify(ftpDialogController).showAndHandleInput();
+    }
+
+    @Test
+    public void reloadsLastSelectedNodeOnSelectedReloadEvent() throws Exception {
+        controller.handleSelectedReload(null);
+        verify(dirTreeController).reloadLastSelectedNode();
     }
 }

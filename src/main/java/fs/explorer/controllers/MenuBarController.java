@@ -6,19 +6,22 @@ public class MenuBarController {
     private final FsTypeSwitcher fsTypeSwitcher;
     private final FTPDialogController ftpDialogController;
     private final DirTreeController dirTreeController;
+    private final StatusBarController statusBarController;
 
     public MenuBarController(
             FsTypeSwitcher fsTypeSwitcher,
             FTPDialogController ftpDialogController,
-            DirTreeController dirTreeController
+            DirTreeController dirTreeController,
+            StatusBarController statusBarController
     ) {
         this.fsTypeSwitcher = fsTypeSwitcher;
         this.ftpDialogController = ftpDialogController;
         this.dirTreeController = dirTreeController;
+        this.statusBarController = statusBarController;
     }
 
     public void handleExploreLocalFiles(ActionEvent e) {
-        // TODO clear StatusBar before switch
+        statusBarController.clear();
         fsTypeSwitcher.switchToLocalFs();
     }
 
