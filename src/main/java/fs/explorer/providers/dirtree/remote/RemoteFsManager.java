@@ -81,6 +81,9 @@ public class RemoteFsManager implements FsManager, Disposable {
                 result = streamReader.apply(is);
                 // read the rest or command completion fails
                 skipRest(is);
+            } catch(InterruptedIOException e) {
+                ftpClient.completePendingCommand();
+                throw new InterruptedIOException(e.getMessage());
             }
             if(!ftpClient.completePendingCommand()) {
                 throw new IOException("failed to finish remote file read");
