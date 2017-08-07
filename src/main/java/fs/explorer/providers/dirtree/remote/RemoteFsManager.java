@@ -5,6 +5,7 @@ import fs.explorer.providers.dirtree.IOFunction;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.path.TargetType;
 import fs.explorer.utils.Disposable;
+import fs.explorer.utils.FTPPathUtils;
 import fs.explorer.utils.FileTypeInfo;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -12,6 +13,9 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -111,23 +115,19 @@ public class RemoteFsManager implements FsManager, Disposable {
         if(entries == null) {
             throw new IOException("failed to list entries");
         }
-        try {
-            return Arrays.stream(entries).map(e -> {
-                String lastComponent = e.getName();
-                String path = Paths.get(pathStr, lastComponent).toString();
-                TargetType targetType = null;
-                if(e.isDirectory()) {
-                    targetType = TargetType.DIRECTORY;
-                } else if(FileTypeInfo.isZipArchive(path)) {
-                    targetType = TargetType.ZIP_ARCHIVE;
-                } else {
-                    targetType = TargetType.FILE;
-                }
-                return new FsPath(path, targetType, lastComponent);
-            }).collect(Collectors.toList());
-        } catch (InvalidPathException e) {
-            throw new IOException("malformed path");
-        }
+        return Arrays.stream(entries).map(e -> {
+            String lastComponent = e.getName();
+            String path = FTPPathUtils.append(pathStr, lastComponent);
+            TargetType targetType = null;
+            if(e.isDirectory()) {
+                targetType = TargetType.DIRECTORY;
+            } else if(FileTypeInfo.isZipArchive(path)) {
+                targetType = TargetType.ZIP_ARCHIVE;
+            } else {
+                targetType = TargetType.FILE;
+            }
+            return new FsPath(path, targetType, lastComponent);
+        }).collect(Collectors.toList());
     }
 
     @Override
