@@ -20,69 +20,89 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Application {
-    private final MainWindow mainWindow;
+    private MainWindow mainWindow;
+    private boolean applicationInitialized = false;
+    private String errorMessage;
 
-    // TODO decide how to handle this exception
-    public Application() throws IOException {
-        List<Disposable> disposables = new ArrayList<>();
+    private static final String APP_START_ERROR = "Failed to start the application";
+    private static final String DISK_ACCESS_ERROR = "failed to access local disk";
 
-        LocalFsManager localFsManager = new LocalFsManager();
+    public Application() {
+        try {
+            List<Disposable> disposables = new ArrayList<>();
 
-        ArchivesReader archivesReader = new ArchivesReader();
-        ArchivesManager archivesManager = new ArchivesManager(archivesReader);
-        disposables.add(archivesManager);
+            LocalFsManager localFsManager = new LocalFsManager();
 
-        StatusBar statusBar = new StatusBar("Ready");
-        StatusBarController statusBarController = new StatusBarController(statusBar);
+            ArchivesReader archivesReader = new ArchivesReader();
+            ArchivesManager archivesManager = new ArchivesManager(archivesReader);
+            disposables.add(archivesManager);
 
-        PreviewRenderer previewRenderer = new DefaultPreviewRenderer();
+            StatusBar statusBar = new StatusBar("Ready");
+            StatusBarController statusBarController = new StatusBarController(statusBar);
 
-        PreviewPane previewPane = new PreviewPane();
-        DefaultPreviewProvider previewProvider =
-                new DefaultPreviewProvider(localFsManager, archivesManager, previewRenderer);
-        AsyncPreviewProvider asyncPreviewProvider = new AsyncPreviewProvider(previewProvider);
-        disposables.add(asyncPreviewProvider);
-        PreviewController previewController =
-                new PreviewController(previewPane, asyncPreviewProvider, statusBarController);
+            PreviewRenderer previewRenderer = new DefaultPreviewRenderer();
 
-        DirTreeModel dirTreeModel = new DirTreeModel();
-        DirTreePane dirTreePane = new DirTreePane(dirTreeModel.getInnerTreeModel());
-        DirTreeController dirTreeController = new DirTreeController(
-                dirTreePane,
-                dirTreeModel,
-                previewController,
-                statusBarController
-        );
-        dirTreePane.setController(dirTreeController);
+            PreviewPane previewPane = new PreviewPane();
+            DefaultPreviewProvider previewProvider =
+                    new DefaultPreviewProvider(localFsManager, archivesManager, previewRenderer);
+            AsyncPreviewProvider asyncPreviewProvider = new AsyncPreviewProvider(previewProvider);
+            disposables.add(asyncPreviewProvider);
+            PreviewController previewController =
+                    new PreviewController(previewPane, asyncPreviewProvider, statusBarController);
 
-        FTPDialog ftpDialog = new FTPDialog();
-        FTPInfoValidator ftpInfoValidator = new FTPInfoValidator();
-        RemoteFsManager remoteFsManager = new RemoteFsManager();
-        disposables.add(remoteFsManager);
-        FsTypeSwitcher fsTypeSwitcher = new FsTypeSwitcher(
-                dirTreeController,
-                previewProvider,
-                localFsManager,
-                remoteFsManager,
-                archivesManager
-        );
-        disposables.add(fsTypeSwitcher);
-        FTPDialogController ftpDialogController = new FTPDialogController(
-                ftpDialog, ftpInfoValidator, fsTypeSwitcher, statusBarController);
-        MenuBarController controller = new MenuBarController(
-                fsTypeSwitcher, ftpDialogController, dirTreeController, statusBarController);
-        MenuBar menuBar = new MenuBar(controller);
+            DirTreeModel dirTreeModel = new DirTreeModel();
+            DirTreePane dirTreePane = new DirTreePane(dirTreeModel.getInnerTreeModel());
+            DirTreeController dirTreeController = new DirTreeController(
+                    dirTreePane,
+                    dirTreeModel,
+                    previewController,
+                    statusBarController
+            );
+            dirTreePane.setController(dirTreeController);
 
-        mainWindow = new MainWindow("FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
-        MainWindowController mainWindowController = new MainWindowController(
-                mainWindow,
-                statusBarController,
-                disposables
-        );
-        mainWindow.setController(mainWindowController);
+            FTPDialog ftpDialog = new FTPDialog();
+            FTPInfoValidator ftpInfoValidator = new FTPInfoValidator();
+            RemoteFsManager remoteFsManager = new RemoteFsManager();
+            disposables.add(remoteFsManager);
+            FsTypeSwitcher fsTypeSwitcher = new FsTypeSwitcher(
+                    dirTreeController,
+                    previewProvider,
+                    localFsManager,
+                    remoteFsManager,
+                    archivesManager
+            );
+            disposables.add(fsTypeSwitcher);
+            FTPDialogController ftpDialogController = new FTPDialogController(
+                    ftpDialog, ftpInfoValidator, fsTypeSwitcher, statusBarController);
+            MenuBarController controller = new MenuBarController(
+                    fsTypeSwitcher, ftpDialogController, dirTreeController, statusBarController);
+            MenuBar menuBar = new MenuBar(controller);
+
+            mainWindow = new MainWindow("FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
+            MainWindowController mainWindowController = new MainWindowController(
+                    mainWindow,
+                    statusBarController,
+                    disposables
+            );
+            mainWindow.setController(mainWindowController);
+            applicationInitialized = true;
+        } catch (IOException e) {
+            errorMessage = DISK_ACCESS_ERROR;
+            applicationInitialized = false;
+        }
     }
 
     public void run() {
-        SwingUtilities.invokeLater(mainWindow::show);
+        if(applicationInitialized) {
+            SwingUtilities.invokeLater(mainWindow::show);
+        } else {
+            SwingUtilities.invokeLater(() -> {
+                String msg = APP_START_ERROR;
+                if(errorMessage != null && !errorMessage.isEmpty()) {
+                    msg += (": " + errorMessage);
+                }
+                JOptionPane.showMessageDialog(null, msg);
+            });
+        }
     }
 }
