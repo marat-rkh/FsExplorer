@@ -1,4 +1,4 @@
-package fs.explorer.views;
+package fs.explorer;
 
 import fs.explorer.controllers.*;
 import fs.explorer.controllers.FTPDialogController;
@@ -13,6 +13,7 @@ import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewRenderer;
 import fs.explorer.providers.preview.PreviewRenderer;
 import fs.explorer.utils.Disposable;
+import fs.explorer.views.*;
 
 import javax.swing.*;
 import java.io.IOException;
