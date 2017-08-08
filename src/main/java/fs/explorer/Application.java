@@ -33,6 +33,8 @@ public class Application {
             List<Disposable> disposables = new ArrayList<>();
 
             LocalFsManager localFsManager = new LocalFsManager();
+            RemoteFsManager remoteFsManager = new RemoteFsManager();
+            disposables.add(remoteFsManager);
 
             ArchivesReader archivesReader = new ArchivesReader();
             ArchivesManager archivesManager = new ArchivesManager(archivesReader);
@@ -41,9 +43,8 @@ public class Application {
             StatusBar statusBar = new StatusBar("Ready");
             StatusBarController statusBarController = new StatusBarController(statusBar);
 
-            PreviewRenderer previewRenderer = new DefaultPreviewRenderer();
-
             PreviewPane previewPane = new PreviewPane();
+            PreviewRenderer previewRenderer = new DefaultPreviewRenderer();
             DefaultPreviewProvider previewProvider =
                     new DefaultPreviewProvider(localFsManager, archivesManager, previewRenderer);
             AsyncPreviewProvider asyncPreviewProvider = new AsyncPreviewProvider(previewProvider);
@@ -61,10 +62,6 @@ public class Application {
             );
             dirTreePane.setController(dirTreeController);
 
-            FTPDialog ftpDialog = new FTPDialog();
-            FTPInfoValidator ftpInfoValidator = new FTPInfoValidator();
-            RemoteFsManager remoteFsManager = new RemoteFsManager();
-            disposables.add(remoteFsManager);
             FsTypeSwitcher fsTypeSwitcher = new FsTypeSwitcher(
                     dirTreeController,
                     previewProvider,
@@ -73,11 +70,15 @@ public class Application {
                     archivesManager
             );
             disposables.add(fsTypeSwitcher);
+
+            FTPDialog ftpDialog = new FTPDialog();
+            FTPInfoValidator ftpInfoValidator = new FTPInfoValidator();
             FTPDialogController ftpDialogController = new FTPDialogController(
                     ftpDialog, ftpInfoValidator, fsTypeSwitcher, statusBarController);
-            MenuBarController controller = new MenuBarController(
+
+            MenuBarController menuBarController = new MenuBarController(
                     fsTypeSwitcher, ftpDialogController, dirTreeController, statusBarController);
-            MenuBar menuBar = new MenuBar(controller);
+            MenuBar menuBar = new MenuBar(menuBarController);
 
             mainWindow = new MainWindow("FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
             MainWindowController mainWindowController = new MainWindowController(
@@ -86,6 +87,7 @@ public class Application {
                     disposables
             );
             mainWindow.setController(mainWindowController);
+
             applicationInitialized = true;
         } catch (IOException e) {
             errorMessage = DISK_ACCESS_ERROR;
