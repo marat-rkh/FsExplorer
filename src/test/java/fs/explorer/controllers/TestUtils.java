@@ -1,4 +1,4 @@
-package fs.explorer;
+package fs.explorer.controllers;
 
 import fs.explorer.models.dirtree.DirTreeModel;
 

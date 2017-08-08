@@ -9,6 +9,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class FsUtils {
     public static void deleteDirectoryRecursively(Path dir) throws IOException {
+        if(!Files.isDirectory(dir)) {
+            throw new IOException("not a directory");
+        }
         Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(
