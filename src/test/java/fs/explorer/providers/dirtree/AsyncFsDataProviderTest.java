@@ -17,6 +17,7 @@ import static org.junit.Assert.*;
 public class AsyncFsDataProviderTest {
     private FsDataProvider fsDataProvider;
     private AsyncFsDataProvider asyncFsDataProvider;
+
     private CyclicBarrier cyclicBarrier;
     private AtomicInteger counter;
 
