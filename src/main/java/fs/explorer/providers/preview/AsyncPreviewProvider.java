@@ -10,13 +10,15 @@ import java.util.function.Consumer;
 // @NotThreadSafe
 public class AsyncPreviewProvider implements PreviewProvider, Disposable {
     private final PreviewProvider previewProvider;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private Future<?> currentTask;
+    private final ScheduledThreadPoolExecutor executor;
+    private ScheduledFuture<?> currentTask;
 
     private static final String INTERNAL_ERROR = "internal error";
 
     public AsyncPreviewProvider(PreviewProvider previewProvider) {
         this.previewProvider = previewProvider;
+        executor = new ScheduledThreadPoolExecutor(4);
+        executor.setRemoveOnCancelPolicy(true);
     }
 
     @Override
@@ -71,7 +73,7 @@ public class AsyncPreviewProvider implements PreviewProvider, Disposable {
             if(currentTask != null) {
                 currentTask.cancel(/*mayInterruptIfRunning*/true);
             }
-            currentTask = executor.submit(getPreviewTask);
+            currentTask = executor.schedule(getPreviewTask, 100, TimeUnit.MILLISECONDS);
         } catch (RejectedExecutionException e) {
             onFail.accept(INTERNAL_ERROR);
         }

@@ -57,7 +57,12 @@ public class DefaultPreviewProvider implements PreviewProvider {
         // TODO support encodings
         String contents = new String(bytes);
         TextPreviewData previewData = new TextPreviewData(contents);
-        JComponent preview = previewRenderer.renderText(previewData);
+        JComponent preview = null;
+        try {
+            preview = previewRenderer.renderText(previewData);
+        } catch (InterruptedException e) {
+            return;
+        }
         if(preview != null) {
             onComplete.accept(preview);
         } else {
@@ -81,7 +86,12 @@ public class DefaultPreviewProvider implements PreviewProvider {
             return;
         }
         ImagePreviewData previewData = new ImagePreviewData(bytes);
-        JComponent preview = previewRenderer.renderImage(previewData);
+        JComponent preview;
+        try {
+            preview = previewRenderer.renderImage(previewData);
+        } catch (InterruptedException e) {
+            return;
+        }
         if(preview != null) {
             onComplete.accept(preview);
         } else {

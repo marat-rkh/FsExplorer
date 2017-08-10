@@ -1,11 +1,14 @@
 package fs.explorer.providers.preview;
 
 import javax.swing.*;
-import java.util.Optional;
+import java.util.Comparator;
+import java.util.concurrent.*;
 
 // @ThreadSafe
 public class DefaultPreviewRenderer implements PreviewRenderer {
-    public JTextArea renderText(TextPreviewData data) {
+    private ExecutorService executor = Executors.newCachedThreadPool();
+
+    public JTextArea renderText(TextPreviewData data) throws InterruptedException {
         if(data == null) {
             return null;
         }
@@ -13,12 +16,19 @@ public class DefaultPreviewRenderer implements PreviewRenderer {
         if(text == null) {
             return null;
         }
-        JTextArea textArea = new JTextArea(text);
-        textArea.setEditable(false);
-        return textArea;
+        Future<JTextArea> task = executor.submit(() -> {
+            JTextArea textArea = new JTextArea(text);
+            textArea.setEditable(false);
+            return textArea;
+        });
+        try {
+            return task.get();
+        } catch (ExecutionException e) {
+            return null;
+        }
     }
 
-    public JLabel renderImage(ImagePreviewData data) {
+    public JLabel renderImage(ImagePreviewData data) throws InterruptedException {
         if(data == null) {
             return null;
         }
@@ -26,8 +36,15 @@ public class DefaultPreviewRenderer implements PreviewRenderer {
         if(imageBytes == null) {
             return null;
         }
-        // TODO detect when image is corrupted
-        ImageIcon imageIcon = new ImageIcon(imageBytes);
-        return new JLabel(imageIcon, JLabel.CENTER);
+        Future<ImageIcon> task = executor.submit(() -> {
+            // TODO detect when image is corrupted
+            return new ImageIcon(imageBytes);
+        });
+        try {
+            ImageIcon imageIcon = task.get();
+            return new JLabel(imageIcon, JLabel.CENTER);
+        } catch (ExecutionException e) {
+            return null;
+        }
     }
 }
