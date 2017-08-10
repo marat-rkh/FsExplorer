@@ -36,11 +36,19 @@ public class FileTypeInfo {
     private static final String ZIP_EXTENSION = "zip";
 
     public static boolean isTextFile(String path) {
-        return TEXT_FILE_EXTENSIONS.contains(getExtension(path));
+        return isTextFileExtension(getExtension(path));
+    }
+
+    public static boolean isTextFileExtension(String extension) {
+        return TEXT_FILE_EXTENSIONS.contains(extension);
     }
 
     public static boolean isImageFile(String path) {
-        return IMG_FILE_EXTENSIONS.contains(getExtension(path));
+        return isImageFileExtension(getExtension(path));
+    }
+
+    public static boolean isImageFileExtension(String extension) {
+        return IMG_FILE_EXTENSIONS.contains(extension);
     }
 
     public static boolean isZipArchive(String path) {

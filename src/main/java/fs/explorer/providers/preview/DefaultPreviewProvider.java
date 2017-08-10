@@ -6,10 +6,11 @@ import fs.explorer.providers.dirtree.path.ArchiveEntryPath;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.providers.dirtree.path.PathContainer;
+import fs.explorer.utils.FileTypeInfo;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.function.Consumer;
+import java.util.List;
 
 /**
  * This class is thread safe if instances of FsManager, PreviewRenderer
@@ -19,7 +20,7 @@ import java.util.function.Consumer;
 public class DefaultPreviewProvider implements PreviewProvider {
     private volatile FsManager fsManager;
     private final ArchivesManager archivesManager;
-    private final PreviewRenderer previewRenderer;
+    private final List<PreviewRenderer> previewRenderers;
 
     private static final String FILE_READ_FAILED = "failed to read file";
     private static final String RENDERING_FAILED = "failed to create preview";
@@ -28,11 +29,11 @@ public class DefaultPreviewProvider implements PreviewProvider {
     public DefaultPreviewProvider(
             FsManager fsManager,
             ArchivesManager archivesManager,
-            PreviewRenderer previewRenderer
+            List<PreviewRenderer> previewRenderers
     ) {
         this.fsManager = fsManager;
         this.archivesManager = archivesManager;
-        this.previewRenderer = previewRenderer;
+        this.previewRenderers = previewRenderers;
     }
 
     public void resetFsManager(FsManager fsManager) {
@@ -40,75 +41,59 @@ public class DefaultPreviewProvider implements PreviewProvider {
     }
 
     @Override
-    public void getTextPreview(
-            TreeNodeData data,
-            Consumer<JComponent> onComplete,
-            Consumer<String> onFail
-    ) {
-        if(data == null) {
-            onFail.accept(INTERNAL_ERROR);
+    public void getPreview(TreeNodeData data, PreviewProgressHandler progressHandler) {
+        if (data == null) {
+            progressHandler.onError(INTERNAL_ERROR);
             return;
         }
-        byte[] bytes = readContents(data);
-        if(bytes == null) {
-            onFail.accept(FILE_READ_FAILED);
+        boolean canNotRender = data.pathTargetIsDirectory() ||
+                previewRenderers == null ||
+                previewRenderers.isEmpty();
+        if (canNotRender) {
+            progressHandler.onCanNotRenderer();
             return;
         }
-        // TODO support encodings
-        String contents = new String(bytes);
-        TextPreviewData previewData = new TextPreviewData(contents);
-        JComponent preview = null;
-        try {
-            preview = previewRenderer.renderText(previewData);
-        } catch (InterruptedException e) {
+        byte[] fileBytes = readContents(data);
+        if (fileBytes == null) {
+            progressHandler.onError(FILE_READ_FAILED);
             return;
         }
-        if(preview != null) {
-            onComplete.accept(preview);
+        String fileName = data.getPathLastComponent();
+        String fileExtension = FileTypeInfo.getExtension(fileName);
+        PreviewRenderer renderer = null;
+        for (PreviewRenderer r : previewRenderers) {
+            if (r.canRenderForExtension(fileExtension)) {
+                renderer = r;
+                break;
+            }
+        }
+        if (renderer == null) {
+            progressHandler.onCanNotRenderer();
         } else {
-            onFail.accept(RENDERING_FAILED);
-        }
-    }
-
-    @Override
-    public void getImagePreview(
-            TreeNodeData data,
-            Consumer<JComponent> onComplete,
-            Consumer<String> onFail
-    ) {
-        if(data == null) {
-            onFail.accept(INTERNAL_ERROR);
-            return;
-        }
-        byte[] bytes = readContents(data);
-        if(bytes == null) {
-            onFail.accept(FILE_READ_FAILED);
-            return;
-        }
-        ImagePreviewData previewData = new ImagePreviewData(bytes);
-        JComponent preview;
-        try {
-            preview = previewRenderer.renderImage(previewData);
-        } catch (InterruptedException e) {
-            return;
-        }
-        if(preview != null) {
-            onComplete.accept(preview);
-        } else {
-            onFail.accept(RENDERING_FAILED);
+            try {
+                PreviewRenderingData renderingData = new PreviewRenderingData(fileName, fileBytes);
+                JComponent preview = renderer.render(renderingData);
+                if (preview != null) {
+                    progressHandler.onComplete(preview);
+                } else {
+                    progressHandler.onError(RENDERING_FAILED);
+                }
+            } catch (InterruptedException e) {
+                // do nothing
+            }
         }
     }
 
     private byte[] readContents(TreeNodeData data) {
         PathContainer path = data.getPath();
-        if(path.isFsPath()) {
+        if (path.isFsPath()) {
             FsPath dataFsPath = path.asFsPath();
             try {
                 return fsManager.readFile(dataFsPath);
             } catch (IOException e) {
                 return null;
             }
-        } else if(path.isArchiveEntryPath()) {
+        } else if (path.isArchiveEntryPath()) {
             ArchiveEntryPath archiveEntryPath = path.asArchiveEntryPath();
             try {
                 return archivesManager.readEntry(archiveEntryPath, fsManager);

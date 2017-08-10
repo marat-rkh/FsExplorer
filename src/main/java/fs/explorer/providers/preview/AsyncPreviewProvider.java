@@ -7,48 +7,49 @@ import javax.swing.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
-// @NotThreadSafe
 public class AsyncPreviewProvider implements PreviewProvider, Disposable {
     private final PreviewProvider previewProvider;
     private final ScheduledThreadPoolExecutor executor;
+    private final long taskStartDelayMilliseconds;
     private ScheduledFuture<?> currentTask;
 
     private static final String INTERNAL_ERROR = "internal error";
 
-    public AsyncPreviewProvider(PreviewProvider previewProvider) {
+    public AsyncPreviewProvider(PreviewProvider previewProvider, long taskStartDelayMilliseconds) {
         this.previewProvider = previewProvider;
         executor = new ScheduledThreadPoolExecutor(4);
         executor.setRemoveOnCancelPolicy(true);
+        this.taskStartDelayMilliseconds = taskStartDelayMilliseconds;
     }
 
     @Override
-    public void getTextPreview(
-            TreeNodeData data,
-            Consumer<JComponent> onComplete,
-            Consumer<String> onFail
-    ) {
-        runAsync(onFail, () ->
-            previewProvider.getTextPreview(
-                data,
-                arg -> SwingUtilities.invokeLater(() -> onComplete.accept(arg)),
-                arg -> SwingUtilities.invokeLater(() -> onFail.accept(arg))
-            )
-        );
-    }
+    public void getPreview(TreeNodeData data, PreviewProgressHandler progressHandler) {
+        try {
+            if(currentTask != null) {
+                currentTask.cancel(true);
+            }
+            PreviewProgressHandler asyncHandler = new PreviewProgressHandler() {
+                @Override
+                public void onComplete(JComponent preview) {
+                    SwingUtilities.invokeLater(() -> progressHandler.onComplete(preview));
+                }
 
-    @Override
-    public void getImagePreview(
-            TreeNodeData data,
-            Consumer<JComponent> onComplete,
-            Consumer<String> onFail
-    ) {
-        runAsync(onFail, () ->
-            previewProvider.getImagePreview(
-                data,
-                arg -> SwingUtilities.invokeLater(() -> onComplete.accept(arg)),
-                arg -> SwingUtilities.invokeLater(() -> onFail.accept(arg))
-            )
-        );
+                @Override
+                public void onError(String errorMessage) {
+                    SwingUtilities.invokeLater(() -> progressHandler.onError(errorMessage));
+                }
+
+                @Override
+                public void onCanNotRenderer() {
+                    SwingUtilities.invokeLater(progressHandler::onCanNotRenderer);
+                }
+            };
+            Runnable task = () -> previewProvider.getPreview(data, asyncHandler);
+            currentTask = executor.schedule(
+                    task, taskStartDelayMilliseconds, TimeUnit.MILLISECONDS);
+        } catch (RejectedExecutionException e) {
+            progressHandler.onError(INTERNAL_ERROR);
+        }
     }
 
     public void shutdownNow() {
@@ -66,16 +67,5 @@ public class AsyncPreviewProvider implements PreviewProvider, Disposable {
     @Override
     public void dispose() {
         shutdownNow();
-    }
-
-    private void runAsync(Consumer<String> onFail, Runnable getPreviewTask) {
-        try {
-            if(currentTask != null) {
-                currentTask.cancel(/*mayInterruptIfRunning*/true);
-            }
-            currentTask = executor.schedule(getPreviewTask, 100, TimeUnit.MILLISECONDS);
-        } catch (RejectedExecutionException e) {
-            onFail.accept(INTERNAL_ERROR);
-        }
     }
 }

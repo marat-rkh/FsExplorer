@@ -10,14 +10,16 @@ import fs.explorer.providers.dirtree.archives.ArchivesReader;
 import fs.explorer.providers.dirtree.remote.RemoteFsManager;
 import fs.explorer.providers.preview.AsyncPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
-import fs.explorer.providers.preview.DefaultPreviewRenderer;
 import fs.explorer.providers.preview.PreviewRenderer;
+import fs.explorer.providers.preview.renderers.ImagePreviewRenderer;
+import fs.explorer.providers.preview.renderers.TextPreviewRenderer;
 import fs.explorer.utils.Disposable;
 import fs.explorer.views.*;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Application {
@@ -27,6 +29,8 @@ public class Application {
 
     private static final String APP_START_ERROR = "Failed to start the application";
     private static final String DISK_ACCESS_ERROR = "failed to access local disk";
+
+    private static final long previewTaskStartDelayMilliseconds = 100;
 
     public Application() {
         try {
@@ -44,10 +48,11 @@ public class Application {
             StatusBarController statusBarController = new StatusBarController(statusBar);
 
             PreviewPane previewPane = new PreviewPane();
-            PreviewRenderer previewRenderer = new DefaultPreviewRenderer();
+            List<PreviewRenderer> previewRenderers = getPreivewRenderers();
             DefaultPreviewProvider previewProvider =
-                    new DefaultPreviewProvider(localFsManager, archivesManager, previewRenderer);
-            AsyncPreviewProvider asyncPreviewProvider = new AsyncPreviewProvider(previewProvider);
+                    new DefaultPreviewProvider(localFsManager, archivesManager, previewRenderers);
+            AsyncPreviewProvider asyncPreviewProvider = new AsyncPreviewProvider(
+                    previewProvider, previewTaskStartDelayMilliseconds);
             disposables.add(asyncPreviewProvider);
             PreviewController previewController =
                     new PreviewController(previewPane, asyncPreviewProvider, statusBarController);
@@ -107,5 +112,12 @@ public class Application {
                 JOptionPane.showMessageDialog(null, msg);
             });
         }
+    }
+
+    private List<PreviewRenderer> getPreivewRenderers() {
+        return Arrays.asList(
+                new TextPreviewRenderer(),
+                new ImagePreviewRenderer()
+        );
     }
 }

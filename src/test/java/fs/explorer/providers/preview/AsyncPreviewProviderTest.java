@@ -1,6 +1,7 @@
 package fs.explorer.providers.preview;
 
 import fs.explorer.TestEnvironment;
+import fs.explorer.providers.dirtree.TreeNodeData;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 public class AsyncPreviewProviderTest {
     private PreviewProvider previewProvider;
@@ -27,7 +28,7 @@ public class AsyncPreviewProviderTest {
     }
 
     @Test
-    public void interruptsGetTextPreviewOnShutdownNow()
+    public void interruptsGetPreviewOnShutdownNow()
             throws InterruptedException, TimeoutException, BrokenBarrierException {
         previewProvider = mock(PreviewProvider.class);
         doAnswer(invocationOnMock -> {
@@ -40,14 +41,14 @@ public class AsyncPreviewProviderTest {
                 cyclicBarrier.await(10, TimeUnit.SECONDS);
             }
             return null;
-        }).when(previewProvider).getTextPreview(any(), any(), any());
+        }).when(previewProvider).getPreview(any(), any());
 
         cyclicBarrier = new CyclicBarrier(2);
         counter = new AtomicInteger(0);
 
-        asyncPreviewProvider = new AsyncPreviewProvider(previewProvider);
+        asyncPreviewProvider = new AsyncPreviewProvider(previewProvider, 0);
 
-        asyncPreviewProvider.getTextPreview(null, null, null);
+        asyncPreviewProvider.getPreview(null, null);
         cyclicBarrier.await(10, TimeUnit.SECONDS);
         Thread.sleep(2000);
         asyncPreviewProvider.shutdownNow();
@@ -56,9 +57,11 @@ public class AsyncPreviewProviderTest {
     }
 
     @Test
-    public void interruptsGetImagePreviewOnShutdownNow()
+    public void cancelsPreviousGetPreviewTaskWithANewOne()
             throws InterruptedException, TimeoutException, BrokenBarrierException {
         previewProvider = mock(PreviewProvider.class);
+
+        TreeNodeData dummyData1 = mock(TreeNodeData.class);
         doAnswer(invocationOnMock -> {
             cyclicBarrier.await(10, TimeUnit.SECONDS);
             try {
@@ -69,80 +72,24 @@ public class AsyncPreviewProviderTest {
                 cyclicBarrier.await(10, TimeUnit.SECONDS);
             }
             return null;
-        }).when(previewProvider).getImagePreview(any(), any(), any());
+        }).when(previewProvider).getPreview(same(dummyData1), any());
+
+        TreeNodeData dummyData2 = mock(TreeNodeData.class);
+        doNothing().when(previewProvider).getPreview(same(dummyData2), any());
 
         cyclicBarrier = new CyclicBarrier(2);
         counter = new AtomicInteger(0);
 
-        asyncPreviewProvider = new AsyncPreviewProvider(previewProvider);
+        asyncPreviewProvider = new AsyncPreviewProvider(previewProvider, 0);
 
-        asyncPreviewProvider.getImagePreview(null, null, null);
+        asyncPreviewProvider.getPreview(dummyData1, null);
         cyclicBarrier.await(10, TimeUnit.SECONDS);
         Thread.sleep(2000);
-        asyncPreviewProvider.shutdownNow();
-        cyclicBarrier.await(10, TimeUnit.SECONDS);
-        assertEquals(1, counter.get());
-    }
-
-    @Test
-    public void cancelsPreviousGetTextTaskWithGetImageTask()
-            throws InterruptedException, TimeoutException, BrokenBarrierException {
-        previewProvider = mock(PreviewProvider.class);
-        doAnswer(invocationOnMock -> {
-            cyclicBarrier.await(10, TimeUnit.SECONDS);
-            try {
-                Thread.sleep(10000);
-            } catch(InterruptedException e) {
-                counter.incrementAndGet();
-            } finally {
-                cyclicBarrier.await(10, TimeUnit.SECONDS);
-            }
-            return null;
-        }).when(previewProvider).getTextPreview(any(), any(), any());
-        doNothing().when(previewProvider).getImagePreview(any(), any(), any());
-
-        cyclicBarrier = new CyclicBarrier(2);
-        counter = new AtomicInteger(0);
-
-        asyncPreviewProvider = new AsyncPreviewProvider(previewProvider);
-
-        asyncPreviewProvider.getTextPreview(null, null, null);
-        cyclicBarrier.await(10, TimeUnit.SECONDS);
-        Thread.sleep(2000);
-        asyncPreviewProvider.getImagePreview(null, null, null);
+        asyncPreviewProvider.getPreview(dummyData2, null);
         cyclicBarrier.await(10, TimeUnit.SECONDS);
         asyncPreviewProvider.shutdownNow();
         assertEquals(1, counter.get());
     }
 
-    @Test
-    public void cancelsPreviousGetImageTaskWithGetTextTask()
-            throws InterruptedException, TimeoutException, BrokenBarrierException {
-        previewProvider = mock(PreviewProvider.class);
-        doAnswer(invocationOnMock -> {
-            cyclicBarrier.await(10, TimeUnit.SECONDS);
-            try {
-                Thread.sleep(10000);
-            } catch(InterruptedException e) {
-                counter.incrementAndGet();
-            } finally {
-                cyclicBarrier.await(10, TimeUnit.SECONDS);
-            }
-            return null;
-        }).when(previewProvider).getImagePreview(any(), any(), any());
-        doNothing().when(previewProvider).getTextPreview(any(), any(), any());
-
-        cyclicBarrier = new CyclicBarrier(2);
-        counter = new AtomicInteger(0);
-
-        asyncPreviewProvider = new AsyncPreviewProvider(previewProvider);
-
-        asyncPreviewProvider.getImagePreview(null, null, null);
-        cyclicBarrier.await(10, TimeUnit.SECONDS);
-        Thread.sleep(2000);
-        asyncPreviewProvider.getTextPreview(null, null, null);
-        cyclicBarrier.await(10, TimeUnit.SECONDS);
-        asyncPreviewProvider.shutdownNow();
-        assertEquals(1, counter.get());
-    }
+    // TODO try to find a way to test cancels of delayed tasks
 }
