@@ -39,11 +39,10 @@ public class TextPreviewRenderer implements PreviewRenderer {
         if (bytes == null) {
             return null;
         }
-        LazyScrollableTextArea textArea = renderLazyTextArea(bytes);
-        return textArea == null ? null : textArea.asJComponent();
+        return renderLazyTextArea(bytes);
     }
 
-    private LazyScrollableTextArea renderLazyTextArea(byte[] bytes)
+    private JScrollPane renderLazyTextArea(byte[] bytes)
             throws InterruptedException {
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
@@ -71,6 +70,18 @@ public class TextPreviewRenderer implements PreviewRenderer {
         } catch (IOException e) {
             return null;
         }
-        return new LazyScrollableTextArea(textArea, textChunks);
+        return makeLazyTextArea(textArea, textChunks);
+    }
+
+    private JScrollPane makeLazyTextArea(JTextArea textArea, List<String> textChunksList) {
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
+        TextChunksAppender appender = new TextChunksAppender(
+                textArea,
+                new LinkedList<>(textChunksList),
+                verticalScrollBar
+        );
+        verticalScrollBar.addAdjustmentListener(appender);
+        return scrollPane;
     }
 }
