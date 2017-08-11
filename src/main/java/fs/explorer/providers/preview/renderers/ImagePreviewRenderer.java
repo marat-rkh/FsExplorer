@@ -33,7 +33,7 @@ public class ImagePreviewRenderer implements PreviewRenderer {
         });
         try {
             ImageIcon imageIcon = task.get();
-            return new JLabel(imageIcon, JLabel.CENTER);
+            return new JScrollPane(new JLabel(imageIcon, JLabel.CENTER));
         } catch (ExecutionException e) {
             return null;
         }

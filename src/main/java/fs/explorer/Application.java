@@ -12,7 +12,7 @@ import fs.explorer.providers.preview.AsyncPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.PreviewRenderer;
 import fs.explorer.providers.preview.renderers.ImagePreviewRenderer;
-import fs.explorer.providers.preview.renderers.TextPreviewRenderer;
+import fs.explorer.providers.preview.renderers.text.TextPreviewRenderer;
 import fs.explorer.utils.Disposable;
 import fs.explorer.views.*;
 

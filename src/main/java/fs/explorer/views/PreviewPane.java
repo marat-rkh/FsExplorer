@@ -1,23 +1,26 @@
 package fs.explorer.views;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class PreviewPane {
-    private final JScrollPane scrollPane;
+    private final JPanel panel;
     private final JLabel defaultPreview;
 
     public PreviewPane() {
         defaultPreview = new JLabel("No preview", JLabel.CENTER);
-        this.scrollPane = new JScrollPane(defaultPreview);
+        this.panel = new JPanel(new BorderLayout());
     }
 
     public void updatePreview(JComponent preview) {
-        scrollPane.setViewportView(preview);
+        panel.removeAll();
+        panel.add(preview);
     }
 
     public void showDefaultPreview() {
-        scrollPane.setViewportView(defaultPreview);
+        panel.removeAll();
+        panel.add(defaultPreview);
     }
 
-    public JComponent asJComponent() { return scrollPane; }
+    public JComponent asJComponent() { return panel; }
 }
