@@ -28,20 +28,35 @@ public class ImageLabelResizer extends SwingWorker<ImageIcon, Void> {
 
     @Override
     protected ImageIcon doInBackground() throws Exception {
-        timeUnit.sleep(delay);
-        return imageIconMaker.makeIcon(newSize);
+        return makeResizedIcon();
     }
 
     @Override
     protected void done() {
         try {
-            ImageIcon resizedIcon = get();
-            label.setIcon(resizedIcon);
+            handleResizedIcon(get());
         } catch (InterruptedException e) {
             // doNothing
         } catch (ExecutionException e) {
-            label.setIcon(null);
-            label.setText("Failed to resize image");
+            handleMakeIconError();
         }
+    }
+
+    ImageIcon makeResizedIcon() throws InterruptedException {
+        timeUnit.sleep(delay);
+        return imageIconMaker.makeIcon(newSize);
+    }
+
+    void handleResizedIcon(ImageIcon resizedIcon) {
+        if(resizedIcon == null) {
+            handleMakeIconError();
+        } else {
+            label.setIcon(resizedIcon);
+        }
+    }
+
+    void handleMakeIconError() {
+        label.setIcon(null);
+        label.setText("Failed to resize image");
     }
 }
