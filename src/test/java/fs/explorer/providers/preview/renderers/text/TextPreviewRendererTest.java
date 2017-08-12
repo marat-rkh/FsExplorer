@@ -4,7 +4,6 @@ import fs.explorer.providers.preview.PreviewRenderingData;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Queue;
 
 import static org.junit.Assert.*;

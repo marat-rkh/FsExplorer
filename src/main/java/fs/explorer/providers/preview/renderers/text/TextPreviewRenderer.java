@@ -45,7 +45,8 @@ public class TextPreviewRenderer implements PreviewRenderer {
         if (bytes == null) {
             return null;
         }
-        return renderLazyTextArea(bytes).asJComponent();
+        LazyScrollableTextArea lazyTextArea = renderLazyTextArea(bytes);
+        return lazyTextArea == null ? null : lazyTextArea.asJComponent();
     }
 
     LazyScrollableTextArea renderLazyTextArea(byte[] bytes)
