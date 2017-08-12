@@ -27,6 +27,7 @@ class ResizableImageLabel {
     private static class LabelListener implements ComponentListener {
         private final JLabel targetLabel;
         private final ImageIconMaker imageIconMaker;
+        private ImageLabelResizer lastResizer;
 
         LabelListener(JLabel targetLabel, ImageIconMaker imageIconMaker) {
             this.targetLabel = targetLabel;
@@ -43,14 +44,17 @@ class ResizableImageLabel {
             if (newSize == null) {
                 return;
             }
-            ImageLabelResizer resizer = new ImageLabelResizer(
+            if(lastResizer != null) {
+                lastResizer.cancel(true);
+            }
+            lastResizer = new ImageLabelResizer(
                     targetLabel,
                     imageIconMaker,
                     newSize,
                     RESIZE_START_DELAY_MILLISECONDS,
                     TimeUnit.MILLISECONDS
             );
-            resizer.execute();
+            lastResizer.execute();
         }
 
         @Override

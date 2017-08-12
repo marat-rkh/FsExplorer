@@ -2,6 +2,7 @@ package fs.explorer.providers.preview.renderers.image;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +36,7 @@ public class ImageLabelResizer extends SwingWorker<ImageIcon, Void> {
     protected void done() {
         try {
             handleResizedIcon(get());
-        } catch (InterruptedException e) {
+        } catch (CancellationException | InterruptedException e) {
             // doNothing
         } catch (ExecutionException e) {
             handleMakeIconError();
