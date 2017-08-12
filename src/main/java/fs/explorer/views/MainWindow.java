@@ -55,6 +55,8 @@ public final class MainWindow {
         treeAndPreview.setOneTouchExpandable(true);
         treeAndPreview.setDividerLocation(WINDOW_WIDTH / 2);
         treeAndPreview.setResizeWeight(0.5);
+        treeAndPreview.getLeftComponent().setMinimumSize(new Dimension(10, 10));
+        treeAndPreview.getRightComponent().setMinimumSize(new Dimension(10, 10));
 
         JSplitPane mainAndStatusBar = new JSplitPane(
                 JSplitPane.VERTICAL_SPLIT,

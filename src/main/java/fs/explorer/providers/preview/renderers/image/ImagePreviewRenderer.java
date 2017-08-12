@@ -7,6 +7,7 @@ import fs.explorer.utils.FileTypeInfo;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -34,12 +35,13 @@ public class ImagePreviewRenderer implements PreviewRenderer {
 
     ResizableImageLabel renderResizableImage(byte[] imageBytes, Dimension preferredSize)
             throws InterruptedException {
-        Image originalImage;
+        BufferedImage originalImage;
         try {
             ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
             originalImage = ImageIO.read(bais);
-        } catch (InterruptedIOException e) {
-            throw new InterruptedException();
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
         } catch (IOException e) {
             return null;
         }

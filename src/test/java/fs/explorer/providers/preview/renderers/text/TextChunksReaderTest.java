@@ -1,5 +1,6 @@
 package fs.explorer.providers.preview.renderers.text;
 
+import fs.explorer.TestResourceReader;
 import org.junit.Test;
 
 import java.io.*;
@@ -9,7 +10,7 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 
-public class TextChunksReaderTest {
+public class TextChunksReaderTest implements TestResourceReader {
     @Test(expected = IllegalArgumentException.class)
     public void throwsOnZeroChunkSize() throws URISyntaxException, IOException {
         try (Reader reader = new FileReader(testFilePath("/texts/empty.txt"));
@@ -107,9 +108,5 @@ public class TextChunksReaderTest {
             assertNull(chunksReader.readChunk());
         }
 
-    }
-
-    private String testFilePath(String relativePath) throws URISyntaxException {
-        return Paths.get(getClass().getResource(relativePath).toURI()).toString();
     }
 }
