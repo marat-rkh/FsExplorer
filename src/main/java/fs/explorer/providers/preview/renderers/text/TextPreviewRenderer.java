@@ -20,7 +20,13 @@ public class TextPreviewRenderer implements PreviewRenderer {
         maxPreLoadedChunks = DEFAULT_MAX_PRE_LOADED_CHUNKS;
     }
 
-    public TextPreviewRenderer(int textChunkSize, int maxPreLoadedChunks) {
+    TextPreviewRenderer(int textChunkSize, int maxPreLoadedChunks) {
+        if(textChunkSize <= 0) {
+            throw new IllegalArgumentException("chunk size must be > 0");
+        }
+        if(maxPreLoadedChunks < 0) {
+            throw new IllegalArgumentException("pre loaded chunk number must be >= 0");
+        }
         this.textChunkSize = textChunkSize;
         this.maxPreLoadedChunks = maxPreLoadedChunks;
     }
@@ -39,10 +45,10 @@ public class TextPreviewRenderer implements PreviewRenderer {
         if (bytes == null) {
             return null;
         }
-        return renderLazyTextArea(bytes);
+        return renderLazyTextArea(bytes).asJComponent();
     }
 
-    private JScrollPane renderLazyTextArea(byte[] bytes)
+    LazyScrollableTextArea renderLazyTextArea(byte[] bytes)
             throws InterruptedException {
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
@@ -70,18 +76,6 @@ public class TextPreviewRenderer implements PreviewRenderer {
         } catch (IOException e) {
             return null;
         }
-        return makeLazyTextArea(textArea, textChunks);
-    }
-
-    private JScrollPane makeLazyTextArea(JTextArea textArea, List<String> textChunksList) {
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
-        TextChunksAppender appender = new TextChunksAppender(
-                textArea,
-                new LinkedList<>(textChunksList),
-                verticalScrollBar
-        );
-        verticalScrollBar.addAdjustmentListener(appender);
-        return scrollPane;
+        return new LazyScrollableTextArea(textArea, textChunks);
     }
 }
