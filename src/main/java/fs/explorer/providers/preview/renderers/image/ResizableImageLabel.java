@@ -8,18 +8,20 @@ import java.util.concurrent.TimeUnit;
 
 class ResizableImageLabel {
     private final JLabel label;
-    private final ImageIconMaker imageIconMaker;
 
     private static final long RESIZE_START_DELAY_MILLISECONDS = 50;
 
     ResizableImageLabel(JLabel label, ImageIconMaker imageIconMaker) {
         this.label = label;
-        this.imageIconMaker = imageIconMaker;
         this.label.addComponentListener(new LabelListener(label, imageIconMaker));
     }
 
-    JComponent asJComponent() {
+    JLabel getLabel() {
         return label;
+    }
+
+    JComponent asJComponent() {
+        return getLabel();
     }
 
     private static class LabelListener implements ComponentListener {
@@ -38,16 +40,17 @@ class ResizableImageLabel {
                 return;
             }
             Dimension newSize = component.getSize();
-            if (newSize != null) {
-                ImageLabelResizer resizer = new ImageLabelResizer(
-                        targetLabel,
-                        imageIconMaker,
-                        newSize,
-                        RESIZE_START_DELAY_MILLISECONDS,
-                        TimeUnit.MILLISECONDS
-                );
-                resizer.execute();
+            if (newSize == null) {
+                return;
             }
+            ImageLabelResizer resizer = new ImageLabelResizer(
+                    targetLabel,
+                    imageIconMaker,
+                    newSize,
+                    RESIZE_START_DELAY_MILLISECONDS,
+                    TimeUnit.MILLISECONDS
+            );
+            resizer.execute();
         }
 
         @Override

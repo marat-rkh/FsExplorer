@@ -48,7 +48,7 @@ public class ImageLabelResizer extends SwingWorker<ImageIcon, Void> {
     }
 
     void handleResizedIcon(ImageIcon resizedIcon) {
-        if(resizedIcon == null) {
+        if (resizedIcon == null) {
             handleMakeIconError();
         } else {
             label.setIcon(resizedIcon);
