@@ -13,7 +13,6 @@ import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -37,7 +36,7 @@ public class DefaultPreviewProviderTest {
     @Test
     public void doesNotProvidePreviewOnNullData() {
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(null, progressHandler);
+        previewProvider.getPreview(null, null, progressHandler);
 
         verify(progressHandler).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -49,7 +48,7 @@ public class DefaultPreviewProviderTest {
         TreeNodeData dirNode = new TreeNodeData(
                 "", new FsPath("some/entry", TargetType.DIRECTORY, ""));
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(dirNode, progressHandler);
+        previewProvider.getPreview(dirNode, null, progressHandler);
 
         verify(progressHandler, never()).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -60,7 +59,7 @@ public class DefaultPreviewProviderTest {
     public void canNotRenderOnNullRenderers() throws IOException {
         setUpNullRenderers();
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(fsPathNode(""), progressHandler);
+        previewProvider.getPreview(fsPathNode(""), null, progressHandler);
 
         verify(progressHandler, never()).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -70,7 +69,7 @@ public class DefaultPreviewProviderTest {
     @Test
     public void canNotRenderOnEmptyRenderers() throws IOException {
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(fsPathNode(""), progressHandler);
+        previewProvider.getPreview(fsPathNode(""), null, progressHandler);
 
         verify(progressHandler, never()).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -82,7 +81,7 @@ public class DefaultPreviewProviderTest {
         setUpTestRenderers();
         when(fsManager.readFile(any())).thenReturn(null);
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(fsPathNode(""), progressHandler);
+        previewProvider.getPreview(fsPathNode(""), null, progressHandler);
 
         verify(progressHandler).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -94,7 +93,7 @@ public class DefaultPreviewProviderTest {
         setUpTestRenderers();
         when(archivesManager.readEntry(any(), any())).thenReturn(null);
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(archiveEntryNode(""), progressHandler);
+        previewProvider.getPreview(archiveEntryNode(""), null, progressHandler);
 
         verify(progressHandler).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -106,7 +105,7 @@ public class DefaultPreviewProviderTest {
         setUpTestRenderers();
         when(fsManager.readFile(any())).thenThrow(new IOException());
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(fsPathNode(""), progressHandler);
+        previewProvider.getPreview(fsPathNode(""), null, progressHandler);
 
         verify(progressHandler).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -118,7 +117,7 @@ public class DefaultPreviewProviderTest {
         setUpTestRenderers();
         when(archivesManager.readEntry(any(), any())).thenThrow(new IOException());
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(archiveEntryNode(""), progressHandler);
+        previewProvider.getPreview(archiveEntryNode(""), null, progressHandler);
 
         verify(progressHandler).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -129,7 +128,7 @@ public class DefaultPreviewProviderTest {
     public void canNotRenderWhenNoAppropriateRenderer() throws IOException {
         setUpTestRenderers();
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(fsPathNode("file.psd"), progressHandler);
+        previewProvider.getPreview(fsPathNode("file.psd"), null, progressHandler);
 
         verify(progressHandler, never()).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -140,7 +139,7 @@ public class DefaultPreviewProviderTest {
     public void doesNotProvidePreviewOnRenderingFail() throws IOException {
         setUpFailingRenderers();
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(fsPathNode("file.txt"), progressHandler);
+        previewProvider.getPreview(fsPathNode("file.txt"), null, progressHandler);
 
         verify(progressHandler).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -151,7 +150,7 @@ public class DefaultPreviewProviderTest {
     public void doesNothingOnRenderingInterrupted() throws IOException {
         setUpFailingRenderers();
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(fsPathNode("file.jpg"), progressHandler);
+        previewProvider.getPreview(fsPathNode("file.jpg"), null, progressHandler);
 
         verify(progressHandler, never()).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -162,7 +161,7 @@ public class DefaultPreviewProviderTest {
     public void providesPreview1() {
         setUpTestRenderers();
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(fsPathNode("file.txt"), progressHandler);
+        previewProvider.getPreview(fsPathNode("file.txt"), null, progressHandler);
 
         verify(progressHandler, never()).onError(any());
         verify(progressHandler).onComplete(any());
@@ -173,7 +172,7 @@ public class DefaultPreviewProviderTest {
     public void providesPreview2() {
         setUpTestRenderers();
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(fsPathNode("file.jpg"), progressHandler);
+        previewProvider.getPreview(fsPathNode("file.jpg"), null, progressHandler);
 
         verify(progressHandler, never()).onError(any());
         verify(progressHandler).onComplete(any());
@@ -184,7 +183,7 @@ public class DefaultPreviewProviderTest {
     public void providesPreviewInArchive1() {
         setUpTestRenderers();
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(archiveEntryNode("file.txt"), progressHandler);
+        previewProvider.getPreview(archiveEntryNode("file.txt"), null, progressHandler);
 
         verify(progressHandler, never()).onError(any());
         verify(progressHandler).onComplete(any());
@@ -195,7 +194,7 @@ public class DefaultPreviewProviderTest {
     public void providesPreviewInArchive2() {
         setUpTestRenderers();
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(archiveEntryNode("file.jpg"), progressHandler);
+        previewProvider.getPreview(archiveEntryNode("file.jpg"), null, progressHandler);
 
         verify(progressHandler, never()).onError(any());
         verify(progressHandler).onComplete(any());

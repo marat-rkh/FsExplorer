@@ -1,6 +1,7 @@
 package fs.explorer.controllers;
 
 import fs.explorer.providers.dirtree.TreeNodeData;
+import fs.explorer.providers.preview.PreviewContext;
 import fs.explorer.providers.preview.PreviewProgressHandler;
 import fs.explorer.providers.preview.PreviewProvider;
 import fs.explorer.views.PreviewPane;
@@ -53,8 +54,9 @@ public class PreviewController {
                 handleCanNotRenderer();
             }
         };
+        PreviewContext context = new PreviewContext(previewPane.getSize());
         statusBarController.setProgressMessage(LOADING_PREVIEW);
-        previewProvider.getPreview(nodeData, progressHandler);
+        previewProvider.getPreview(nodeData, context, progressHandler);
     }
 
     private void handlePreview(String path, JComponent preview) {

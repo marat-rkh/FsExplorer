@@ -2,19 +2,14 @@ package fs.explorer.providers.preview.renderers.image;
 
 import fs.explorer.providers.preview.PreviewRenderer;
 import fs.explorer.providers.preview.PreviewRenderingData;
-import fs.explorer.providers.preview.renderers.image.ImageIconMaker;
-import fs.explorer.providers.preview.renderers.image.ResizableImageLabel;
 import fs.explorer.utils.FileTypeInfo;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.util.concurrent.ExecutionException;
 
 public class ImagePreviewRenderer implements PreviewRenderer {
 
@@ -32,11 +27,13 @@ public class ImagePreviewRenderer implements PreviewRenderer {
         if (imageBytes == null) {
             return null;
         }
-        ResizableImageLabel resizableImage = renderResizableImage(imageBytes);
+        Dimension preferredSize = data.getPreviewContext().getPreferredSize();
+        ResizableImageLabel resizableImage = renderResizableImage(imageBytes, preferredSize);
         return resizableImage == null ? null : resizableImage.asJComponent();
     }
 
-    ResizableImageLabel renderResizableImage(byte[] imageBytes) throws InterruptedException {
+    ResizableImageLabel renderResizableImage(byte[] imageBytes, Dimension preferredSize)
+            throws InterruptedException {
         Image originalImage;
         try {
             ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
@@ -50,8 +47,7 @@ public class ImagePreviewRenderer implements PreviewRenderer {
             return null;
         }
         ImageIconMaker imageIconMaker = new ImageIconMaker(originalImage);
-        // TODO make initial scaling
-        JLabel label = new JLabel(imageIconMaker.makeIcon(), JLabel.CENTER);
+        JLabel label = new JLabel(imageIconMaker.makeIcon(preferredSize), JLabel.CENTER);
         return new ResizableImageLabel(label, imageIconMaker);
     }
 }

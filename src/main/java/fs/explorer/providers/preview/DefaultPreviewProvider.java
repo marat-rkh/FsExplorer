@@ -41,7 +41,11 @@ public class DefaultPreviewProvider implements PreviewProvider {
     }
 
     @Override
-    public void getPreview(TreeNodeData data, PreviewProgressHandler progressHandler) {
+    public void getPreview(
+            TreeNodeData data,
+            PreviewContext context,
+            PreviewProgressHandler progressHandler
+    ) {
         if (data == null) {
             progressHandler.onError(INTERNAL_ERROR);
             return;
@@ -71,7 +75,8 @@ public class DefaultPreviewProvider implements PreviewProvider {
             progressHandler.onCanNotRenderer();
         } else {
             try {
-                PreviewRenderingData renderingData = new PreviewRenderingData(fileName, fileBytes);
+                PreviewRenderingData renderingData = new PreviewRenderingData(
+                        fileName, fileBytes, context);
                 JComponent preview = renderer.render(renderingData);
                 if (preview != null) {
                     progressHandler.onComplete(preview);

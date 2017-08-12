@@ -41,14 +41,14 @@ public class AsyncPreviewProviderTest {
                 cyclicBarrier.await(10, TimeUnit.SECONDS);
             }
             return null;
-        }).when(previewProvider).getPreview(any(), any());
+        }).when(previewProvider).getPreview(any(), any(), any());
 
         cyclicBarrier = new CyclicBarrier(2);
         counter = new AtomicInteger(0);
 
         asyncPreviewProvider = new AsyncPreviewProvider(previewProvider, 0);
 
-        asyncPreviewProvider.getPreview(null, null);
+        asyncPreviewProvider.getPreview(null, null, null);
         cyclicBarrier.await(10, TimeUnit.SECONDS);
         Thread.sleep(2000);
         asyncPreviewProvider.shutdownNow();
@@ -72,20 +72,20 @@ public class AsyncPreviewProviderTest {
                 cyclicBarrier.await(10, TimeUnit.SECONDS);
             }
             return null;
-        }).when(previewProvider).getPreview(same(dummyData1), any());
+        }).when(previewProvider).getPreview(same(dummyData1), any(), any());
 
         TreeNodeData dummyData2 = mock(TreeNodeData.class);
-        doNothing().when(previewProvider).getPreview(same(dummyData2), any());
+        doNothing().when(previewProvider).getPreview(same(dummyData2), any(), any());
 
         cyclicBarrier = new CyclicBarrier(2);
         counter = new AtomicInteger(0);
 
         asyncPreviewProvider = new AsyncPreviewProvider(previewProvider, 0);
 
-        asyncPreviewProvider.getPreview(dummyData1, null);
+        asyncPreviewProvider.getPreview(dummyData1, null, null);
         cyclicBarrier.await(10, TimeUnit.SECONDS);
         Thread.sleep(2000);
-        asyncPreviewProvider.getPreview(dummyData2, null);
+        asyncPreviewProvider.getPreview(dummyData2, null, null);
         cyclicBarrier.await(10, TimeUnit.SECONDS);
         asyncPreviewProvider.shutdownNow();
         assertEquals(1, counter.get());

@@ -5,7 +5,6 @@ import fs.explorer.utils.Disposable;
 
 import javax.swing.*;
 import java.util.concurrent.*;
-import java.util.function.Consumer;
 
 public class AsyncPreviewProvider implements PreviewProvider, Disposable {
     private final PreviewProvider previewProvider;
@@ -23,7 +22,11 @@ public class AsyncPreviewProvider implements PreviewProvider, Disposable {
     }
 
     @Override
-    public void getPreview(TreeNodeData data, PreviewProgressHandler progressHandler) {
+    public void getPreview(
+            TreeNodeData data,
+            PreviewContext context,
+            PreviewProgressHandler progressHandler
+    ) {
         try {
             if(currentTask != null) {
                 currentTask.cancel(true);
@@ -44,7 +47,7 @@ public class AsyncPreviewProvider implements PreviewProvider, Disposable {
                     SwingUtilities.invokeLater(progressHandler::onCanNotRenderer);
                 }
             };
-            Runnable task = () -> previewProvider.getPreview(data, asyncHandler);
+            Runnable task = () -> previewProvider.getPreview(data, context, asyncHandler);
             currentTask = executor.schedule(
                     task, taskStartDelayMilliseconds, TimeUnit.MILLISECONDS);
         } catch (RejectedExecutionException e) {

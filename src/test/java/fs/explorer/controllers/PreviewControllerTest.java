@@ -30,7 +30,7 @@ public class PreviewControllerTest {
         TreeNodeData testData = nodeData("/some/dir/file.txt", false, "file.txt");
         previewController.updatePreview(testData);
         verify(statusBarController).setProgressMessage(any());
-        verify(previewProvider).getPreview(any(), any());
+        verify(previewProvider).getPreview(any(), any(), any());
         verify(previewPane).updatePreview(any());
         verify(statusBarController).setInfoMessage(any(), any());
         verify(statusBarController, never()).setErrorMessage(any(), any());
@@ -40,7 +40,7 @@ public class PreviewControllerTest {
     @Test
     public void doesNotUpdatePreviewOnDirectory() {
         previewController.updatePreview(nodeData("/some/dir", true, "dir"));
-        verify(previewProvider, never()).getPreview(any(), any());
+        verify(previewProvider, never()).getPreview(any(), any(), any());
         verify(previewPane, never()).updatePreview(any());
         verify(statusBarController, never()).setErrorMessage(any(), any());
         verify(statusBarController, never()).setErrorMessage(any());
@@ -52,7 +52,7 @@ public class PreviewControllerTest {
         TreeNodeData testData = nodeData("/some/dir/file.psd", false, "file.psd");
         previewController.updatePreview(testData);
         verify(statusBarController).setProgressMessage(any());
-        verify(previewProvider).getPreview(any(), any());
+        verify(previewProvider).getPreview(any(), any(), any());
         verify(previewPane).showDefaultPreview();
         verify(statusBarController).clear();
     }
@@ -60,7 +60,7 @@ public class PreviewControllerTest {
     @Test
     public void failsToUpdatePreviewOnNullData() {
         previewController.updatePreview(null);
-        verify(previewProvider, never()).getPreview(any(), any());
+        verify(previewProvider, never()).getPreview(any(), any(), any());
         verify(previewPane).showDefaultPreview();
         verify(statusBarController).setErrorMessage(any(), any());
     }
@@ -71,7 +71,7 @@ public class PreviewControllerTest {
         TreeNodeData testData = nodeData("/some/dir/file.txt", false, "file.txt");
         previewController.updatePreview(testData);
         verify(statusBarController).setProgressMessage(any());
-        verify(previewProvider).getPreview(any(), any());
+        verify(previewProvider).getPreview(any(), any(), any());
         verify(previewPane).showDefaultPreview();
         verify(statusBarController).setErrorMessage(any(), any());
     }
@@ -95,21 +95,33 @@ public class PreviewControllerTest {
 
     private static class CompletingPreviewProvider implements PreviewProvider {
         @Override
-        public void getPreview(TreeNodeData data, PreviewProgressHandler progressHandler) {
+        public void getPreview(
+                TreeNodeData data,
+                PreviewContext context,
+                PreviewProgressHandler progressHandler
+        ) {
             progressHandler.onComplete(null);
         }
     }
 
     private static class FailingPreviewProvider implements PreviewProvider {
         @Override
-        public void getPreview(TreeNodeData data, PreviewProgressHandler progressHandler) {
+        public void getPreview(
+                TreeNodeData data,
+                PreviewContext context,
+                PreviewProgressHandler progressHandler
+        ) {
             progressHandler.onError("");
         }
     }
 
     private static class CanNotRenderPreviewProvider implements PreviewProvider {
         @Override
-        public void getPreview(TreeNodeData data, PreviewProgressHandler progressHandler) {
+        public void getPreview(
+                TreeNodeData data,
+                PreviewContext context,
+                PreviewProgressHandler progressHandler
+        ) {
             progressHandler.onCanNotRenderer();
         }
     }

@@ -28,7 +28,7 @@ public class TextPreviewRendererTest {
     @Test
     public void doesNotRenderOnNullDataBytes() throws InterruptedException {
         TextPreviewRenderer renderer = new TextPreviewRenderer();
-        PreviewRenderingData data = new PreviewRenderingData("", null);
+        PreviewRenderingData data = new PreviewRenderingData("", null, null);
         assertNull(renderer.render(data));
     }
 
