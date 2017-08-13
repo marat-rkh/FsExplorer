@@ -2,13 +2,13 @@ package fs.explorer.controllers;
 
 import java.awt.event.ActionEvent;
 
-public class MenuBarController {
+public class ToolBarController {
     private final FsTypeSwitcher fsTypeSwitcher;
     private final FTPDialogController ftpDialogController;
     private final DirTreeController dirTreeController;
     private final StatusBarController statusBarController;
 
-    public MenuBarController(
+    public ToolBarController(
             FsTypeSwitcher fsTypeSwitcher,
             FTPDialogController ftpDialogController,
             DirTreeController dirTreeController,

@@ -6,8 +6,8 @@ import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class MenuBarControllerTest {
-    private MenuBarController controller;
+public class ToolBarControllerTest {
+    private ToolBarController controller;
     private FsTypeSwitcher fsTypeSwitcher;
     private FTPDialogController ftpDialogController;
     private DirTreeController dirTreeController;
@@ -19,7 +19,7 @@ public class MenuBarControllerTest {
         ftpDialogController = mock(FTPDialogController.class);
         dirTreeController = mock(DirTreeController.class);
         statusBarController = mock(StatusBarController.class);
-        controller = new MenuBarController(
+        controller = new ToolBarController(
                 fsTypeSwitcher, ftpDialogController, dirTreeController, statusBarController);
     }
 

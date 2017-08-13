@@ -10,6 +10,9 @@ public class StatusBar {
 
     public StatusBar(String idleMessage) {
         label = new JLabel(idleMessage);
+        label.setMinimumSize(new Dimension(10, 20));
+        label.setPreferredSize(new Dimension(10, 20));
+        label.setMaximumSize(new Dimension(10, 20));
         label.setForeground(CustomColors.DARK_GREEN);
     }
 
@@ -21,5 +24,7 @@ public class StatusBar {
         label.setForeground(color);
     }
 
-    public JComponent asJComponent() { return label; }
+    JComponent asJComponent() {
+        return label;
+    }
 }

@@ -77,11 +77,11 @@ public class Application {
             FTPDialogController ftpDialogController = new FTPDialogController(
                     ftpDialog, ftpInfoValidator, fsTypeSwitcher, statusBarController);
 
-            MenuBarController menuBarController = new MenuBarController(
+            ToolBarController toolBarController = new ToolBarController(
                     fsTypeSwitcher, ftpDialogController, dirTreeController, statusBarController);
-            MenuBar menuBar = new MenuBar(menuBarController);
+            ToolBar toolBar = new ToolBar(toolBarController);
 
-            mainWindow = new MainWindow("FsExplorer", menuBar, statusBar, dirTreePane, previewPane);
+            mainWindow = new MainWindow("FsExplorer", toolBar, statusBar, dirTreePane, previewPane);
             MainWindowController mainWindowController = new MainWindowController(
                     mainWindow,
                     statusBarController,

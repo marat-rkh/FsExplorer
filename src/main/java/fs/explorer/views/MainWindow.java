@@ -8,14 +8,14 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 public final class MainWindow {
-    private final int WINDOW_WIDTH = 640;
-    private final int WINDOW_HEIGHT = 480;
+    private static final int WINDOW_WIDTH = 640;
+    private static final int WINDOW_HEIGHT = 480;
 
     private final JFrame frame;
 
     public MainWindow(
             String name,
-            MenuBar menuBar,
+            ToolBar toolBar,
             StatusBar statusBar,
             DirTreePane dirTreePane,
             PreviewPane previewPane
@@ -23,9 +23,9 @@ public final class MainWindow {
         frame = new JFrame(name);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.getContentPane().setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
-        frame.setJMenuBar(menuBar.asJMenuBar());
-        JSplitPane mainPane = createMainPane(statusBar, dirTreePane, previewPane);
-        frame.getContentPane().add(mainPane, BorderLayout.CENTER);
+        frame.getContentPane().add(toolBar.asJComponent(), BorderLayout.NORTH);
+        frame.getContentPane().add(createMainPane(dirTreePane, previewPane), BorderLayout.CENTER);
+        frame.getContentPane().add(statusBar.asJComponent(), BorderLayout.SOUTH);
     }
 
     public void setController(MainWindowController controller) {
@@ -42,11 +42,7 @@ public final class MainWindow {
         frame.setCursor(cursor);
     }
 
-    private JSplitPane createMainPane(
-            StatusBar statusBar,
-            DirTreePane dirTreePane,
-            PreviewPane previewPane
-    ) {
+    private JSplitPane createMainPane(DirTreePane dirTreePane, PreviewPane previewPane) {
         JSplitPane treeAndPreview = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
                 dirTreePane.asJComponent(),
@@ -57,16 +53,7 @@ public final class MainWindow {
         treeAndPreview.setResizeWeight(0.5);
         treeAndPreview.getLeftComponent().setMinimumSize(new Dimension(10, 10));
         treeAndPreview.getRightComponent().setMinimumSize(new Dimension(10, 10));
-
-        JSplitPane mainAndStatusBar = new JSplitPane(
-                JSplitPane.VERTICAL_SPLIT,
-                treeAndPreview,
-                statusBar.asJComponent()
-        );
-        mainAndStatusBar.setDividerLocation(92 * WINDOW_HEIGHT / 100);
-        mainAndStatusBar.setResizeWeight(1.0);
-        mainAndStatusBar.setEnabled(false);
-        return mainAndStatusBar;
+        return treeAndPreview;
     }
 
     private static class MainWindowListener implements WindowListener {
