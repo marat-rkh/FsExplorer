@@ -4,51 +4,30 @@ import fs.explorer.providers.dirtree.FsManager;
 import fs.explorer.providers.dirtree.IOFunction;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.path.TargetType;
-import fs.explorer.utils.Disposable;
 import fs.explorer.utils.FTPPathUtils;
 import fs.explorer.utils.FileTypeInfo;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPReply;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// @ThreadSafe
-public class RemoteFsManager implements FsManager, Disposable {
-    private final FTPClient ftpClient;
+public class RemoteFsManager implements FsManager {
+    private final FTPConnectionInfo connectionInfo;
 
-    private static final long KEEP_ALIVE_TIMEOUT_SECONDS = 150;
     private static final int BUFFER_SIZE = 8192;
 
-    public RemoteFsManager() {
-        ftpClient = new FTPClient();
+    public RemoteFsManager(FTPConnectionInfo connectionInfo) {
+        this.connectionInfo = connectionInfo;
     }
 
-    public void connect(FTPConnectionInfo connectionInfo) throws FTPException {
-        synchronized(ftpClient) {
-            doConnect(connectionInfo);
-        }
-    }
-
-    public void disconnect() throws FTPException {
-        synchronized(ftpClient) {
-            doDisconnect();
-        }
-    }
-
-    public void reconnect(FTPConnectionInfo connectionInfo) throws FTPException {
-        synchronized(ftpClient) {
-            doDisconnect();
-            doConnect(connectionInfo);
+    public void checkConnection() throws FTPException {
+        try (FTPConnection connection = new FTPConnection(connectionInfo)) {
+            connection.open();
         }
     }
 
@@ -57,10 +36,10 @@ public class RemoteFsManager implements FsManager, Disposable {
         return withFileStream(filePath, is -> {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[BUFFER_SIZE];
-            int len = 0;
-            while((len = is.read(buffer)) != -1) {
+            int len;
+            while ((len = is.read(buffer)) != -1) {
                 baos.write(buffer, 0, len);
-                if(Thread.currentThread().isInterrupted()) {
+                if (Thread.currentThread().isInterrupted()) {
                     throw new InterruptedIOException();
                 }
             }
@@ -69,59 +48,63 @@ public class RemoteFsManager implements FsManager, Disposable {
     }
 
     @Override
-    public <R> R withFileStream(
-            FsPath filePath, IOFunction<InputStream, R> streamReader) throws IOException {
-        if(filePath == null || filePath.getPath() == null) {
+    public <R> R withFileStream(FsPath filePath, IOFunction<InputStream, R> streamReader)
+            throws IOException {
+        if (filePath == null || filePath.getPath() == null) {
             throw new IOException("bad file path");
         }
-        synchronized(ftpClient) {
-            R result = null;
-            try (
-                    InputStream is = ftpClient.retrieveFileStream(filePath.getPath())
-            ) {
-                if(is == null) {
+        try (FTPConnection connection = new FTPConnection(connectionInfo)) {
+            connection.open();
+            R result;
+            try (InputStream is = connection.retrieveFileStream(filePath.getPath())) {
+                if (is == null) {
                     throw new IOException("failed to read remote file");
                 }
                 result = streamReader.apply(is);
                 // read the rest or command completion fails
                 skipRest(is);
-            } catch(InterruptedIOException e) {
-                ftpClient.completePendingCommand();
+            } catch (InterruptedIOException e) {
+                connection.completePendingCommand();
                 throw new InterruptedIOException(e.getMessage());
             }
-            if(!ftpClient.completePendingCommand()) {
+            if (!connection.completePendingCommand()) {
                 throw new IOException("failed to finish remote file read");
             }
             return result;
+        } catch (FTPException e) {
+            throw new IOException(e.getMessage());
         }
     }
 
     @Override
     public List<FsPath> list(FsPath directoryPath) throws IOException {
-        if(directoryPath == null) {
+        if (directoryPath == null) {
             throw new IOException("bad directory path");
         }
-        if(!directoryPath.isDirectory()) {
+        if (!directoryPath.isDirectory()) {
             throw new IOException("not a directory");
         }
         String pathStr = directoryPath.getPath();
-        if(pathStr == null) {
+        if (pathStr == null) {
             throw new IOException("bad directory path");
         }
-        FTPFile[] entries = null;
-        synchronized(ftpClient) {
-            entries = ftpClient.listFiles(pathStr);
+        FTPFile[] entries;
+        try (FTPConnection connection = new FTPConnection(connectionInfo)) {
+            connection.open();
+            entries = connection.listFiles(pathStr);
+        } catch (FTPException e) {
+            throw new IOException(e.getMessage());
         }
-        if(entries == null) {
+        if (entries == null) {
             throw new IOException("failed to list entries");
         }
         return Arrays.stream(entries).map(e -> {
             String lastComponent = e.getName();
             String path = FTPPathUtils.append(pathStr, lastComponent);
-            TargetType targetType = null;
-            if(e.isDirectory()) {
+            TargetType targetType;
+            if (e.isDirectory()) {
                 targetType = TargetType.DIRECTORY;
-            } else if(FileTypeInfo.isZipArchive(path)) {
+            } else if (FileTypeInfo.isZipArchive(path)) {
                 targetType = TargetType.ZIP_ARCHIVE;
             } else {
                 targetType = TargetType.FILE;
@@ -130,86 +113,10 @@ public class RemoteFsManager implements FsManager, Disposable {
         }).collect(Collectors.toList());
     }
 
-    @Override
-    public void dispose() {
-        try {
-            disconnect();
-        } catch (FTPException e) {
-            // do nothing
-        }
-    }
-
-    private void doConnect(FTPConnectionInfo connectionInfo) throws FTPException {
-        if(ftpClient.isConnected()) {
-            throw new FTPException("already connected");
-        }
-        try {
-            makeConnection(connectionInfo);
-            login(connectionInfo);
-            configureClient();
-        } catch (IOException e) {
-            if(ftpClient.isConnected()) {
-                try {
-                    ftpClient.disconnect();
-                } catch (IOException ioe) {
-                    // do nothing
-                }
-            }
-            throw new FTPException(e.getMessage());
-        }
-    }
-
-    private void doDisconnect() throws FTPException {
-        if(ftpClient.isConnected()) {
-            try {
-                ftpClient.logout();
-            } catch (IOException e) {
-                throw new FTPException("failed to logout");
-            } finally {
-                try {
-                    ftpClient.disconnect();
-                } catch (IOException ioe) {
-                    // do nothing
-                }
-            }
-        }
-    }
-
-    private void makeConnection(FTPConnectionInfo connectionInfo)
-            throws IOException, FTPException {
-        ftpClient.connect(connectionInfo.getHost());
-        int replyCode = ftpClient.getReplyCode();
-        if(!FTPReply.isPositiveCompletion(replyCode)) {
-            ftpClient.disconnect();
-            throw new FTPException("connection failed");
-        }
-    }
-
-    private void login(FTPConnectionInfo connectionInfo) throws IOException, FTPException {
-        String user = connectionInfo.getUser();
-        String password = new String(connectionInfo.getPassword());
-        if(user.isEmpty() && password.isEmpty()) {
-            user = "anonymous";
-            password = "";
-        }
-        if(!ftpClient.login(user, password)) {
-            ftpClient.disconnect();
-            throw new FTPException("login failed");
-        }
-    }
-
-    private void configureClient() throws IOException, FTPException {
-        if(!ftpClient.setFileType(FTP.BINARY_FILE_TYPE)) {
-            ftpClient.disconnect();
-            throw new FTPException("connection configureClient failed");
-        }
-        ftpClient.setControlKeepAliveTimeout(KEEP_ALIVE_TIMEOUT_SECONDS);
-    }
-
     private void skipRest(InputStream is) throws IOException {
         byte[] buffer = new byte[BUFFER_SIZE];
-        while(is.read(buffer) != -1) {
-            if(Thread.currentThread().isInterrupted()) {
+        while (is.read(buffer) != -1) {
+            if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedIOException();
             }
         }

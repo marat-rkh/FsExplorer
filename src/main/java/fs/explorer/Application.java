@@ -7,7 +7,6 @@ import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.providers.dirtree.local.LocalFsManager;
 import fs.explorer.providers.dirtree.archives.ArchivesManager;
 import fs.explorer.providers.dirtree.archives.ArchivesReader;
-import fs.explorer.providers.dirtree.remote.RemoteFsManager;
 import fs.explorer.providers.preview.AsyncPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.PreviewRenderer;
@@ -37,8 +36,6 @@ public class Application {
             List<Disposable> disposables = new ArrayList<>();
 
             LocalFsManager localFsManager = new LocalFsManager();
-            RemoteFsManager remoteFsManager = new RemoteFsManager();
-            disposables.add(remoteFsManager);
 
             ArchivesReader archivesReader = new ArchivesReader();
             ArchivesManager archivesManager = new ArchivesManager(archivesReader);
@@ -71,7 +68,6 @@ public class Application {
                     dirTreeController,
                     previewProvider,
                     localFsManager,
-                    remoteFsManager,
                     archivesManager
             );
             disposables.add(fsTypeSwitcher);

@@ -12,35 +12,31 @@ import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.utils.Disposable;
 import fs.explorer.utils.OSInfo;
 
-// @NotThreadSafe
 public class FsTypeSwitcher implements Disposable {
     private final DirTreeController dirTreeController;
     private final DefaultPreviewProvider previewProvider;
     private final LocalFsManager localFsManager;
-    private final RemoteFsManager remoteFsManager;
     private final ArchivesManager archivesManager;
 
     private AsyncFsDataProvider asyncFsDataProvider;
 
     private static final FsPath localDriveTopDir = OSInfo.getRootFsPath();
-    private static final FsPath remoteHostTopDir =
-            new FsPath("/", TargetType.DIRECTORY, "/");
+    private static final FsPath remoteHostTopDir = new FsPath(
+            "/", TargetType.DIRECTORY, "/");
 
     public FsTypeSwitcher(
             DirTreeController dirTreeController,
             DefaultPreviewProvider previewProvider,
             LocalFsManager localFsManager,
-            RemoteFsManager remoteFsManager,
             ArchivesManager archivesManager
     ) {
         this.dirTreeController = dirTreeController;
         this.previewProvider = previewProvider;
         this.localFsManager = localFsManager;
-        this.remoteFsManager = remoteFsManager;
         this.archivesManager = archivesManager;
     }
 
-    public void switchToLocalFs() {
+    void switchToLocalFs() {
         disposeCurrentFsDataProvider();
         asyncFsDataProvider = new AsyncFsDataProvider(
                 new FsDataProvider(localDriveTopDir, localFsManager, archivesManager)
@@ -49,8 +45,9 @@ public class FsTypeSwitcher implements Disposable {
         previewProvider.resetFsManager(localFsManager);
     }
 
-    public void switchToRemoteFs(FTPConnectionInfo connectionInfo) throws FTPException {
-        remoteFsManager.reconnect(connectionInfo);
+    void switchToRemoteFs(FTPConnectionInfo connectionInfo) throws FTPException {
+        RemoteFsManager remoteFsManager = new RemoteFsManager(connectionInfo);
+        remoteFsManager.checkConnection();
         disposeCurrentFsDataProvider();
         asyncFsDataProvider = new AsyncFsDataProvider(
                 new FsDataProvider(remoteHostTopDir, remoteFsManager, archivesManager)
@@ -59,8 +56,8 @@ public class FsTypeSwitcher implements Disposable {
         previewProvider.resetFsManager(remoteFsManager);
     }
 
-    public void disposeCurrentFsDataProvider() {
-        if(asyncFsDataProvider != null) {
+    void disposeCurrentFsDataProvider() {
+        if (asyncFsDataProvider != null) {
             // TODO this `dispose` should be done in background thread
             asyncFsDataProvider.dispose();
             asyncFsDataProvider = null;
