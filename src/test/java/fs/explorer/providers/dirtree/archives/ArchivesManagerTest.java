@@ -128,7 +128,6 @@ public class ArchivesManagerTest {
                 archivesManager.listSubEntry(dirPath(fsPath, "home/", "home"), fsManager);
 
         assertNotNull(entries);
-        System.out.println(entries);
         assertThat(entries, containsInAnyOrder(
                 filePath(fsPath, "home/draft.txt", "draft.txt"),
                 zipPath(fsPath, "home/sub-arch.zip", "sub-arch.zip"),
