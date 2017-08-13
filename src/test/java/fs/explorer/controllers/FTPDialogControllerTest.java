@@ -54,7 +54,7 @@ public class FTPDialogControllerTest {
     @Test
     public void showsFTPDialogAgainOnValidationFail() {
         FTPConnectionInfo testInfo =
-                new FTPConnectionInfo("host", "user", new char[]{'p','a','s','s'});
+                new FTPConnectionInfo("host", "user", new char[]{'p', 'a', 's', 's'});
         when(ftpDialog.showAndWaitResult())
                 .thenReturn(Optional.of(testInfo))
                 .thenReturn(Optional.empty());
@@ -70,7 +70,7 @@ public class FTPDialogControllerTest {
     @Test
     public void switchesToRemoteFs() throws FTPException {
         FTPConnectionInfo testInfo =
-                new FTPConnectionInfo("host", "user", new char[]{'p','a','s','s'});
+                new FTPConnectionInfo("host", "user", new char[]{'p', 'a', 's', 's'});
         when(ftpDialog.showAndWaitResult()).thenReturn(Optional.of(testInfo));
         when(ftpInfoValidator.validate(any())).thenReturn(Optional.empty());
         ftpDialogController.showAndHandleInput();
@@ -82,7 +82,7 @@ public class FTPDialogControllerTest {
     @Test
     public void switchesToRemoteFsAfterDialogShownAgain() throws FTPException {
         FTPConnectionInfo testInfo =
-                new FTPConnectionInfo("host", "user", new char[]{'p','a','s','s'});
+                new FTPConnectionInfo("host", "user", new char[]{'p', 'a', 's', 's'});
         when(ftpDialog.showAndWaitResult()).thenReturn(Optional.of(testInfo));
         when(ftpInfoValidator.validate(any()))
                 .thenReturn(Optional.of("Some error"))
@@ -96,7 +96,7 @@ public class FTPDialogControllerTest {
     @Test
     public void handlesFsSwitchFailure() throws FTPException {
         FTPConnectionInfo testInfo =
-                new FTPConnectionInfo("host", "user", new char[]{'p','a','s','s'});
+                new FTPConnectionInfo("host", "user", new char[]{'p', 'a', 's', 's'});
         when(ftpDialog.showAndWaitResult()).thenReturn(Optional.of(testInfo));
         when(ftpInfoValidator.validate(any())).thenReturn(Optional.empty());
         doThrow(FTPException.class).when(fsTypeSwitcher).switchToRemoteFs(any());
@@ -104,5 +104,30 @@ public class FTPDialogControllerTest {
 
         verify(statusBarController, never()).setInfoMessage(any(), any());
         verify(statusBarController).setErrorMessage(any(), any());
+    }
+
+    @Test
+    public void showsAndHandlesInputOnHandleLastInputWithNoLastConnection() throws FTPException {
+        FTPConnectionInfo testInfo =
+                new FTPConnectionInfo("host", "user", new char[]{'p', 'a', 's', 's'});
+        when(ftpDialog.showAndWaitResult()).thenReturn(Optional.of(testInfo));
+        when(ftpInfoValidator.validate(any())).thenReturn(Optional.empty());
+        ftpDialogController.handleLastInput();
+
+        verify(fsTypeSwitcher).switchToRemoteFs(testInfo);
+        verify(statusBarController).setInfoMessage(any(), any());
+    }
+
+    @Test
+    public void handlesLastInputWhenLastConnectionPresent() throws FTPException {
+        FTPConnectionInfo testInfo =
+                new FTPConnectionInfo("host", "user", new char[]{'p', 'a', 's', 's'});
+        when(ftpDialog.showAndWaitResult()).thenReturn(Optional.of(testInfo));
+        when(ftpInfoValidator.validate(any())).thenReturn(Optional.empty());
+        ftpDialogController.showAndHandleInput();
+        ftpDialogController.handleLastInput();
+
+        verify(fsTypeSwitcher, times(2)).switchToRemoteFs(testInfo);
+        verify(statusBarController, times(2)).setInfoMessage(any(), any());
     }
 }

@@ -29,6 +29,10 @@ public class ToolBarController {
         ftpDialogController.showAndHandleInput();
     }
 
+    public void handleReconnectToLastRemoteHost(ActionEvent e) {
+        ftpDialogController.handleLastInput();
+    }
+
     public void handleSelectedReload(ActionEvent e) {
         dirTreeController.reloadLastSelectedNode();
     }

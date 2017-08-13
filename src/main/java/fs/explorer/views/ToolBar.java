@@ -11,10 +11,12 @@ public final class ToolBar {
 
     private static final String EXPLORE_LOCAL_FILES_ICON = "/icons/local16.png";
     private static final String EXPLORE_REMOTE_FILES_ICON = "/icons/ftp16.png";
+    private static final String RECONNECT_ICON = "/icons/ftp-reconnect16.png";
     private static final String RELOAD_ICON = "/icons/reload16.png";
 
     private static final String EXPLORE_LOCAL_FILES_TIP = "Explore local files";
     private static final String EXPLORE_REMOTE_FILES_TIP = "Explore remote files (FTP)";
+    private static final String RECONNECT_TIP = "Reconnect to remote host";
     private static final String RELOAD_TIP = "Reload selected";
 
     public ToolBar(ToolBarController toolBarController) {
@@ -26,10 +28,16 @@ public final class ToolBar {
                 EXPLORE_LOCAL_FILES_TIP,
                 toolBarController::handleExploreLocalFiles
         ));
+        toolBar.addSeparator();
         toolBar.add(button(
                 EXPLORE_REMOTE_FILES_ICON,
                 EXPLORE_REMOTE_FILES_TIP,
                 toolBarController::handleExploreRemoteFiles
+        ));
+        toolBar.add(button(
+                RECONNECT_ICON,
+                RECONNECT_TIP,
+                toolBarController::handleReconnectToLastRemoteHost
         ));
         toolBar.addSeparator();
         toolBar.add(button(

@@ -42,6 +42,12 @@ public class ToolBarControllerTest {
     }
 
     @Test
+    public void handlesReconnectToLastRemoteHost() throws Exception {
+        controller.handleReconnectToLastRemoteHost(null);
+        verify(ftpDialogController).handleLastInput();
+    }
+
+    @Test
     public void reloadsLastSelectedNodeOnSelectedReloadEvent() throws Exception {
         controller.handleSelectedReload(null);
         verify(dirTreeController).reloadLastSelectedNode();

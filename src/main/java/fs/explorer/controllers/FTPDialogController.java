@@ -12,6 +12,8 @@ public class FTPDialogController {
     private final FsTypeSwitcher fsTypeSwitcher;
     private final StatusBarController statusBarController;
 
+    private FTPConnectionInfo lastConnectionInfo;
+
     private static final String CONNECTION_FAILED = "FTP connection failed";
     private static final String CONNECTED = "Connected";
 
@@ -27,8 +29,16 @@ public class FTPDialogController {
         this.statusBarController = statusBarController;
     }
 
-    public void showAndHandleInput() {
+    void showAndHandleInput() {
         showAndHandleInput("");
+    }
+
+    void handleLastInput() {
+        if (lastConnectionInfo != null) {
+            handleInput(lastConnectionInfo);
+        } else {
+            showAndHandleInput();
+        }
     }
 
     private void showAndHandleInput(String errorMessage) {
@@ -37,8 +47,9 @@ public class FTPDialogController {
     }
 
     private void handleInput(FTPConnectionInfo connectionInfo) {
+        lastConnectionInfo = connectionInfo;
         Optional<String> optError = ftpInfoValidator.validate(connectionInfo);
-        if(optError.isPresent()) {
+        if (optError.isPresent()) {
             showAndHandleInput(optError.get());
         } else {
             try {
