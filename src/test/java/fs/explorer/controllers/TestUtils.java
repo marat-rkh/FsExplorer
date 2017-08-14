@@ -22,13 +22,4 @@ public class TestUtils {
             DirTreeModel model, int... indices) {
         return getChild(model, model.getRoot(), indices);
     }
-
-    /**
-     * Enumeration returned by DefaultMutableTreeNode is raw type
-     * so we cast it as we know that test data contains correct types.
-     */
-    @SuppressWarnings("unchecked")
-    public static List<DefaultMutableTreeNode> getNodesInBFSOrder(DirTreeModel model) {
-        return Collections.list(model.getRoot().breadthFirstEnumeration());
-    }
 }

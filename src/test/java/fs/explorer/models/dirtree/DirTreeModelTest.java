@@ -146,6 +146,8 @@ public class DirTreeModelTest {
         assertFalse(dirTreeModel.containsNode(node2));
     }
 
+    // TODO test breadthFirstEnumeration
+
     private TreeNodeData nodeData(String label) {
         TreeNodeData data = mock(TreeNodeData.class);
         when(data.toString()).thenReturn(label);

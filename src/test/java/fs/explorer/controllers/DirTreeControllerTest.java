@@ -5,7 +5,7 @@ import fs.explorer.providers.dirtree.AsyncFsDataProvider;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.path.TargetType;
-import fs.explorer.providers.utils.loading.TreeNodeLoader;
+import fs.explorer.providers.dirtree.TreeNodeLoader;
 import fs.explorer.views.DirTreePane;
 import org.junit.Before;
 import org.junit.Test;
@@ -456,7 +456,8 @@ public class DirTreeControllerTest {
     }
 
     private void checkTestDirTreeModelNotChanged() {
-        List<DefaultMutableTreeNode> nodes = TestUtils.getNodesInBFSOrder(dirTreeModel);
+        List<DefaultMutableTreeNode> nodes = DirTreeModel.breadthFirstEnumeration(
+                dirTreeModel.getRoot());
         assertEquals(5, nodes.size());
         assertTrue(dirTreeModel.getRoot() == nodes.get(0));
         assertEquals("dir1", getLabel(nodes.get(1)));

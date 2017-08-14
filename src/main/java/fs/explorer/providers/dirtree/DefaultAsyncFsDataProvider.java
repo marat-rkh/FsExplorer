@@ -1,7 +1,5 @@
 package fs.explorer.providers.dirtree;
 
-import fs.explorer.providers.utils.loading.TreeNodeFutureLoader;
-import fs.explorer.providers.utils.loading.TreeNodeLoader;
 import fs.explorer.utils.Disposable;
 
 import javax.swing.*;
@@ -38,7 +36,7 @@ public class DefaultAsyncFsDataProvider implements AsyncFsDataProvider, Disposab
                     arg -> SwingUtilities.invokeLater(() -> onFail.accept(arg))
                 )
             );
-            return new TreeNodeFutureLoader(task);
+            return new TreeNodeLoader(task);
         } catch (RejectedExecutionException e) {
             onFail.accept(INTERNAL_ERROR);
             return null;

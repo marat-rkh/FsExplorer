@@ -71,6 +71,7 @@ public class DefaultPreviewProvider implements PreviewProvider {
                 break;
             }
         }
+        // TODO this should be done before reading contents
         if (renderer == null) {
             progressHandler.onCanNotRenderer();
         } else {

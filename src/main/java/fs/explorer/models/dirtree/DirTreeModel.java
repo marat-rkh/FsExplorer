@@ -7,6 +7,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DirTreeModel {
@@ -64,6 +65,19 @@ public class DirTreeModel {
     // So, we need a wrapper for DefaultMutableTreeNode
     public static ExtTreeNodeData getExtNodeData(DefaultMutableTreeNode node) {
         return (ExtTreeNodeData) node.getUserObject();
+    }
+
+    // TODO this method should be embedded in DefaultMutableTreeNode
+    // So, we need a wrapper for DefaultMutableTreeNode
+    /**
+     * Enumeration returned by DefaultMutableTreeNode is a raw type.
+     * We cast it safely as DirTreeModel uses only instances of DefaultMutableTreeNode.
+     */
+    @SuppressWarnings("unchecked")
+    public static List<DefaultMutableTreeNode> breadthFirstEnumeration(
+            DefaultMutableTreeNode node
+    ) {
+        return Collections.list(node.breadthFirstEnumeration());
     }
 
     private DefaultMutableTreeNode addChild(

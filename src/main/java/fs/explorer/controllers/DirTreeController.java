@@ -5,7 +5,7 @@ import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.models.dirtree.ExtTreeNodeData;
 import fs.explorer.providers.dirtree.path.TargetType;
-import fs.explorer.providers.utils.loading.TreeNodeLoader;
+import fs.explorer.providers.dirtree.TreeNodeLoader;
 import fs.explorer.views.DirTreePane;
 
 import javax.swing.event.TreeExpansionEvent;
@@ -121,13 +121,31 @@ public class DirTreeController {
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
             return;
         }
+        List<DefaultMutableTreeNode> children = dirTreeModel.getChildren(node);
+        dirTreeModel.removeAllChildren(node);
+        dirTreeModel.addFakeChild(node, "<loading...>");
         extNodeData.setStatus(ExtTreeNodeData.Status.LOADING);
+        stopLoadings(children);
         TreeNodeLoader loader = treeDataProvider.getNodesFor(
                 extNodeData.getNodeData(),
                 contentsInserter(node, extNodeData),
                 loadContentsErrorHandler(node, extNodeData)
         );
         extNodeData.setLoader(loader);
+    }
+
+    // TODO it is better to run this in a background thread
+    private void stopLoadings(List<DefaultMutableTreeNode> removedNodes) {
+        removedNodes.forEach(root ->
+                DirTreeModel.breadthFirstEnumeration(root).forEach(child -> {
+                    ExtTreeNodeData extNodeData = DirTreeModel.getExtNodeData(child);
+                    TreeNodeLoader loader = extNodeData.getLoader();
+                    if (loader != null) {
+                        loader.cancel(true);
+                    }
+                    extNodeData.setLoader(null);
+                })
+        );
     }
 
     private Consumer<List<TreeNodeData>> contentsInserter(

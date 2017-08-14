@@ -1,6 +1,6 @@
 package fs.explorer.models.dirtree;
 
-import fs.explorer.providers.utils.loading.TreeNodeLoader;
+import fs.explorer.providers.dirtree.TreeNodeLoader;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.providers.dirtree.path.TargetType;
