@@ -8,6 +8,8 @@ public class ToolBarController {
     private final DirTreeController dirTreeController;
     private final StatusBarController statusBarController;
 
+    private static final String EXPLORING_LOCAL_DRIVE = "Exploring local drive";
+
     public ToolBarController(
             FsTypeSwitcher fsTypeSwitcher,
             FTPDialogController ftpDialogController,
@@ -21,8 +23,8 @@ public class ToolBarController {
     }
 
     public void handleExploreLocalFiles(ActionEvent e) {
-        statusBarController.clear();
         fsTypeSwitcher.switchToLocalFs();
+        statusBarController.setInfoMessage(EXPLORING_LOCAL_DRIVE);
     }
 
     public void handleExploreRemoteFiles(ActionEvent e) {
