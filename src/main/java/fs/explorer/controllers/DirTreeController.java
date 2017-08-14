@@ -1,6 +1,6 @@
 package fs.explorer.controllers;
 
-import fs.explorer.providers.dirtree.AsyncTreeDataProvider;
+import fs.explorer.providers.dirtree.AsyncFsDataProvider;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.models.dirtree.ExtTreeNodeData;
@@ -21,7 +21,7 @@ public class DirTreeController {
     private final PreviewController previewController;
     private final StatusBarController statusBarController;
 
-    private AsyncTreeDataProvider treeDataProvider;
+    private AsyncFsDataProvider treeDataProvider;
 
     private DefaultMutableTreeNode lastSelectedNode;
 
@@ -33,7 +33,7 @@ public class DirTreeController {
             DirTreeModel dirTreeModel,
             PreviewController previewController,
             StatusBarController statusBarController,
-            AsyncTreeDataProvider defaultDataProvider
+            AsyncFsDataProvider defaultDataProvider
     ) {
         this.dirTreePane = dirTreePane;
         this.dirTreeModel = dirTreeModel;
@@ -51,9 +51,9 @@ public class DirTreeController {
         this(dirTreePane, dirTreeModel, previewController, statusBarController, null);
     }
 
-    public AsyncTreeDataProvider getTreeDataProvider() { return treeDataProvider; }
+    public AsyncFsDataProvider getTreeDataProvider() { return treeDataProvider; }
 
-    public void resetDataProvider(AsyncTreeDataProvider treeDataProvider) {
+    public void resetDataProvider(AsyncFsDataProvider treeDataProvider) {
         if(treeDataProvider == null) {
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
             return;

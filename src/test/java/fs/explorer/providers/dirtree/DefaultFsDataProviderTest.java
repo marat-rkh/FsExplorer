@@ -18,18 +18,18 @@ import java.util.function.Consumer;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class FsDataProviderTest {
+public class DefaultFsDataProviderTest {
     private FsPath topDir;
     private FsManager fsManager;
     private ArchivesManager archivesManager;
-    private FsDataProvider fsDataProvider;
+    private DefaultFsDataProvider fsDataProvider;
 
     @Before
     public void setUp() throws URISyntaxException, IOException {
         fsManager = mock(FsManager.class);
         archivesManager = mock(ArchivesManager.class);
         topDir = new FsPath("/some/dir", TargetType.DIRECTORY, "dir");
-        fsDataProvider = new FsDataProvider(topDir, fsManager, archivesManager);
+        fsDataProvider = new DefaultFsDataProvider(topDir, fsManager, archivesManager);
     }
 
     @Test

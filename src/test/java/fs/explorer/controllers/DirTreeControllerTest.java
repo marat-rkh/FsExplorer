@@ -1,7 +1,7 @@
 package fs.explorer.controllers;
 
 import fs.explorer.models.dirtree.DirTreeModel;
-import fs.explorer.providers.dirtree.AsyncTreeDataProvider;
+import fs.explorer.providers.dirtree.AsyncFsDataProvider;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.path.TargetType;
@@ -373,7 +373,7 @@ public class DirTreeControllerTest {
 
     // TODO test loaders handling (removing on operations completion)
 
-    private AsyncTreeDataProvider makeTestDataProvider() {
+    private AsyncFsDataProvider makeTestDataProvider() {
         TestDataProvider provider = spy(new TestDataProvider());
         provider.setTestTopNode(nodeData("/", TargetType.DIRECTORY));
         provider.setTestNodes(Arrays.asList(
@@ -493,7 +493,7 @@ public class DirTreeControllerTest {
         return DirTreeModel.getExtNodeData(node).getNodeData().pathTargetIsDirectory();
     }
 
-    private static class TestDataProvider implements AsyncTreeDataProvider {
+    private static class TestDataProvider implements AsyncFsDataProvider {
         private TreeNodeData testTopNode;
         private List<TreeNodeData> testNodes;
 
@@ -521,7 +521,7 @@ public class DirTreeControllerTest {
         }
     }
 
-    private static class FailingDataProvider implements AsyncTreeDataProvider {
+    private static class FailingDataProvider implements AsyncFsDataProvider {
         @Override
         public void getTopNode(Consumer<TreeNodeData> onComplete) {
             onComplete.accept(null);

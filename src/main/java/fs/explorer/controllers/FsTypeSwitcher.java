@@ -18,7 +18,7 @@ public class FsTypeSwitcher implements Disposable {
     private final LocalFsManager localFsManager;
     private final ArchivesManager archivesManager;
 
-    private AsyncFsDataProvider asyncFsDataProvider;
+    private DefaultAsyncFsDataProvider asyncFsDataProvider;
 
     private static final FsPath localDriveTopDir = OSInfo.getRootFsPath();
     private static final FsPath remoteHostTopDir = new FsPath(
@@ -38,8 +38,8 @@ public class FsTypeSwitcher implements Disposable {
 
     void switchToLocalFs() {
         disposeCurrentFsDataProvider();
-        asyncFsDataProvider = new AsyncFsDataProvider(
-                new FsDataProvider(localDriveTopDir, localFsManager, archivesManager)
+        asyncFsDataProvider = new DefaultAsyncFsDataProvider(
+                new DefaultFsDataProvider(localDriveTopDir, localFsManager, archivesManager)
         );
         dirTreeController.resetDataProvider(asyncFsDataProvider);
         previewProvider.resetFsManager(localFsManager);
@@ -49,8 +49,8 @@ public class FsTypeSwitcher implements Disposable {
         RemoteFsManager remoteFsManager = new RemoteFsManager(connectionInfo);
         remoteFsManager.checkConnection();
         disposeCurrentFsDataProvider();
-        asyncFsDataProvider = new AsyncFsDataProvider(
-                new FsDataProvider(remoteHostTopDir, remoteFsManager, archivesManager)
+        asyncFsDataProvider = new DefaultAsyncFsDataProvider(
+                new DefaultFsDataProvider(remoteHostTopDir, remoteFsManager, archivesManager)
         );
         dirTreeController.resetDataProvider(asyncFsDataProvider);
         previewProvider.resetFsManager(remoteFsManager);

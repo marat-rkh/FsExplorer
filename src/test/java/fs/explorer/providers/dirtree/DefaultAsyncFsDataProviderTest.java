@@ -14,9 +14,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
-public class AsyncFsDataProviderTest {
+public class DefaultAsyncFsDataProviderTest {
     private FsDataProvider fsDataProvider;
-    private AsyncFsDataProvider asyncFsDataProvider;
+    private DefaultAsyncFsDataProvider asyncFsDataProvider;
 
     private CyclicBarrier cyclicBarrier;
     private AtomicInteger counter;
@@ -41,7 +41,7 @@ public class AsyncFsDataProviderTest {
         cyclicBarrier = new CyclicBarrier(4);
         counter = new AtomicInteger(0);
 
-        asyncFsDataProvider = new AsyncFsDataProvider(fsDataProvider);
+        asyncFsDataProvider = new DefaultAsyncFsDataProvider(fsDataProvider);
     }
 
     @Test
