@@ -7,37 +7,47 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DirTreeModel {
     private final DefaultTreeModel treeModel;
     private final DefaultMutableTreeNode root;
 
     public DirTreeModel() {
-        root = rootNode();
+        root = makeInnerNode(ExtTreeNodeData.fakeNodeData("root"), true);
         treeModel = new DefaultTreeModel(root);
     }
 
-    public DefaultTreeModel getInnerTreeModel() { return treeModel; }
+    public DefaultTreeModel getInnerTreeModel() {
+        return treeModel;
+    }
 
-    public DefaultMutableTreeNode getRoot() { return root; }
+    // TODO remove this method by making appropriate listeners
+    // Listeners must convert DefaultMutableTreeNode to DirTreeNode
+    public DirTreeNode fromInnerNode(DefaultMutableTreeNode innerNode) {
+        return new DirTreeNode(innerNode);
+    }
 
-    public List<DefaultMutableTreeNode> getChildren(DefaultMutableTreeNode node) {
-        int childCount = treeModel.getChildCount(node);
-        List<DefaultMutableTreeNode> children = new ArrayList<>(childCount);
-        for(int i = 0; i < childCount; ++i) {
-            children.add((DefaultMutableTreeNode) treeModel.getChild(node, i));
+    public DirTreeNode getRoot() {
+        return new DirTreeNode(root);
+    }
+
+    public List<DirTreeNode> getChildren(DirTreeNode node) {
+        int childCount = treeModel.getChildCount(node.getInnerNode());
+        List<DirTreeNode> children = new ArrayList<>(childCount);
+        for (int i = 0; i < childCount; ++i) {
+            DefaultMutableTreeNode child =
+                    (DefaultMutableTreeNode) treeModel.getChild(node.getInnerNode(), i);
+            children.add(new DirTreeNode(child));
         }
         return children;
     }
 
-    public ExtTreeNodeData getExtNodeData(DefaultMutableTreeNode node) {
-        return (ExtTreeNodeData) node.getUserObject();
-    }
-
-    public boolean containsNode(DefaultMutableTreeNode node) {
-        TreeNode[] nodes = node.getPath();
-        if(nodes == null || nodes.length == 0) {
+    public boolean containsNode(DirTreeNode node) {
+        TreeNode[] nodes = node.getInnerNode().getPath();
+        if (nodes == null || nodes.length == 0) {
             return false;
         }
         TreeNode farthestParent = nodes[0];
@@ -45,52 +55,77 @@ public class DirTreeModel {
         return farthestParent == root;
     }
 
-    public void removeAllChildren(DefaultMutableTreeNode parent) {
-        getChildren(parent).forEach(treeModel::removeNodeFromParent);
+    public void removeAllChildren(DirTreeNode parent) {
+        getChildren(parent).forEach(ch ->
+                treeModel.removeNodeFromParent(ch.getInnerNode())
+        );
     }
 
-    public DefaultMutableTreeNode addNullDirChild(
-            DefaultMutableTreeNode parent, TreeNodeData nodeData) {
-        return addChild(parent, nullDirNode(nodeData));
+    public DirTreeNode addNullDirChild(DirTreeNode parent, TreeNodeData nodeData) {
+        DefaultMutableTreeNode nullDirNode = makeInnerNode(
+                ExtTreeNodeData.nullNodeData(nodeData), true);
+        DefaultMutableTreeNode loadingNode = makeInnerNode(
+                ExtTreeNodeData.fakeNodeData("<loading...>"), false);
+        nullDirNode.add(loadingNode);
+        return addChild(parent, nullDirNode);
     }
 
-    public DefaultMutableTreeNode addFileChild(
-            DefaultMutableTreeNode parent, TreeNodeData nodeData) {
-        return addChild(parent, fileNode(nodeData));
+    public DirTreeNode addFileChild(DirTreeNode parent, TreeNodeData nodeData) {
+        DefaultMutableTreeNode fileNode = makeInnerNode(
+                ExtTreeNodeData.loadedNodeData(nodeData), false);
+        return addChild(parent, fileNode);
     }
 
-    public DefaultMutableTreeNode addFakeChild(
-            DefaultMutableTreeNode parent, String label) {
-        return addChild(parent, fakeNode(label));
+    public DirTreeNode addFakeChild(DirTreeNode parent, String label) {
+        DefaultMutableTreeNode fakeNode = makeInnerNode(
+                ExtTreeNodeData.fakeNodeData(label), false);
+        return addChild(parent, fakeNode);
     }
 
-    private DefaultMutableTreeNode addChild(
-            DefaultMutableTreeNode parent, DefaultMutableTreeNode child) {
-        treeModel.insertNodeInto(child, parent, parent.getChildCount());
-        return child;
+    private DirTreeNode addChild(DirTreeNode parent, DefaultMutableTreeNode innerChild) {
+        DefaultMutableTreeNode innerParent = parent.getInnerNode();
+        treeModel.insertNodeInto(innerChild, innerParent, innerParent.getChildCount());
+        return new DirTreeNode(innerChild);
     }
 
-    private DefaultMutableTreeNode nullDirNode(TreeNodeData nodeData) {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(
-                ExtTreeNodeData.nullNodeData(nodeData), /*allowsChildren*/true);
-        DefaultMutableTreeNode loadingNode = new DefaultMutableTreeNode(
-                ExtTreeNodeData.fakeNodeData("<loading...>"), /*allowsChildren*/false);
-        node.add(loadingNode);
-        return node;
+    private DefaultMutableTreeNode makeInnerNode(ExtTreeNodeData data, boolean allowsChildren) {
+        return new DefaultMutableTreeNode(data, allowsChildren);
     }
 
-    private DefaultMutableTreeNode fileNode(TreeNodeData nodeData) {
-        return new DefaultMutableTreeNode(
-                ExtTreeNodeData.loadedNodeData(nodeData), /*allowsChildren*/false);
-    }
+    public static class DirTreeNode {
+        private final DefaultMutableTreeNode innerNode;
 
-    private DefaultMutableTreeNode fakeNode(String label) {
-        return new DefaultMutableTreeNode(
-                ExtTreeNodeData.fakeNodeData(label), /*allowsChildren*/false);
-    }
+        private DirTreeNode(DefaultMutableTreeNode innerNode) {
+            this.innerNode = innerNode;
+        }
 
-    private DefaultMutableTreeNode rootNode() {
-        return new DefaultMutableTreeNode(
-                ExtTreeNodeData.fakeNodeData("root"), /*allowsChildren*/true);
+        // TODO this should be private
+        public DefaultMutableTreeNode getInnerNode() {
+            return innerNode;
+        }
+
+        public ExtTreeNodeData getExtTreeNodeData() {
+            return (ExtTreeNodeData) innerNode.getUserObject();
+        }
+
+        // TODO test
+        public TreePath getTreePath() {
+            return new TreePath(innerNode.getPath());
+        }
+
+        public boolean getAllowsChildren() {
+            return innerNode.getAllowsChildren();
+        }
+
+        /**
+         * Node: enumeration returned by DefaultMutableTreeNode is a raw type.
+         * We can safely cast it as DirTreeModel controls the actual type.
+         */
+        @SuppressWarnings("unchecked")
+        public List<DirTreeNode> breadthFirstEnumeration() {
+            List<DefaultMutableTreeNode> innerNodes = Collections.list(
+                    innerNode.breadthFirstEnumeration());
+            return innerNodes.stream().map(DirTreeNode::new).collect(Collectors.toList());
+        }
     }
 }

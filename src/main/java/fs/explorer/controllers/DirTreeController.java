@@ -1,5 +1,6 @@
 package fs.explorer.controllers;
 
+import fs.explorer.models.dirtree.DirTreeModel.DirTreeNode;
 import fs.explorer.providers.dirtree.TreeDataProvider;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
@@ -22,7 +23,7 @@ public class DirTreeController {
 
     private TreeDataProvider treeDataProvider;
 
-    private DefaultMutableTreeNode lastSelectedNode;
+    private DirTreeNode lastSelectedNode;
 
     private static final String DATA_PROVIDER_ERROR = "Failed to load data";
     private static final String INTERNAL_ERROR = "internal error";
@@ -50,76 +51,78 @@ public class DirTreeController {
         this(dirTreePane, dirTreeModel, previewController, statusBarController, null);
     }
 
-    public TreeDataProvider getTreeDataProvider() { return treeDataProvider; }
+    public TreeDataProvider getTreeDataProvider() {
+        return treeDataProvider;
+    }
 
     public void resetDataProvider(TreeDataProvider treeDataProvider) {
-        if(treeDataProvider == null) {
+        if (treeDataProvider == null) {
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
             return;
         }
         this.treeDataProvider = treeDataProvider;
-        DefaultMutableTreeNode root = dirTreeModel.getRoot();
+        DirTreeNode root = dirTreeModel.getRoot();
         dirTreeModel.removeAllChildren(root);
         this.treeDataProvider.getTopNode(nodeData -> {
             dirTreeModel.addNullDirChild(root, nodeData);
-            dirTreePane.expandPath(new TreePath(root.getPath()));
+            dirTreePane.expandPath(root.getTreePath());
         });
     }
 
     public void handleTreeSelection(
-            TreeSelectionEvent e, DefaultMutableTreeNode lastSelectedNode) {
-        if(lastSelectedNode == null) {
+            TreeSelectionEvent e, DefaultMutableTreeNode lastSelectedInnerNode) {
+        if (lastSelectedInnerNode == null) {
             return;
         }
-        this.lastSelectedNode = lastSelectedNode;
-        ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(lastSelectedNode);
-        if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
+        this.lastSelectedNode = dirTreeModel.fromInnerNode(lastSelectedInnerNode);
+        ExtTreeNodeData extNodeData = lastSelectedNode.getExtTreeNodeData();
+        if (extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
             previewController.updatePreview(extNodeData.getNodeData());
         }
     }
 
     public void handleTreeExpansion(TreeExpansionEvent event) {
         TreePath treePath = event.getPath();
-        if(treePath == null) {
+        if (treePath == null) {
             return;
         }
-        DefaultMutableTreeNode node =
-                (DefaultMutableTreeNode) treePath.getLastPathComponent();
-        if(node == null) {
+        DefaultMutableTreeNode innerNode = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+        if (innerNode == null) {
             return;
         }
-        ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(node);
-        if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
+        DirTreeNode node = dirTreeModel.fromInnerNode(innerNode);
+        ExtTreeNodeData extNodeData = node.getExtTreeNodeData();
+        if (extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
                 extNodeData.getStatus() == ExtTreeNodeData.Status.NULL) {
-            reloadContents(node, extNodeData);
+            reloadContents(node);
         }
     }
 
     public void reloadLastSelectedNode() {
-        if(lastSelectedNode == null) {
+        if (lastSelectedNode == null) {
             return;
         }
-        ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(lastSelectedNode);
+        ExtTreeNodeData extNodeData = lastSelectedNode.getExtTreeNodeData();
         ExtTreeNodeData.Status status = extNodeData.getStatus();
-        if(
-                extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
-                (status == ExtTreeNodeData.Status.NULL || status == ExtTreeNodeData.Status.LOADED)
-        ) {
+        boolean reloadNeeded = extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
+                (status == ExtTreeNodeData.Status.NULL || status == ExtTreeNodeData.Status.LOADED);
+        if (reloadNeeded) {
             TargetType targetType = extNodeData.getNodeData().getPathTargetType();
             // TODO support reload for zip archives
-            if(targetType == TargetType.DIRECTORY) {
-                reloadContents(lastSelectedNode, extNodeData);
-            } else if(targetType == TargetType.FILE) {
+            if (targetType == TargetType.DIRECTORY) {
+                reloadContents(lastSelectedNode);
+            } else if (targetType == TargetType.FILE) {
                 previewController.updatePreview(extNodeData.getNodeData());
             }
         }
     }
 
-    private void reloadContents(DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
-        if(treeDataProvider == null) {
+    private void reloadContents(DirTreeNode node) {
+        if (treeDataProvider == null) {
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
             return;
         }
+        ExtTreeNodeData extNodeData = node.getExtTreeNodeData();
         extNodeData.setStatus(ExtTreeNodeData.Status.LOADING);
         treeDataProvider.getNodesFor(
                 extNodeData.getNodeData(),
@@ -129,18 +132,18 @@ public class DirTreeController {
     }
 
     private Consumer<List<TreeNodeData>> contentsInserter(
-            DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
+            DirTreeNode node, ExtTreeNodeData extNodeData) {
         return contents -> {
-            if(!dirTreeModel.containsNode(node)) {
+            if (!dirTreeModel.containsNode(node)) {
                 return;
             }
             dirTreeModel.removeAllChildren(node);
-            if(contents.isEmpty()) {
+            if (contents.isEmpty()) {
                 dirTreeModel.addFakeChild(node, "<empty>");
             } else {
-                for(TreeNodeData nodeData : contents) {
+                for (TreeNodeData nodeData : contents) {
                     TargetType targetType = nodeData.getPathTargetType();
-                    if(targetType == TargetType.DIRECTORY ||
+                    if (targetType == TargetType.DIRECTORY ||
                             targetType == TargetType.ZIP_ARCHIVE) {
                         dirTreeModel.addNullDirChild(node, nodeData);
                     } else {
@@ -148,21 +151,21 @@ public class DirTreeController {
                     }
                 }
             }
-            dirTreePane.expandPath(new TreePath(node.getPath()));
+            dirTreePane.expandPath(node.getTreePath());
             extNodeData.setStatus(ExtTreeNodeData.Status.LOADED);
         };
     }
 
     private Consumer<String> loadContentsErrorHandler(
-            DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
+            DirTreeNode node, ExtTreeNodeData extNodeData) {
         return errorMessage -> {
-            if(!dirTreeModel.containsNode(node)) {
+            if (!dirTreeModel.containsNode(node)) {
                 return;
             }
             dirTreeModel.removeAllChildren(node);
             dirTreeModel.addFakeChild(node, "<error>");
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, errorMessage);
-            dirTreePane.expandPath(new TreePath(node.getPath()));
+            dirTreePane.expandPath(node.getTreePath());
             extNodeData.setStatus(ExtTreeNodeData.Status.LOADED);
         };
     }
