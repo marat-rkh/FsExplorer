@@ -31,10 +31,6 @@ public class DirTreeModel {
         return children;
     }
 
-    public ExtTreeNodeData getExtNodeData(DefaultMutableTreeNode node) {
-        return (ExtTreeNodeData) node.getUserObject();
-    }
-
     public boolean containsNode(DefaultMutableTreeNode node) {
         TreeNode[] nodes = node.getPath();
         if(nodes == null || nodes.length == 0) {
@@ -62,6 +58,12 @@ public class DirTreeModel {
     public DefaultMutableTreeNode addFakeChild(
             DefaultMutableTreeNode parent, String label) {
         return addChild(parent, fakeNode(label));
+    }
+
+    // TODO this method should be embedded in DefaultMutableTreeNode
+    // So, we need a wrapper for DefaultMutableTreeNode
+    public static ExtTreeNodeData getExtNodeData(DefaultMutableTreeNode node) {
+        return (ExtTreeNodeData) node.getUserObject();
     }
 
     private DefaultMutableTreeNode addChild(

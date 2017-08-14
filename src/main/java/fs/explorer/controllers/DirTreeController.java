@@ -72,7 +72,7 @@ public class DirTreeController {
             return;
         }
         this.lastSelectedNode = lastSelectedNode;
-        ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(lastSelectedNode);
+        ExtTreeNodeData extNodeData = DirTreeModel.getExtNodeData(lastSelectedNode);
         if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
             previewController.updatePreview(extNodeData.getNodeData());
         }
@@ -88,7 +88,7 @@ public class DirTreeController {
         if(node == null) {
             return;
         }
-        ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(node);
+        ExtTreeNodeData extNodeData = DirTreeModel.getExtNodeData(node);
         if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
                 extNodeData.getStatus() == ExtTreeNodeData.Status.NULL) {
             reloadContents(node, extNodeData);
@@ -99,7 +99,7 @@ public class DirTreeController {
         if(lastSelectedNode == null) {
             return;
         }
-        ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(lastSelectedNode);
+        ExtTreeNodeData extNodeData = DirTreeModel.getExtNodeData(lastSelectedNode);
         ExtTreeNodeData.Status status = extNodeData.getStatus();
         if(
                 extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&

@@ -78,7 +78,7 @@ public class DirTreeControllerTest {
 
         ArgumentCaptor<TreeNodeData> captor = ArgumentCaptor.forClass(TreeNodeData.class);
         verify(previewController).updatePreview(captor.capture());
-        assertTrue(dirTreeModel.getExtNodeData(dir1).getNodeData() == captor.getValue());
+        assertTrue(DirTreeModel.getExtNodeData(dir1).getNodeData() == captor.getValue());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class DirTreeControllerTest {
 
         ArgumentCaptor<TreeNodeData> captor = ArgumentCaptor.forClass(TreeNodeData.class);
         verify(previewController).updatePreview(captor.capture());
-        assertTrue(dirTreeModel.getExtNodeData(file1).getNodeData() == captor.getValue());
+        assertTrue(DirTreeModel.getExtNodeData(file1).getNodeData() == captor.getValue());
     }
 
     @Test
@@ -163,7 +163,7 @@ public class DirTreeControllerTest {
     public void doesNotLoadContentsOnLoadingDirExpansion() {
         setupTestDirTreeModel();
         DefaultMutableTreeNode dir2 = TestUtils.getChild(dirTreeModel, 0, 1);
-        dirTreeModel.getExtNodeData(dir2).setStatus(Status.LOADING);
+        DirTreeModel.getExtNodeData(dir2).setStatus(Status.LOADING);
         dirTreeController.handleTreeExpansion(expansionEvent(dir2));
 
         verify(dirTreeController.getTreeDataProvider(), never())
@@ -355,7 +355,7 @@ public class DirTreeControllerTest {
 
         ArgumentCaptor<TreeNodeData> captor = ArgumentCaptor.forClass(TreeNodeData.class);
         verify(previewController, times(2)).updatePreview(captor.capture());
-        assertTrue(dirTreeModel.getExtNodeData(file1).getNodeData() == captor.getValue());
+        assertTrue(DirTreeModel.getExtNodeData(file1).getNodeData() == captor.getValue());
     }
 
     @Test
@@ -435,7 +435,7 @@ public class DirTreeControllerTest {
         DefaultMutableTreeNode dir1 = dirTreeModel.addNullDirChild(
                 dirTreeModel.getRoot(), nodeData("dir1", TargetType.DIRECTORY));
         dirTreeModel.removeAllChildren(dir1);
-        dirTreeModel.getExtNodeData(dir1).setStatus(Status.LOADED);
+        DirTreeModel.getExtNodeData(dir1).setStatus(Status.LOADED);
         dirTreeModel.addFileChild(dir1, nodeData("file1", TargetType.FILE));
         dirTreeModel.addNullDirChild(dir1, nodeData("dir2", TargetType.DIRECTORY));
     }
@@ -475,19 +475,19 @@ public class DirTreeControllerTest {
     }
 
     private String getLabel(DefaultMutableTreeNode node) {
-        return dirTreeModel.getExtNodeData(node).getNodeData().getLabel();
+        return DirTreeModel.getExtNodeData(node).getNodeData().getLabel();
     }
 
     private Type getType(DefaultMutableTreeNode node) {
-        return dirTreeModel.getExtNodeData(node).getType();
+        return DirTreeModel.getExtNodeData(node).getType();
     }
 
     private Status getStatus(DefaultMutableTreeNode node) {
-        return dirTreeModel.getExtNodeData(node).getStatus();
+        return DirTreeModel.getExtNodeData(node).getStatus();
     }
 
     private boolean isDirectoryNode(DefaultMutableTreeNode node) {
-        return dirTreeModel.getExtNodeData(node).getNodeData().pathTargetIsDirectory();
+        return DirTreeModel.getExtNodeData(node).getNodeData().pathTargetIsDirectory();
     }
 
     private static class TestDataProvider implements TreeDataProvider {

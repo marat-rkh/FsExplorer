@@ -30,7 +30,7 @@ public class DirTreeModelTest {
     public void createdWithValidRoot() {
         DefaultMutableTreeNode root = dirTreeModel.getRoot();
         assertNotNull(root);
-        checkNode(dirTreeModel, root, Type.FAKE, Status.LOADED, null);
+        checkNode(root, Type.FAKE, Status.LOADED, null);
         assertEquals(Collections.emptyList(), dirTreeModel.getChildren(root));
     }
 
@@ -42,12 +42,12 @@ public class DirTreeModelTest {
         List<DefaultMutableTreeNode> children = dirTreeModel.getChildren(root);
         assertEquals(1, children.size());
         DefaultMutableTreeNode node = children.get(0);
-        checkNode(dirTreeModel, node, Type.NORMAL, Status.NULL, "dir");
+        checkNode(node, Type.NORMAL, Status.NULL, "dir");
 
         children = dirTreeModel.getChildren(node);
         assertEquals(1, children.size());
         node = children.get(0);
-        checkNode(dirTreeModel, node, Type.FAKE, Status.LOADED, null);
+        checkNode(node, Type.FAKE, Status.LOADED, null);
         assertEquals(Collections.emptyList(), dirTreeModel.getChildren(node));
     }
 
@@ -58,7 +58,7 @@ public class DirTreeModelTest {
 
         List<DefaultMutableTreeNode> children = dirTreeModel.getChildren(root);
         assertEquals(1, children.size());
-        checkNode(dirTreeModel, children.get(0), Type.NORMAL, Status.LOADED, "file");
+        checkNode(children.get(0), Type.NORMAL, Status.LOADED, "file");
         assertEquals(Collections.emptyList(), dirTreeModel.getChildren(children.get(0)));
     }
 
@@ -69,7 +69,7 @@ public class DirTreeModelTest {
 
         List<DefaultMutableTreeNode> children = dirTreeModel.getChildren(root);
         assertEquals(1, children.size());
-        checkNode(dirTreeModel, children.get(0), Type.FAKE, Status.LOADED, "fake");
+        checkNode(children.get(0), Type.FAKE, Status.LOADED, "fake");
         assertEquals(Collections.emptyList(), dirTreeModel.getChildren(children.get(0)));
     }
 
@@ -153,13 +153,12 @@ public class DirTreeModelTest {
     }
 
     private void checkNode(
-            DirTreeModel dirTreeModel,
             DefaultMutableTreeNode node,
             Type type,
             Status status,
             String label
     ) {
-        ExtTreeNodeData extNodeData = dirTreeModel.getExtNodeData(node);
+        ExtTreeNodeData extNodeData = DirTreeModel.getExtNodeData(node);
         assertEquals(type, extNodeData.getType());
         assertEquals(status, extNodeData.getStatus());
         if(label != null) {
