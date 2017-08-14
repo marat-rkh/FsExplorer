@@ -81,7 +81,7 @@ public class DefaultPreviewProviderTest {
         setUpTestRenderers();
         when(fsManager.readFile(any())).thenReturn(null);
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(fsPathNode(""), null, progressHandler);
+        previewProvider.getPreview(fsPathNode("file.txt"), null, progressHandler);
 
         verify(progressHandler).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -93,7 +93,7 @@ public class DefaultPreviewProviderTest {
         setUpTestRenderers();
         when(archivesManager.readEntry(any(), any())).thenReturn(null);
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(archiveEntryNode(""), null, progressHandler);
+        previewProvider.getPreview(archiveEntryNode("file.txt"), null, progressHandler);
 
         verify(progressHandler).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -105,7 +105,7 @@ public class DefaultPreviewProviderTest {
         setUpTestRenderers();
         when(fsManager.readFile(any())).thenThrow(new IOException());
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(fsPathNode(""), null, progressHandler);
+        previewProvider.getPreview(fsPathNode("file.txt"), null, progressHandler);
 
         verify(progressHandler).onError(any());
         verify(progressHandler, never()).onComplete(any());
@@ -117,7 +117,7 @@ public class DefaultPreviewProviderTest {
         setUpTestRenderers();
         when(archivesManager.readEntry(any(), any())).thenThrow(new IOException());
         PreviewProgressHandler progressHandler = mock(PreviewProgressHandler.class);
-        previewProvider.getPreview(archiveEntryNode(""), null, progressHandler);
+        previewProvider.getPreview(archiveEntryNode("file.txt"), null, progressHandler);
 
         verify(progressHandler).onError(any());
         verify(progressHandler, never()).onComplete(any());

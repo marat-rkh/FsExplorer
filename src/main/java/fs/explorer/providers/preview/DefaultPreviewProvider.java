@@ -10,6 +10,7 @@ import fs.explorer.utils.FileTypeInfo;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.List;
 
 /**
@@ -57,12 +58,6 @@ public class DefaultPreviewProvider implements PreviewProvider {
             progressHandler.onCanNotRenderer();
             return;
         }
-        // TODO this should not fail on InterruptedIOException
-        byte[] fileBytes = readContents(data);
-        if (fileBytes == null) {
-            progressHandler.onError(FILE_READ_FAILED);
-            return;
-        }
         String fileName = data.getPathLastComponent();
         String fileExtension = FileTypeInfo.getExtension(fileName);
         PreviewRenderer renderer = null;
@@ -72,44 +67,46 @@ public class DefaultPreviewProvider implements PreviewProvider {
                 break;
             }
         }
-        // TODO this should be done before reading contents
         if (renderer == null) {
             progressHandler.onCanNotRenderer();
-        } else {
-            try {
-                PreviewRenderingData renderingData = new PreviewRenderingData(
-                        fileName, fileBytes, context);
-                JComponent preview = renderer.render(renderingData);
-                if (preview != null) {
-                    progressHandler.onComplete(preview);
-                } else {
-                    progressHandler.onError(RENDERING_FAILED);
-                }
-            } catch (InterruptedException e) {
-                // do nothing
+            return;
+        }
+        byte[] fileBytes;
+        try {
+            fileBytes = readContents(data);
+        } catch (InterruptedIOException e) {
+            return;
+        } catch (IOException e) {
+            fileBytes = null;
+        }
+        if (fileBytes == null) {
+            progressHandler.onError(FILE_READ_FAILED);
+            return;
+        }
+        try {
+            PreviewRenderingData renderingData = new PreviewRenderingData(
+                    fileName, fileBytes, context);
+            JComponent preview = renderer.render(renderingData);
+            if (preview != null) {
+                progressHandler.onComplete(preview);
+            } else {
+                progressHandler.onError(RENDERING_FAILED);
             }
+        } catch (InterruptedException e) {
+            // do nothing
         }
     }
 
-    private byte[] readContents(TreeNodeData data) {
+    private byte[] readContents(TreeNodeData data) throws IOException {
         PathContainer path = data.getPath();
         if (path.isFsPath()) {
             FsPath dataFsPath = path.asFsPath();
-            try {
-                return fsManager.readFile(dataFsPath);
-            } catch (IOException e) {
-                return null;
-            }
+            return fsManager.readFile(dataFsPath);
         } else if (path.isArchiveEntryPath()) {
             ArchiveEntryPath archiveEntryPath = path.asArchiveEntryPath();
-            try {
-                return archivesManager.readEntry(archiveEntryPath, fsManager);
-            } catch (IOException e) {
-                return null;
-            }
+            return archivesManager.readEntry(archiveEntryPath, fsManager);
         } else {
             return null;
         }
-
     }
 }
