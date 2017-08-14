@@ -1,9 +1,9 @@
 package fs.explorer.controllers;
 
 import fs.explorer.TestEnvironment;
+import fs.explorer.providers.dirtree.AsyncTreeDataProvider;
 import fs.explorer.providers.dirtree.FsManager;
 import fs.explorer.providers.dirtree.local.LocalFsManager;
-import fs.explorer.providers.dirtree.TreeDataProvider;
 import fs.explorer.providers.dirtree.archives.ArchivesManager;
 import fs.explorer.providers.dirtree.remote.FTPConnectionInfo;
 import fs.explorer.providers.dirtree.remote.FTPException;
@@ -145,8 +145,8 @@ public class FsTypeSwitcherTest {
 
         verify(fsTypeSwitcher, times(3)).disposeCurrentFsDataProvider();
 
-        ArgumentCaptor<TreeDataProvider> captor1 =
-                ArgumentCaptor.forClass(TreeDataProvider.class);
+        ArgumentCaptor<AsyncTreeDataProvider> captor1 =
+                ArgumentCaptor.forClass(AsyncTreeDataProvider.class);
         verify(dirTreeController, times(3)).resetDataProvider(captor1.capture());
         assertNotNull(captor1.getAllValues().get(2));
 
@@ -165,8 +165,8 @@ public class FsTypeSwitcherTest {
 
         verify(fsTypeSwitcher, times(3)).disposeCurrentFsDataProvider();
 
-        ArgumentCaptor<TreeDataProvider> captor1 =
-                ArgumentCaptor.forClass(TreeDataProvider.class);
+        ArgumentCaptor<AsyncTreeDataProvider> captor1 =
+                ArgumentCaptor.forClass(AsyncTreeDataProvider.class);
         verify(dirTreeController, times(3)).resetDataProvider(captor1.capture());
         assertNotNull(captor1.getAllValues().get(2));
 
@@ -207,21 +207,21 @@ public class FsTypeSwitcherTest {
         Collections.shuffle(actions);
         actions.forEach(Runnable::run);
         SwitchAction.Type lastAction = actions.get(5).getType();
-        if(lastAction == SwitchAction.Type.TO_REMOTE_FAILING) {
+        if (lastAction == SwitchAction.Type.TO_REMOTE_FAILING) {
             lastAction = actions.get(4).getType();
         }
-        if(lastAction == SwitchAction.Type.TO_LOCAL) {
-            ArgumentCaptor<TreeDataProvider> captor1 =
-                    ArgumentCaptor.forClass(TreeDataProvider.class);
+        if (lastAction == SwitchAction.Type.TO_LOCAL) {
+            ArgumentCaptor<AsyncTreeDataProvider> captor1 =
+                    ArgumentCaptor.forClass(AsyncTreeDataProvider.class);
             verify(dirTreeController, times(5)).resetDataProvider(captor1.capture());
             assertNotNull(captor1.getAllValues().get(2));
 
             ArgumentCaptor<FsManager> captor2 = ArgumentCaptor.forClass(FsManager.class);
             verify(previewProvider, times(5)).resetFsManager(captor2.capture());
             assertTrue(captor2.getAllValues().get(4) == localFsManager);
-        } else if(lastAction == SwitchAction.Type.TO_REMOTE) {
-            ArgumentCaptor<TreeDataProvider> captor1 =
-                    ArgumentCaptor.forClass(TreeDataProvider.class);
+        } else if (lastAction == SwitchAction.Type.TO_REMOTE) {
+            ArgumentCaptor<AsyncTreeDataProvider> captor1 =
+                    ArgumentCaptor.forClass(AsyncTreeDataProvider.class);
             verify(dirTreeController, times(5)).resetDataProvider(captor1.capture());
             assertNotNull(captor1.getAllValues().get(2));
 
@@ -247,7 +247,9 @@ public class FsTypeSwitcherTest {
             runnable.run();
         }
 
-        Type getType() { return type; }
+        Type getType() {
+            return type;
+        }
 
         enum Type {
             TO_LOCAL,

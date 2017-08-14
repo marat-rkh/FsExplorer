@@ -1,10 +1,11 @@
 package fs.explorer.controllers;
 
 import fs.explorer.models.dirtree.DirTreeModel;
-import fs.explorer.providers.dirtree.TreeDataProvider;
+import fs.explorer.providers.dirtree.AsyncTreeDataProvider;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.providers.dirtree.path.FsPath;
 import fs.explorer.providers.dirtree.path.TargetType;
+import fs.explorer.providers.utils.loading.TreeNodeLoader;
 import fs.explorer.views.DirTreePane;
 import org.junit.Before;
 import org.junit.Test;
@@ -370,7 +371,9 @@ public class DirTreeControllerTest {
         assertNotEquals(Status.LOADING, getStatus(fakeNode));
     }
 
-    private TreeDataProvider makeTestDataProvider() {
+    // TODO test loaders handling (removing on operations completion)
+
+    private AsyncTreeDataProvider makeTestDataProvider() {
         TestDataProvider provider = spy(new TestDataProvider());
         provider.setTestTopNode(nodeData("/", TargetType.DIRECTORY));
         provider.setTestNodes(Arrays.asList(
@@ -394,7 +397,7 @@ public class DirTreeControllerTest {
     }
 
     private void setUpFailingDataProvider() {
-        TreeDataProvider provider = spy(new FailingDataProvider());
+        FailingDataProvider provider = spy(new FailingDataProvider());
         dirTreeController = new DirTreeController(
                 dirTreePane,
                 dirTreeModel,
@@ -490,7 +493,7 @@ public class DirTreeControllerTest {
         return DirTreeModel.getExtNodeData(node).getNodeData().pathTargetIsDirectory();
     }
 
-    private static class TestDataProvider implements TreeDataProvider {
+    private static class TestDataProvider implements AsyncTreeDataProvider {
         private TreeNodeData testTopNode;
         private List<TreeNodeData> testNodes;
 
@@ -500,36 +503,38 @@ public class DirTreeControllerTest {
         }
 
         @Override
-        public void getNodesFor(
+        public TreeNodeLoader getNodesFor(
                 TreeNodeData node,
                 Consumer<List<TreeNodeData>> onComplete,
                 Consumer<String> onFail
         ) {
             onComplete.accept(testNodes);
+            return null;
         }
 
-        public void setTestTopNode(TreeNodeData testTopNode) {
+        void setTestTopNode(TreeNodeData testTopNode) {
             this.testTopNode = testTopNode;
         }
 
-        public void setTestNodes(List<TreeNodeData> testNodes) {
+        void setTestNodes(List<TreeNodeData> testNodes) {
             this.testNodes = testNodes;
         }
     }
 
-    private static class FailingDataProvider implements TreeDataProvider {
+    private static class FailingDataProvider implements AsyncTreeDataProvider {
         @Override
         public void getTopNode(Consumer<TreeNodeData> onComplete) {
             onComplete.accept(null);
         }
 
         @Override
-        public void getNodesFor(
+        public TreeNodeLoader getNodesFor(
                 TreeNodeData node,
                 Consumer<List<TreeNodeData>> onComplete,
                 Consumer<String> onFail
         ) {
             onFail.accept(null);
+            return null;
         }
     }
 }

@@ -1,16 +1,15 @@
 package fs.explorer.providers.dirtree;
 
+import fs.explorer.providers.utils.loading.TreeNodeFutureLoader;
+import fs.explorer.providers.utils.loading.TreeNodeLoader;
 import fs.explorer.utils.Disposable;
 
 import javax.swing.*;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
-public class AsyncFsDataProvider implements TreeDataProvider, Disposable {
+public class AsyncFsDataProvider implements AsyncTreeDataProvider, Disposable {
     private final FsDataProvider fsDataProvider;
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -26,21 +25,23 @@ public class AsyncFsDataProvider implements TreeDataProvider, Disposable {
     }
 
     @Override
-    public void getNodesFor(
+    public TreeNodeLoader getNodesFor(
             TreeNodeData node,
             Consumer<List<TreeNodeData>> onComplete,
             Consumer<String> onFail
     ) {
         try {
-            executor.execute(() ->
+            Future<?> task = executor.submit(() ->
                 fsDataProvider.getNodesFor(
                     node,
                     arg -> SwingUtilities.invokeLater(() -> onComplete.accept(arg)),
                     arg -> SwingUtilities.invokeLater(() -> onFail.accept(arg))
                 )
             );
+            return new TreeNodeFutureLoader(task);
         } catch (RejectedExecutionException e) {
             onFail.accept(INTERNAL_ERROR);
+            return null;
         }
     }
 

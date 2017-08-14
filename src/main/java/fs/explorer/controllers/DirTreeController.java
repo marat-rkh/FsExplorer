@@ -1,10 +1,11 @@
 package fs.explorer.controllers;
 
-import fs.explorer.providers.dirtree.TreeDataProvider;
+import fs.explorer.providers.dirtree.AsyncTreeDataProvider;
 import fs.explorer.providers.dirtree.TreeNodeData;
 import fs.explorer.models.dirtree.DirTreeModel;
 import fs.explorer.models.dirtree.ExtTreeNodeData;
 import fs.explorer.providers.dirtree.path.TargetType;
+import fs.explorer.providers.utils.loading.TreeNodeLoader;
 import fs.explorer.views.DirTreePane;
 
 import javax.swing.event.TreeExpansionEvent;
@@ -20,7 +21,7 @@ public class DirTreeController {
     private final PreviewController previewController;
     private final StatusBarController statusBarController;
 
-    private TreeDataProvider treeDataProvider;
+    private AsyncTreeDataProvider treeDataProvider;
 
     private DefaultMutableTreeNode lastSelectedNode;
 
@@ -32,7 +33,7 @@ public class DirTreeController {
             DirTreeModel dirTreeModel,
             PreviewController previewController,
             StatusBarController statusBarController,
-            TreeDataProvider defaultDataProvider
+            AsyncTreeDataProvider defaultDataProvider
     ) {
         this.dirTreePane = dirTreePane;
         this.dirTreeModel = dirTreeModel;
@@ -50,9 +51,9 @@ public class DirTreeController {
         this(dirTreePane, dirTreeModel, previewController, statusBarController, null);
     }
 
-    public TreeDataProvider getTreeDataProvider() { return treeDataProvider; }
+    public AsyncTreeDataProvider getTreeDataProvider() { return treeDataProvider; }
 
-    public void resetDataProvider(TreeDataProvider treeDataProvider) {
+    public void resetDataProvider(AsyncTreeDataProvider treeDataProvider) {
         if(treeDataProvider == null) {
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
             return;
@@ -121,11 +122,12 @@ public class DirTreeController {
             return;
         }
         extNodeData.setStatus(ExtTreeNodeData.Status.LOADING);
-        treeDataProvider.getNodesFor(
+        TreeNodeLoader loader = treeDataProvider.getNodesFor(
                 extNodeData.getNodeData(),
                 contentsInserter(node, extNodeData),
                 loadContentsErrorHandler(node, extNodeData)
         );
+        extNodeData.setLoader(loader);
     }
 
     private Consumer<List<TreeNodeData>> contentsInserter(
@@ -148,8 +150,7 @@ public class DirTreeController {
                     }
                 }
             }
-            dirTreePane.expandPath(new TreePath(node.getPath()));
-            extNodeData.setStatus(ExtTreeNodeData.Status.LOADED);
+            loadingFinished(node, extNodeData);
         };
     }
 
@@ -162,8 +163,13 @@ public class DirTreeController {
             dirTreeModel.removeAllChildren(node);
             dirTreeModel.addFakeChild(node, "<error>");
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, errorMessage);
-            dirTreePane.expandPath(new TreePath(node.getPath()));
-            extNodeData.setStatus(ExtTreeNodeData.Status.LOADED);
+            loadingFinished(node, extNodeData);
         };
+    }
+
+    private void loadingFinished(DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
+        dirTreePane.expandPath(new TreePath(node.getPath()));
+        extNodeData.setStatus(ExtTreeNodeData.Status.LOADED);
+        extNodeData.setLoader(null);
     }
 }
