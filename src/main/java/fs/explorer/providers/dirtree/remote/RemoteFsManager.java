@@ -95,6 +95,11 @@ public class RemoteFsManager implements FsManager {
         } catch (FTPException e) {
             throw new IOException(e.getMessage());
         }
+        // we do not have control over listFiles so we can
+        // only check interruption after operation is completed
+        if(Thread.currentThread().isInterrupted()) {
+            throw new InterruptedIOException();
+        }
         if (entries == null) {
             throw new IOException("failed to list entries");
         }

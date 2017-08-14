@@ -33,7 +33,9 @@ public class DirTreePane {
         this.eventsListener.setController(controller);
     }
 
-    public JComponent asJComponent() { return scrollPane; }
+    public JComponent asJComponent() {
+        return scrollPane;
+    }
 
     public void expandPath(TreePath treePath) {
         tree.expandPath(treePath);
@@ -54,7 +56,7 @@ public class DirTreePane {
 
         @Override
         public void valueChanged(TreeSelectionEvent e) {
-            if(controller == null) {
+            if (controller == null) {
                 return;
             }
             DefaultMutableTreeNode node =
@@ -64,13 +66,18 @@ public class DirTreePane {
 
         @Override
         public void treeExpanded(TreeExpansionEvent event) {
-            if(controller == null) {
+            if (controller == null) {
                 return;
             }
             controller.handleTreeExpansion(event);
         }
 
         @Override
-        public void treeCollapsed(TreeExpansionEvent event) {}
+        public void treeCollapsed(TreeExpansionEvent event) {
+            if (controller == null) {
+                return;
+            }
+            controller.handleTreeCollapse(event);
+        }
     }
 }

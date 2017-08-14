@@ -113,7 +113,11 @@ public class ArchivesManager implements Disposable {
         ArchiveData archiveData = archives.computeIfAbsent(
                 archivePath, key -> tryMakeArchive(key, isTopLevel, fsManager));
         if(archiveData == null) {
-            throw new IOException("failed to process archive");
+            if(Thread.currentThread().isInterrupted()) {
+                throw new InterruptedIOException();
+            } else {
+                throw new IOException("failed to process archive");
+            }
         }
         return archiveData;
     }

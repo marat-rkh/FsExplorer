@@ -57,6 +57,7 @@ public class DefaultPreviewProvider implements PreviewProvider {
             progressHandler.onCanNotRenderer();
             return;
         }
+        // TODO this should not fail on InterruptedIOException
         byte[] fileBytes = readContents(data);
         if (fileBytes == null) {
             progressHandler.onError(FILE_READ_FAILED);

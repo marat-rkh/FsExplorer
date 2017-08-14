@@ -82,12 +82,7 @@ public class DirTreeController {
     }
 
     public void handleTreeExpansion(TreeExpansionEvent event) {
-        TreePath treePath = event.getPath();
-        if (treePath == null) {
-            return;
-        }
-        DefaultMutableTreeNode node =
-                (DefaultMutableTreeNode) treePath.getLastPathComponent();
+        DefaultMutableTreeNode node = getNode(event);
         if (node == null) {
             return;
         }
@@ -95,6 +90,21 @@ public class DirTreeController {
         if (extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
                 extNodeData.getStatus() == ExtTreeNodeData.Status.NULL) {
             reloadContents(node, extNodeData);
+        }
+    }
+
+    public void handleTreeCollapse(TreeExpansionEvent event) {
+        DefaultMutableTreeNode node = getNode(event);
+        if (node == null) {
+            return;
+        }
+        ExtTreeNodeData extNodeData = DirTreeModel.getExtNodeData(node);
+        if (extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
+                extNodeData.getStatus() == ExtTreeNodeData.Status.LOADING) {
+            extNodeData.setStatus(ExtTreeNodeData.Status.NULL);
+            if (extNodeData.getLoader() != null) {
+                extNodeData.getLoader().cancel(true);
+            }
         }
     }
 
@@ -115,6 +125,14 @@ public class DirTreeController {
                 previewController.updatePreview(extNodeData.getNodeData());
             }
         }
+    }
+
+    private DefaultMutableTreeNode getNode(TreeExpansionEvent event) {
+        TreePath treePath = event.getPath();
+        if (treePath == null) {
+            return null;
+        }
+        return (DefaultMutableTreeNode) treePath.getLastPathComponent();
     }
 
     private void reloadContents(DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {

@@ -4,6 +4,7 @@ import fs.explorer.providers.dirtree.archives.ArchivesManager;
 import fs.explorer.providers.dirtree.path.*;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -40,20 +41,22 @@ public class DefaultFsDataProvider implements FsDataProvider {
             Consumer<List<TreeNodeData>> onComplete,
             Consumer<String> onFail
     ) {
-        if(node == null || node.getPath() == null) {
+        if (node == null || node.getPath() == null) {
             onFail.accept(INTERNAL_ERROR);
             return;
         }
         try {
             PathContainer path = node.getPath();
-            if(path.isFsPath()) {
+            if (path.isFsPath()) {
                 handleFsPath(path.asFsPath(), onComplete, onFail);
-            } else if(path.isArchiveEntryPath()) {
+            } else if (path.isArchiveEntryPath()) {
                 ArchiveEntryPath archiveEntryPath = path.asArchiveEntryPath();
                 handleArchiveEntryPath(archiveEntryPath, onComplete, onFail);
             } else {
                 onFail.accept(INTERNAL_ERROR);
             }
+        } catch (InterruptedIOException e) {
+            // do nothing
         } catch (IOException e) {
             onFail.accept(DATA_READ_ERROR + " - " + node.pathToString());
         }
@@ -65,9 +68,9 @@ public class DefaultFsDataProvider implements FsDataProvider {
             Consumer<String> onFail
     ) throws IOException {
         TargetType targetType = path.getTargetType();
-        if(targetType == TargetType.DIRECTORY) {
+        if (targetType == TargetType.DIRECTORY) {
             List<FsPath> entries = fsManager.list(path);
-            if(entries == null) {
+            if (entries == null) {
                 onFail.accept(INTERNAL_ERROR);
                 return;
             }
@@ -75,10 +78,10 @@ public class DefaultFsDataProvider implements FsDataProvider {
                     .map(DefaultFsDataProvider::toTreeNodeData)
                     .collect(Collectors.toList());
             onComplete.accept(groupAndSort(data));
-        } else if(targetType == TargetType.ZIP_ARCHIVE) {
+        } else if (targetType == TargetType.ZIP_ARCHIVE) {
             archivesManager.addArchiveIfAbsent(path, fsManager);
             List<ArchiveEntryPath> entries = archivesManager.listArchive(path, fsManager);
-            if(entries == null) {
+            if (entries == null) {
                 onFail.accept(INTERNAL_ERROR);
                 return;
             }
@@ -97,9 +100,9 @@ public class DefaultFsDataProvider implements FsDataProvider {
             Consumer<String> onFail
     ) throws IOException {
         TargetType targetType = path.getTargetType();
-        if(targetType == TargetType.DIRECTORY || targetType == TargetType.ZIP_ARCHIVE) {
+        if (targetType == TargetType.DIRECTORY || targetType == TargetType.ZIP_ARCHIVE) {
             List<ArchiveEntryPath> entries = archivesManager.listSubEntry(path, fsManager);
-            if(entries == null) {
+            if (entries == null) {
                 onFail.accept(INTERNAL_ERROR);
                 return;
             }
@@ -114,7 +117,7 @@ public class DefaultFsDataProvider implements FsDataProvider {
 
     private static TreeNodeData toTreeNodeData(FsPath path) {
         String label = path.getLastComponent();
-        if(label.isEmpty()) {
+        if (label.isEmpty()) {
             label = "?";
         }
         return new TreeNodeData(label, path);
@@ -122,7 +125,7 @@ public class DefaultFsDataProvider implements FsDataProvider {
 
     private static TreeNodeData toTreeNodeData(ArchiveEntryPath path) {
         String label = path.getLastComponent();
-        if(label.isEmpty()) {
+        if (label.isEmpty()) {
             label = "?";
         }
         return new TreeNodeData(label, path);
@@ -131,8 +134,8 @@ public class DefaultFsDataProvider implements FsDataProvider {
     private List<TreeNodeData> groupAndSort(List<TreeNodeData> data) {
         List<TreeNodeData> dirsData = new ArrayList<>();
         List<TreeNodeData> filesData = new ArrayList<>();
-        for(TreeNodeData d : data) {
-            if(d.pathTargetIsDirectory()) {
+        for (TreeNodeData d : data) {
+            if (d.pathTargetIsDirectory()) {
                 dirsData.add(d);
             } else {
                 filesData.add(d);

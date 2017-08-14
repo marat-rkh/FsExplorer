@@ -11,7 +11,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// @ThreadSafe
 public class LocalFsManager implements FsManager {
     private static final int BUFFER_SIZE = 8196;
 
@@ -20,7 +19,7 @@ public class LocalFsManager implements FsManager {
         return withFileStream(fsPath, fis -> {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[BUFFER_SIZE];
-            int len = 0;
+            int len;
             while((len = fis.read(buffer)) != -1) {
                 baos.write(buffer, 0, len);
                 if(Thread.currentThread().isInterrupted()) {
@@ -55,9 +54,16 @@ public class LocalFsManager implements FsManager {
             throw new IOException("bad directory path");
         }
         try {
-            return Files.list(Paths.get(pathStr))
+            List<FsPath> entries = Files.list(Paths.get(pathStr))
                     .map(FsPath::fromPath)
                     .collect(Collectors.toList());
+            // TODO consider checking interruption every N read entries
+            // Local reads should be fast enough, so for now we check
+            // interruption only after everything is read
+            if(Thread.currentThread().isInterrupted()) {
+                throw new InterruptedIOException();
+            }
+            return entries;
         } catch (InvalidPathException e) {
             throw new IOException("malformed directory path");
         }
