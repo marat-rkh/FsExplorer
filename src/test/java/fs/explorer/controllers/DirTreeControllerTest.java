@@ -124,7 +124,7 @@ public class DirTreeControllerTest {
         assertEquals("newFile1", getLabel(chs.get(2)));
 
         ArgumentCaptor<TreePath> captor = ArgumentCaptor.forClass(TreePath.class);
-        verify(dirTreePane).expandPath(captor.capture());
+        verify(dirTreePane, atLeast(1)).expandPath(captor.capture());
         assertEquals(new TreePath(dir2.getPath()), captor.getValue());
     }
 
@@ -144,7 +144,7 @@ public class DirTreeControllerTest {
         assertEquals(Type.FAKE, getType(chs.get(0)));
 
         ArgumentCaptor<TreePath> captor = ArgumentCaptor.forClass(TreePath.class);
-        verify(dirTreePane).expandPath(captor.capture());
+        verify(dirTreePane, atLeast(1)).expandPath(captor.capture());
         assertEquals(new TreePath(dir2.getPath()), captor.getValue());
     }
 
@@ -214,7 +214,7 @@ public class DirTreeControllerTest {
         assertEquals("<error>", getLabel(chs.get(0)));
 
         ArgumentCaptor<TreePath> captor = ArgumentCaptor.forClass(TreePath.class);
-        verify(dirTreePane).expandPath(captor.capture());
+        verify(dirTreePane, atLeast(1)).expandPath(captor.capture());
         assertEquals(new TreePath(dir2.getPath()), captor.getValue());
     }
 
@@ -240,7 +240,6 @@ public class DirTreeControllerTest {
         verify(spiedModel).containsNode(dir2);
         verify(spiedModel, never()).addNullDirChild(any(), any());
         verify(spiedModel, never()).addFileChild(any(), any());
-        verify(dirTreePane, never()).expandPath(any());
     }
 
     @Test
@@ -256,7 +255,6 @@ public class DirTreeControllerTest {
         verify(spiedModel).containsNode(dir2);
         verify(spiedModel, never()).addNullDirChild(any(), any());
         verify(spiedModel, never()).addFileChild(any(), any());
-        verify(dirTreePane, never()).expandPath(any());
     }
 
     @Test
@@ -272,7 +270,6 @@ public class DirTreeControllerTest {
         verify(spiedModel).containsNode(dir2);
         verify(spiedModel, never()).addNullDirChild(any(), any());
         verify(spiedModel, never()).addFileChild(any(), any());
-        verify(dirTreePane, never()).expandPath(any());
     }
 
     @Test
@@ -376,6 +373,10 @@ public class DirTreeControllerTest {
         List<DefaultMutableTreeNode> chs = dirTreeModel.getChildren(dir2);
         assertEquals(1, chs.size());
         assertEquals("<loading...>", getLabel(chs.get(0)));
+
+        ArgumentCaptor<TreePath> captor = ArgumentCaptor.forClass(TreePath.class);
+        verify(dirTreePane, atLeast(1)).expandPath(captor.capture());
+        assertEquals(new TreePath(dir2.getPath()), captor.getValue());
     }
 
     @Test
@@ -390,6 +391,10 @@ public class DirTreeControllerTest {
         List<DefaultMutableTreeNode> chs = dirTreeModel.getChildren(dir1);
         assertEquals(1, chs.size());
         assertEquals("<loading...>", getLabel(chs.get(0)));
+
+        ArgumentCaptor<TreePath> captor = ArgumentCaptor.forClass(TreePath.class);
+        verify(dirTreePane, atLeast(1)).expandPath(captor.capture());
+        assertEquals(new TreePath(dir1.getPath()), captor.getValue());
     }
 
     @Test
@@ -446,7 +451,7 @@ public class DirTreeControllerTest {
     }
 
     @Test
-    public void updatesTreeNodeLoaderOnRealod() {
+    public void updatesTreeNodeLoaderOnReload() {
         setUpDoNothingProvider();
         setupTestDirTreeModel();
         DefaultMutableTreeNode dir2 = TestUtils.getChild(dirTreeModel, 0, 1);

@@ -122,10 +122,11 @@ public class DirTreeController {
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
             return;
         }
+        extNodeData.setStatus(ExtTreeNodeData.Status.LOADING);
         List<DefaultMutableTreeNode> children = dirTreeModel.getChildren(node);
         dirTreeModel.removeAllChildren(node);
         dirTreeModel.addFakeChild(node, "<loading...>");
-        extNodeData.setStatus(ExtTreeNodeData.Status.LOADING);
+        dirTreePane.expandPath(new TreePath(node.getPath()));
         stopLoadings(children);
         if (extNodeData.getLoader() != null) {
             extNodeData.getLoader().cancel(true);
@@ -190,8 +191,8 @@ public class DirTreeController {
     }
 
     private void loadingFinished(DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
-        dirTreePane.expandPath(new TreePath(node.getPath()));
         extNodeData.setStatus(ExtTreeNodeData.Status.LOADED);
         extNodeData.setLoader(null);
+        dirTreePane.expandPath(new TreePath(node.getPath()));
     }
 }
