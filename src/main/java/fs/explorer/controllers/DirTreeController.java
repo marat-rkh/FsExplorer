@@ -51,10 +51,12 @@ public class DirTreeController {
         this(dirTreePane, dirTreeModel, previewController, statusBarController, null);
     }
 
-    public AsyncFsDataProvider getTreeDataProvider() { return treeDataProvider; }
+    public AsyncFsDataProvider getTreeDataProvider() {
+        return treeDataProvider;
+    }
 
     public void resetDataProvider(AsyncFsDataProvider treeDataProvider) {
-        if(treeDataProvider == null) {
+        if (treeDataProvider == null) {
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
             return;
         }
@@ -69,55 +71,54 @@ public class DirTreeController {
 
     public void handleTreeSelection(
             TreeSelectionEvent e, DefaultMutableTreeNode lastSelectedNode) {
-        if(lastSelectedNode == null) {
+        if (lastSelectedNode == null) {
             return;
         }
         this.lastSelectedNode = lastSelectedNode;
         ExtTreeNodeData extNodeData = DirTreeModel.getExtNodeData(lastSelectedNode);
-        if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
+        if (extNodeData.getType() == ExtTreeNodeData.Type.NORMAL) {
             previewController.updatePreview(extNodeData.getNodeData());
         }
     }
 
     public void handleTreeExpansion(TreeExpansionEvent event) {
         TreePath treePath = event.getPath();
-        if(treePath == null) {
+        if (treePath == null) {
             return;
         }
         DefaultMutableTreeNode node =
                 (DefaultMutableTreeNode) treePath.getLastPathComponent();
-        if(node == null) {
+        if (node == null) {
             return;
         }
         ExtTreeNodeData extNodeData = DirTreeModel.getExtNodeData(node);
-        if(extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
+        if (extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
                 extNodeData.getStatus() == ExtTreeNodeData.Status.NULL) {
             reloadContents(node, extNodeData);
         }
     }
 
     public void reloadLastSelectedNode() {
-        if(lastSelectedNode == null) {
+        if (lastSelectedNode == null) {
             return;
         }
         ExtTreeNodeData extNodeData = DirTreeModel.getExtNodeData(lastSelectedNode);
         ExtTreeNodeData.Status status = extNodeData.getStatus();
-        if(
-                extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
-                (status == ExtTreeNodeData.Status.NULL || status == ExtTreeNodeData.Status.LOADED)
-        ) {
+        boolean reloadNeeded = extNodeData.getType() == ExtTreeNodeData.Type.NORMAL &&
+                (status == ExtTreeNodeData.Status.NULL || status == ExtTreeNodeData.Status.LOADED);
+        if (reloadNeeded) {
             TargetType targetType = extNodeData.getNodeData().getPathTargetType();
             // TODO support reload for zip archives
-            if(targetType == TargetType.DIRECTORY) {
+            if (targetType == TargetType.DIRECTORY) {
                 reloadContents(lastSelectedNode, extNodeData);
-            } else if(targetType == TargetType.FILE) {
+            } else if (targetType == TargetType.FILE) {
                 previewController.updatePreview(extNodeData.getNodeData());
             }
         }
     }
 
     private void reloadContents(DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
-        if(treeDataProvider == null) {
+        if (treeDataProvider == null) {
             statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
             return;
         }
@@ -126,6 +127,9 @@ public class DirTreeController {
         dirTreeModel.addFakeChild(node, "<loading...>");
         extNodeData.setStatus(ExtTreeNodeData.Status.LOADING);
         stopLoadings(children);
+        if (extNodeData.getLoader() != null) {
+            extNodeData.getLoader().cancel(true);
+        }
         TreeNodeLoader loader = treeDataProvider.getNodesFor(
                 extNodeData.getNodeData(),
                 contentsInserter(node, extNodeData),
@@ -151,16 +155,16 @@ public class DirTreeController {
     private Consumer<List<TreeNodeData>> contentsInserter(
             DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
         return contents -> {
-            if(!dirTreeModel.containsNode(node)) {
+            if (!dirTreeModel.containsNode(node)) {
                 return;
             }
             dirTreeModel.removeAllChildren(node);
-            if(contents.isEmpty()) {
+            if (contents.isEmpty()) {
                 dirTreeModel.addFakeChild(node, "<empty>");
             } else {
-                for(TreeNodeData nodeData : contents) {
+                for (TreeNodeData nodeData : contents) {
                     TargetType targetType = nodeData.getPathTargetType();
-                    if(targetType == TargetType.DIRECTORY ||
+                    if (targetType == TargetType.DIRECTORY ||
                             targetType == TargetType.ZIP_ARCHIVE) {
                         dirTreeModel.addNullDirChild(node, nodeData);
                     } else {
@@ -175,7 +179,7 @@ public class DirTreeController {
     private Consumer<String> loadContentsErrorHandler(
             DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
         return errorMessage -> {
-            if(!dirTreeModel.containsNode(node)) {
+            if (!dirTreeModel.containsNode(node)) {
                 return;
             }
             dirTreeModel.removeAllChildren(node);
