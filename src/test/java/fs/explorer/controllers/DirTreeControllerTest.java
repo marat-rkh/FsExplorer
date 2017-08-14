@@ -462,6 +462,33 @@ public class DirTreeControllerTest {
         assertNotSame(currentLoader, getLoader(dir2));
     }
 
+    @Test
+    public void cancelsLoadingOnCollapse() {
+        setupTestDirTreeModel();
+        DefaultMutableTreeNode dir2 = TestUtils.getChild(dirTreeModel, 0, 1);
+        DirTreeModel.getExtNodeData(dir2).setStatus(Status.LOADING);
+        TreeNodeLoader initialLoader = getLoader(dir2);
+
+        dirTreeController.handleTreeCollapse(expansionEvent(dir2));
+
+        assertEquals(Status.NULL, getStatus(dir2));
+        verify(initialLoader).cancel(true);
+        assertNull(getLoader(dir2));
+    }
+
+    @Test
+    public void doesNotCancelsLoadingOnLoadedNodeCollapse() {
+        setupTestDirTreeModel();
+        DefaultMutableTreeNode dir1 = TestUtils.getChild(dirTreeModel, 0);
+        TreeNodeLoader initialLoader = getLoader(dir1);
+        System.out.println(initialLoader);
+        dirTreeController.handleTreeCollapse(expansionEvent(dir1));
+
+        assertEquals(Status.LOADED, getStatus(dir1));
+        verify(initialLoader, never()).cancel(anyBoolean());
+        assertSame(initialLoader, getLoader(dir1));
+    }
+
     private AsyncFsDataProvider makeTestDataProvider() {
         TestDataProvider provider = spy(new TestDataProvider());
         provider.setTestTopNode(nodeData("/", TargetType.DIRECTORY));

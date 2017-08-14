@@ -104,6 +104,7 @@ public class DirTreeController {
             extNodeData.setStatus(ExtTreeNodeData.Status.NULL);
             if (extNodeData.getLoader() != null) {
                 extNodeData.getLoader().cancel(true);
+                extNodeData.setLoader(null);
             }
         }
     }
