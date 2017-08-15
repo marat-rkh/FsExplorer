@@ -146,7 +146,56 @@ public class DirTreeModelTest {
         assertFalse(dirTreeModel.containsNode(node2));
     }
 
-    // TODO test breadthFirstEnumeration
+    @Test
+    public void enumeratesInBreathFirstOrder1() {
+        DefaultMutableTreeNode root = dirTreeModel.getRoot();
+        DefaultMutableTreeNode dir1 = dirTreeModel.addNullDirChild(root, nodeData("dir1"));
+        dirTreeModel.addFileChild(dir1, nodeData("file1"));
+        dirTreeModel.addFileChild(dir1, nodeData("file2"));
+        DefaultMutableTreeNode dir2 = dirTreeModel.addNullDirChild(root, nodeData("dir2"));
+        dirTreeModel.addNullDirChild(dir2, nodeData("dir3"));
+
+        List<DefaultMutableTreeNode> children = DirTreeModel.breadthFirstEnumeration(dir1);
+        assertNotNull(children);
+        assertEquals(4, children.size());
+        checkNode(children.get(0), Type.NORMAL, Status.NULL, "dir1");
+        assertEquals(Type.FAKE, DirTreeModel.getExtNodeData(children.get(1)).getType());
+        checkNode(children.get(2), Type.NORMAL, Status.LOADED, "file1");
+        checkNode(children.get(3), Type.NORMAL, Status.LOADED, "file2");
+    }
+
+    @Test
+    public void enumeratesInBreathFirstOrder2() {
+        DefaultMutableTreeNode root = dirTreeModel.getRoot();
+        DefaultMutableTreeNode dir1 = dirTreeModel.addNullDirChild(root, nodeData("dir1"));
+        dirTreeModel.addFileChild(dir1, nodeData("file1"));
+        dirTreeModel.addFileChild(dir1, nodeData("file2"));
+        DefaultMutableTreeNode dir2 = dirTreeModel.addNullDirChild(root, nodeData("dir2"));
+        dirTreeModel.addNullDirChild(dir2, nodeData("dir3"));
+
+        List<DefaultMutableTreeNode> children = DirTreeModel.breadthFirstEnumeration(dir2);
+        assertNotNull(children);
+        assertEquals(4, children.size());
+        checkNode(children.get(0), Type.NORMAL, Status.NULL, "dir2");
+        assertEquals(Type.FAKE, DirTreeModel.getExtNodeData(children.get(1)).getType());
+        checkNode(children.get(2), Type.NORMAL, Status.NULL, "dir3");
+        assertEquals(Type.FAKE, DirTreeModel.getExtNodeData(children.get(3)).getType());
+    }
+
+    @Test
+    public void enumeratesInBreathFirstOrder3() {
+        DefaultMutableTreeNode root = dirTreeModel.getRoot();
+        DefaultMutableTreeNode dir1 = dirTreeModel.addNullDirChild(root, nodeData("dir1"));
+        DefaultMutableTreeNode file1 = dirTreeModel.addFileChild(dir1, nodeData("file1"));
+        dirTreeModel.addFileChild(dir1, nodeData("file2"));
+        DefaultMutableTreeNode dir2 = dirTreeModel.addNullDirChild(root, nodeData("dir2"));
+        dirTreeModel.addNullDirChild(dir2, nodeData("dir3"));
+
+        List<DefaultMutableTreeNode> children = DirTreeModel.breadthFirstEnumeration(file1);
+        assertNotNull(children);
+        assertEquals(1, children.size());
+        checkNode(children.get(0), Type.NORMAL, Status.LOADED, "file1");
+    }
 
     private TreeNodeData nodeData(String label) {
         TreeNodeData data = mock(TreeNodeData.class);
@@ -163,7 +212,7 @@ public class DirTreeModelTest {
         ExtTreeNodeData extNodeData = DirTreeModel.getExtNodeData(node);
         assertEquals(type, extNodeData.getType());
         assertEquals(status, extNodeData.getStatus());
-        if(label != null) {
+        if (label != null) {
             assertEquals(label, extNodeData.toString());
         }
     }
