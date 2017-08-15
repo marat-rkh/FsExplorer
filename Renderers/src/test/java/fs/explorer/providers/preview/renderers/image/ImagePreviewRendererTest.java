@@ -2,6 +2,8 @@ package fs.explorer.providers.preview.renderers.image;
 
 import fs.explorer.TestResourceReader;
 import fs.explorer.providers.preview.PreviewRenderingData;
+import fs.explorer.providers.preview.renderers.image.ImagePreviewRenderer;
+import fs.explorer.providers.preview.renderers.image.ResizableImageLabel;
 import org.junit.Test;
 
 import java.awt.*;
@@ -10,7 +12,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class ImagePreviewRendererTest implements TestResourceReader {
     @Test

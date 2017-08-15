@@ -1,13 +1,15 @@
 package fs.explorer.providers.preview.renderers.text;
 
 import fs.explorer.TestResourceReader;
+import fs.explorer.providers.preview.renderers.text.TextChunksReader;
 import org.junit.Test;
 
 import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TextChunksReaderTest implements TestResourceReader {
     @Test(expected = IllegalArgumentException.class)

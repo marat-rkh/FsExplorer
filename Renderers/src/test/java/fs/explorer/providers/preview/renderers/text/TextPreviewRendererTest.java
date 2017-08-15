@@ -1,6 +1,8 @@
 package fs.explorer.providers.preview.renderers.text;
 
 import fs.explorer.providers.preview.PreviewRenderingData;
+import fs.explorer.providers.preview.renderers.text.LazyScrollableTextArea;
+import fs.explorer.providers.preview.renderers.text.TextPreviewRenderer;
 import org.junit.Test;
 
 import java.util.Arrays;

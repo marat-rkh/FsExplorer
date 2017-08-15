@@ -10,7 +10,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 
 public class ImagePreviewRenderer implements PreviewRenderer {
 

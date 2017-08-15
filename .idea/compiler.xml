@@ -8,12 +8,14 @@
         <outputRelativeToContentRoot value="true" />
         <module name="App" />
         <module name="Common" />
+        <module name="Renderers" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="App" target="1.8" />
       <module name="Common" target="1.8" />
       <module name="FsExplorer" target="1.5" />
+      <module name="Renderers" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

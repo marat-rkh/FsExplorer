@@ -5,8 +5,12 @@ import fs.explorer.providers.preview.PreviewRenderingData;
 import fs.explorer.utils.FileTypeInfo;
 
 import javax.swing.*;
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TextPreviewRenderer implements PreviewRenderer {
     private final int textChunkSize;

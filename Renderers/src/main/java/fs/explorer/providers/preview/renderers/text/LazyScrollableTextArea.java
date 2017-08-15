@@ -1,7 +1,9 @@
 package fs.explorer.providers.preview.renderers.text;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 class LazyScrollableTextArea {
     private final JTextArea textArea;

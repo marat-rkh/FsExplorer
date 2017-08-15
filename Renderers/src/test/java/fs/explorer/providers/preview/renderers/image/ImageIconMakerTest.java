@@ -1,6 +1,7 @@
 package fs.explorer.providers.preview.renderers.image;
 
 import fs.explorer.TestResourceReader;
+import fs.explorer.providers.preview.renderers.image.ImageIconMaker;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -11,7 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ImageIconMakerTest implements TestResourceReader {
     @Test
