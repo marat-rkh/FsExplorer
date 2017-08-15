@@ -13,14 +13,15 @@ class ImageIconMaker {
 
     ImageIcon makeIcon(Dimension size) throws InterruptedException {
         Image resized;
-        if (size == null) {
+        Dimension originalSize = new Dimension(originalImage.getWidth(), originalImage.getHeight());
+        boolean resizeNotNeeded = size == null ||
+                (originalSize.getHeight() <= size.height && originalSize.getWidth() <= size.width);
+        if (resizeNotNeeded) {
             resized = originalImage;
+        } else if (isNewAspectRationGreater(originalSize, size)) {
+            resized = originalImage.getScaledInstance(-1, size.height, Image.SCALE_DEFAULT);
         } else {
-            if(originalImage.getHeight() > originalImage.getWidth()) {
-                resized = originalImage.getScaledInstance(-1, size.height, Image.SCALE_DEFAULT);
-            } else {
-                resized = originalImage.getScaledInstance(size.width, -1, Image.SCALE_DEFAULT);
-            }
+            resized = originalImage.getScaledInstance(size.width, -1, Image.SCALE_DEFAULT);
         }
         ImageIcon icon = new ImageIcon(resized);
         // ImageIcon constructor can be interrupted but it does not throw
@@ -30,5 +31,13 @@ class ImageIconMaker {
             throw new InterruptedException();
         }
         return icon;
+    }
+
+    private boolean isNewAspectRationGreater(Dimension oldSize, Dimension newSize) {
+        long newWidth = newSize.width;
+        long newHeight = newSize.height;
+        long oldWidth = oldSize.width;
+        long oldHeight = oldSize.height;
+        return newWidth * oldHeight > oldWidth * newHeight;
     }
 }

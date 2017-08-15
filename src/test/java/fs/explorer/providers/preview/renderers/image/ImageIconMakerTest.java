@@ -25,13 +25,13 @@ public class ImageIconMakerTest implements TestResourceReader {
     }
 
     @Test
-    public void makesStretchedIconForWideImage()
+    public void keepsOriginalSizeWhenScreenIsBiggerForWideImage()
             throws URISyntaxException, IOException, InterruptedException {
         BufferedImage image = ImageIO.read(new File(testFilePath("/imgs/wide.jpg")));
         ImageIconMaker iconMaker = new ImageIconMaker(image);
         ImageIcon icon = iconMaker.makeIcon(new Dimension(800, 800));
-        assertEquals(800, icon.getIconWidth());
-        assertTrue(icon.getIconHeight() < 800);
+        assertEquals(450, icon.getIconWidth());
+        assertEquals(112, icon.getIconHeight());
     }
 
     @Test
@@ -39,18 +39,18 @@ public class ImageIconMakerTest implements TestResourceReader {
             throws URISyntaxException, IOException, InterruptedException {
         BufferedImage image = ImageIO.read(new File(testFilePath("/imgs/tall.jpg")));
         ImageIconMaker iconMaker = new ImageIconMaker(image);
-        ImageIcon icon = iconMaker.makeIcon(new Dimension(400, 400));
-        assertEquals(400, icon.getIconHeight());
-        assertTrue(icon.getIconWidth() < 400);
-    }
-
-    @Test
-    public void makesStretchedIconForTallImage()
-            throws URISyntaxException, IOException, InterruptedException {
-        BufferedImage image = ImageIO.read(new File(testFilePath("/imgs/tall.jpg")));
-        ImageIconMaker iconMaker = new ImageIconMaker(image);
         ImageIcon icon = iconMaker.makeIcon(new Dimension(100, 100));
         assertEquals(100, icon.getIconHeight());
         assertTrue(icon.getIconWidth() < 100);
+    }
+
+    @Test
+    public void keepsOriginalSizeWhenScreenIsBiggerForTallImage()
+            throws URISyntaxException, IOException, InterruptedException {
+        BufferedImage image = ImageIO.read(new File(testFilePath("/imgs/tall.jpg")));
+        ImageIconMaker iconMaker = new ImageIconMaker(image);
+        ImageIcon icon = iconMaker.makeIcon(new Dimension(400, 400));
+        assertEquals(218, icon.getIconHeight());
+        assertEquals(89, icon.getIconWidth());
     }
 }
