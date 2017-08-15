@@ -154,8 +154,7 @@ public class DirTreeControllerTest {
         DefaultMutableTreeNode dir1 = TestUtils.getChild(dirTreeModel, 0);
         dirTreeController.handleTreeExpansion(expansionEvent(dir1));
 
-        verify(dirTreeController.getTreeDataProvider(), never())
-                .getNodesFor(any(), any(), any());
+        verify(dirTreeController.getTreeDataProvider(), never()).getNodesFor(any(), any(), any());
         checkTestDirTreeModelNotChanged();
         verify(dirTreePane, never()).expandPath(any());
     }
@@ -167,8 +166,7 @@ public class DirTreeControllerTest {
         DirTreeModel.getExtNodeData(dir2).setStatus(Status.LOADING);
         dirTreeController.handleTreeExpansion(expansionEvent(dir2));
 
-        verify(dirTreeController.getTreeDataProvider(), never())
-                .getNodesFor(any(), any(), any());
+        verify(dirTreeController.getTreeDataProvider(), never()).getNodesFor(any(), any(), any());
         checkTestDirTreeModelNotChanged();
         verify(dirTreePane, never()).expandPath(any());
     }
@@ -178,8 +176,7 @@ public class DirTreeControllerTest {
         setupTestDirTreeModel();
         dirTreeController.handleTreeExpansion(expansionEvent(null));
 
-        verify(dirTreeController.getTreeDataProvider(), never())
-                .getNodesFor(any(), any(), any());
+        verify(dirTreeController.getTreeDataProvider(), never()).getNodesFor(any(), any(), any());
         checkTestDirTreeModelNotChanged();
         verify(dirTreePane, never()).expandPath(any());
     }
@@ -191,8 +188,7 @@ public class DirTreeControllerTest {
         when(badEvent.getPath()).thenReturn(null);
         dirTreeController.handleTreeExpansion(badEvent);
 
-        verify(dirTreeController.getTreeDataProvider(), never())
-                .getNodesFor(any(), any(), any());
+        verify(dirTreeController.getTreeDataProvider(), never()).getNodesFor(any(), any(), any());
         checkTestDirTreeModelNotChanged();
         verify(dirTreePane, never()).expandPath(any());
     }
@@ -568,12 +564,12 @@ public class DirTreeControllerTest {
         DirTreeModel.getExtNodeData(dir1).setStatus(Status.LOADED);
         DirTreeModel.getExtNodeData(dir1).setLoader(mock(TreeNodeLoader.class));
 
-        DefaultMutableTreeNode file1 =
-                dirTreeModel.addFileChild(dir1, nodeData("file1", TargetType.FILE));
+        DefaultMutableTreeNode file1 = dirTreeModel.addFileChild(
+                dir1, nodeData("file1", TargetType.FILE));
         DirTreeModel.getExtNodeData(file1).setLoader(mock(TreeNodeLoader.class));
 
-        DefaultMutableTreeNode dir2 =
-                dirTreeModel.addNullDirChild(dir1, nodeData("dir2", TargetType.DIRECTORY));
+        DefaultMutableTreeNode dir2 = dirTreeModel.addNullDirChild(
+                dir1, nodeData("dir2", TargetType.DIRECTORY));
         DirTreeModel.getExtNodeData(dir2).setLoader(mock(TreeNodeLoader.class));
     }
 

@@ -31,8 +31,8 @@ public class ImagePreviewRendererTest implements TestResourceReader {
             throws InterruptedException, URISyntaxException, IOException {
         ImagePreviewRenderer renderer = new ImagePreviewRenderer();
         byte[] imageBytes = Files.readAllBytes(Paths.get(testFilePath("/imgs/wide.jpg")));
-        ResizableImageLabel resizableImage = renderer
-                .renderResizableImage(imageBytes, new Dimension(100, 100));
+        ResizableImageLabel resizableImage = renderer.renderResizableImage(
+                imageBytes, new Dimension(100, 100));
         assertNotNull(resizableImage.getLabel());
         assertNotNull(resizableImage.getLabel().getIcon());
     }

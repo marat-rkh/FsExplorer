@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TestUtils {
-    public static void copyDirectory(Path src, Path dst) throws IOException {
+    static void copyDirectory(Path src, Path dst) throws IOException {
         Path srcParent = src.getParent();
         List<Path> paths = Files.walk(src).collect(Collectors.toList());
-        for(Path p: paths) {
+        for (Path p : paths) {
             Path relative = srcParent.relativize(p);
             Path copyPath = Paths.get(dst.toString(), relative.toString());
-            if(Files.isDirectory(p)) {
+            if (Files.isDirectory(p)) {
                 Files.createDirectory(copyPath);
             } else {
                 Files.copy(p, copyPath);

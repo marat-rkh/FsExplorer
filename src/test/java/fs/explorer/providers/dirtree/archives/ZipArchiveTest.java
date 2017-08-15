@@ -126,16 +126,16 @@ public class ZipArchiveTest {
                 .map(e -> new ZipEntryData(e.getName(), e.isDirectory()))
                 .collect(Collectors.toList());
         assertThat(data, containsInAnyOrder(
-                new ZipEntryData("pics/", /*isDir*/true),
-                new ZipEntryData("pics/photo.jpg", /*isDir*/false),
-                new ZipEntryData("music/", /*isDir*/true),
-                new ZipEntryData("music/track1.mp3", /*isDir*/false),
-                new ZipEntryData("music/track2.mp3", /*isDir*/false),
-                new ZipEntryData("documents/", /*isDir*/true),
-                new ZipEntryData("documents/books/", /*isDir*/true),
-                new ZipEntryData("documents/books/the-book.pdf", /*isDir*/false),
-                new ZipEntryData("draft.txt", /*isDir*/false),
-                new ZipEntryData("my-text.txt", /*isDir*/false)
+                new ZipEntryData("pics/", true),
+                new ZipEntryData("pics/photo.jpg", false),
+                new ZipEntryData("music/", true),
+                new ZipEntryData("music/track1.mp3", false),
+                new ZipEntryData("music/track2.mp3", false),
+                new ZipEntryData("documents/", true),
+                new ZipEntryData("documents/books/", true),
+                new ZipEntryData("documents/books/the-book.pdf", false),
+                new ZipEntryData("draft.txt", false),
+                new ZipEntryData("my-text.txt", false)
         ));
     }
 
@@ -154,8 +154,7 @@ public class ZipArchiveTest {
         zipArchive = new ZipArchive(archivePath, TestUtils.readZipEntries(archivePath));
     }
 
-    private FsPath testZipPath(
-            String relativePath, String lastComponent) throws URISyntaxException {
+    private FsPath testZipPath(String relativePath, String lastComponent) throws URISyntaxException {
         Path dirPath = Paths.get(getClass().getResource(relativePath).toURI());
         return new FsPath(dirPath.toString(), TargetType.ZIP_ARCHIVE, lastComponent);
     }

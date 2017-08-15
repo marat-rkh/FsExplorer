@@ -124,8 +124,8 @@ public class ArchivesManagerTest {
         ));
         when(archivesReader.readEntries(any(), same(fsManager))).thenReturn(testArchive);
         archivesManager.addArchiveIfAbsent(fsPath, fsManager);
-        List<ArchiveEntryPath> entries =
-                archivesManager.listSubEntry(dirPath(fsPath, "home/", "home"), fsManager);
+        List<ArchiveEntryPath> entries = archivesManager.listSubEntry(
+                dirPath(fsPath, "home/", "home"), fsManager);
 
         assertNotNull(entries);
         assertThat(entries, containsInAnyOrder(
@@ -196,8 +196,8 @@ public class ArchivesManagerTest {
         when(archivesReader.readEntries(any(), same(fsManager))).thenReturn(testArchive);
         archivesManager.addArchiveIfAbsent(fsPath, fsManager);
         FsPath otherPath = new FsPath("/other/arch.zip", TargetType.ZIP_ARCHIVE, "arch.zip");
-        List<ArchiveEntryPath> entries =
-                archivesManager.listSubEntry(dirPath(otherPath, "home/", "home"), fsManager);
+        List<ArchiveEntryPath> entries = archivesManager.listSubEntry(
+                dirPath(otherPath, "home/", "home"), fsManager);
         assertNull(entries);
     }
 
@@ -211,8 +211,8 @@ public class ArchivesManagerTest {
         when(archivesReader.readEntries(any(), same(fsManager))).thenReturn(testArchive);
         archivesManager.addArchiveIfAbsent(fsPath, fsManager);
         FsPath otherPath = new FsPath("/other/arch.zip", TargetType.ZIP_ARCHIVE, "arch.zip");
-        List<ArchiveEntryPath> entries =
-                archivesManager.listSubEntry(dirPath(otherPath, "data/", "data"), fsManager);
+        List<ArchiveEntryPath> entries = archivesManager.listSubEntry(
+                dirPath(otherPath, "data/", "data"), fsManager);
         assertNull(entries);
     }
 

@@ -19,7 +19,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class DefaultFsDataProviderTest {
-    private FsPath topDir;
     private FsManager fsManager;
     private ArchivesManager archivesManager;
     private DefaultFsDataProvider fsDataProvider;
@@ -28,7 +27,7 @@ public class DefaultFsDataProviderTest {
     public void setUp() throws URISyntaxException, IOException {
         fsManager = mock(FsManager.class);
         archivesManager = mock(ArchivesManager.class);
-        topDir = new FsPath("/some/dir", TargetType.DIRECTORY, "dir");
+        FsPath topDir = new FsPath("/some/dir", TargetType.DIRECTORY, "dir");
         fsDataProvider = new DefaultFsDataProvider(topDir, fsManager, archivesManager);
     }
 
@@ -39,7 +38,7 @@ public class DefaultFsDataProviderTest {
 
         verify(onCompete).accept(any());
         TreeNodeData topNodeData = onCompete.getValue();
-        checkFsPathNode("dir", "/some/dir", /*isDir*/true, "dir", topNodeData);
+        checkFsPathNode("dir", "/some/dir", true, "dir", topNodeData);
     }
 
     @Test
@@ -47,25 +46,25 @@ public class DefaultFsDataProviderTest {
         setUpFsManagerTestDirs();
         CapturingConsumer<List<TreeNodeData>> onComplete = new CapturingConsumer<>();
         Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
-        fsDataProvider.getNodesFor(fsPathNode(/*isDir*/true), onComplete, onFail);
+        fsDataProvider.getNodesFor(fsPathNode(true), onComplete, onFail);
 
         List<TreeNodeData> nodes = onComplete.getValue();
         assertNotNull(nodes);
         assertEquals(5, nodes.size());
         // sorted directories come first
         checkFsPathNode(
-                "documents", "/home/documents", /*isDir*/true, "documents",
+                "documents", "/home/documents", true, "documents",
                 nodes.get(0)
         );
-        checkFsPathNode("music", "/home/music", /*isDir*/true, "music", nodes.get(1));
-        checkFsPathNode("pics", "/home/pics", /*isDir*/true, "pics", nodes.get(2));
+        checkFsPathNode("music", "/home/music", true, "music", nodes.get(1));
+        checkFsPathNode("pics", "/home/pics", true, "pics", nodes.get(2));
         // then go sorted files
         checkFsPathNode(
-                "draft.txt", "/home/draft.txt", /*isDir*/false, "draft.txt",
+                "draft.txt", "/home/draft.txt", false, "draft.txt",
                 nodes.get(3)
         );
         checkFsPathNode(
-                "my-text.txt", "/home/my-text.txt", /*isDir*/false, "my-text.txt",
+                "my-text.txt", "/home/my-text.txt", false, "my-text.txt",
                 nodes.get(4)
         );
         verify(onFail, never()).accept(any());
@@ -75,7 +74,7 @@ public class DefaultFsDataProviderTest {
     public void doesNotProvideNodesForFile() {
         Consumer<List<TreeNodeData>> onComplete = spy(new TestUtils.DummyConsumer<>());
         Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
-        fsDataProvider.getNodesFor(fsPathNode(/*isDir*/false), onComplete, onFail);
+        fsDataProvider.getNodesFor(fsPathNode(false), onComplete, onFail);
 
         verify(onComplete, never()).accept(any());
         verify(onFail).accept(any());
@@ -86,7 +85,7 @@ public class DefaultFsDataProviderTest {
         when(fsManager.list(any())).thenThrow(new IOException());
         Consumer<List<TreeNodeData>> onComplete = spy(new TestUtils.DummyConsumer<>());
         Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
-        fsDataProvider.getNodesFor(fsPathNode(/*isDir*/true), onComplete, onFail);
+        fsDataProvider.getNodesFor(fsPathNode(true), onComplete, onFail);
 
         verify(onComplete, never()).accept(any());
         verify(onFail).accept(any());
@@ -99,12 +98,12 @@ public class DefaultFsDataProviderTest {
         ));
         CapturingConsumer<List<TreeNodeData>> onComplete = spy(new CapturingConsumer<>());
         Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
-        fsDataProvider.getNodesFor(fsPathNode(/*isDir*/true), onComplete, onFail);
+        fsDataProvider.getNodesFor(fsPathNode(true), onComplete, onFail);
 
         List<TreeNodeData> nodes = onComplete.getValue();
         assertNotNull(nodes);
         assertEquals(1, nodes.size());
-        checkFsPathNode("?", "", /*isDir*/true, "", nodes.get(0));
+        checkFsPathNode("?", "", true, "", nodes.get(0));
         verify(onFail, never()).accept(any());
     }
 
@@ -123,7 +122,7 @@ public class DefaultFsDataProviderTest {
         when(fsManager.list(any())).thenReturn(null);
         Consumer<List<TreeNodeData>> onComplete = spy(new TestUtils.DummyConsumer<>());
         Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
-        fsDataProvider.getNodesFor(fsPathNode(/*isDir*/true), onComplete, onFail);
+        fsDataProvider.getNodesFor(fsPathNode(true), onComplete, onFail);
 
         verify(onComplete, never()).accept(any());
         verify(onFail).accept(any());
@@ -168,8 +167,7 @@ public class DefaultFsDataProviderTest {
         setUpArchiveManagerTestDirs(archivePath);
         CapturingConsumer<List<TreeNodeData>> onComplete = new CapturingConsumer<>();
         Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
-        fsDataProvider.getNodesFor(
-                archiveEntryNode(TargetType.DIRECTORY), onComplete, onFail);
+        fsDataProvider.getNodesFor(archiveEntryNode(TargetType.DIRECTORY), onComplete, onFail);
 
         verify(onFail, never()).accept(any());
         List<TreeNodeData> nodes = onComplete.getValue();
@@ -187,8 +185,7 @@ public class DefaultFsDataProviderTest {
         setUpArchiveManagerTestDirs(archivePath);
         CapturingConsumer<List<TreeNodeData>> onComplete = new CapturingConsumer<>();
         Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
-        fsDataProvider.getNodesFor(
-                archiveEntryNode(TargetType.ZIP_ARCHIVE), onComplete, onFail);
+        fsDataProvider.getNodesFor(archiveEntryNode(TargetType.ZIP_ARCHIVE), onComplete, onFail);
 
         verify(onFail, never()).accept(any());
         List<TreeNodeData> nodes = onComplete.getValue();
@@ -217,8 +214,7 @@ public class DefaultFsDataProviderTest {
         when(archivesManager.listSubEntry(any(), any())).thenReturn(null);
         Consumer<List<TreeNodeData>> onComplete = spy(new TestUtils.DummyConsumer<>());
         Consumer<String> onFail = spy(new TestUtils.DummyConsumer<>());
-        fsDataProvider.getNodesFor(
-                archiveEntryNode(TargetType.DIRECTORY), onComplete, onFail);
+        fsDataProvider.getNodesFor(archiveEntryNode(TargetType.DIRECTORY), onComplete, onFail);
 
         verify(onComplete, never()).accept(any());
         verify(onFail).accept(any());
@@ -242,8 +238,7 @@ public class DefaultFsDataProviderTest {
                 new ArchiveEntryPath(archivePath, "scans/", TargetType.DIRECTORY, "scans")
         );
         List<ArchiveEntryPath> subPaths = Collections.singletonList(
-                new ArchiveEntryPath(
-                        archivePath, "scans/all.zip", TargetType.ZIP_ARCHIVE, "all.zip")
+                new ArchiveEntryPath(archivePath, "scans/all.zip", TargetType.ZIP_ARCHIVE, "all.zip")
         );
         Collections.shuffle(paths);
         when(archivesManager.listArchive(any(), any())).thenReturn(paths);
@@ -303,6 +298,8 @@ public class DefaultFsDataProviderTest {
             value = t;
         }
 
-        public T getValue() { return value; }
+        T getValue() {
+            return value;
+        }
     }
 }

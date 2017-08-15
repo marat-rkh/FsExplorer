@@ -21,8 +21,7 @@ public class PreviewControllerTest {
         previewPane = mock(PreviewPane.class);
         previewProvider = spy(new CompletingPreviewProvider());
         statusBarController = mock(StatusBarController.class);
-        previewController =
-                new PreviewController(previewPane, previewProvider, statusBarController);
+        previewController = new PreviewController(previewPane, previewProvider, statusBarController);
     }
 
     @Test
@@ -78,14 +77,12 @@ public class PreviewControllerTest {
 
     private void setUpFailingProvider() {
         previewProvider = spy(new FailingPreviewProvider());
-        previewController =
-                new PreviewController(previewPane, previewProvider, statusBarController);
+        previewController = new PreviewController(previewPane, previewProvider, statusBarController);
     }
 
     private void setUpCanNotRenderPreviewProvider() {
         previewProvider = spy(new CanNotRenderPreviewProvider());
-        previewController =
-                new PreviewController(previewPane, previewProvider, statusBarController);
+        previewController = new PreviewController(previewPane, previewProvider, statusBarController);
     }
 
     private static TreeNodeData nodeData(String path, boolean isDir, String lastComponent) {

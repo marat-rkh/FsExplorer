@@ -15,7 +15,6 @@ import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
 public class DefaultAsyncFsDataProviderTest {
-    private FsDataProvider fsDataProvider;
     private DefaultAsyncFsDataProvider asyncFsDataProvider;
 
     private CyclicBarrier cyclicBarrier;
@@ -25,12 +24,12 @@ public class DefaultAsyncFsDataProviderTest {
     public void setUp() {
         Assume.assumeTrue(TestEnvironment.asyncTestsNeeded());
 
-        fsDataProvider = mock(FsDataProvider.class);
+        FsDataProvider fsDataProvider = mock(FsDataProvider.class);
         doAnswer(invocationOnMock -> {
             cyclicBarrier.await(10, TimeUnit.SECONDS);
             try {
                 Thread.sleep(10000);
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 counter.incrementAndGet();
             } finally {
                 cyclicBarrier.await(10, TimeUnit.SECONDS);

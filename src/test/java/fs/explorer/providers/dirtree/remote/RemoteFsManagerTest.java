@@ -36,7 +36,7 @@ public class RemoteFsManagerTest {
     @Test
     public void readsTextFile() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(rebexTestServer());
-        byte[] bytes = remoteFsManager.readFile(testFsPath("/readme.txt", /*isDir*/false, ""));
+        byte[] bytes = remoteFsManager.readFile(testFsPath("/readme.txt", false, ""));
         assertNotNull(bytes);
         assertTrue(bytes.length > 0);
     }
@@ -44,7 +44,7 @@ public class RemoteFsManagerTest {
     @Test
     public void readsImageFile() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(rebexTestServer());
-        FsPath path = testFsPath("/pub/example/ConsoleClient.png", /*isDir*/false, "");
+        FsPath path = testFsPath("/pub/example/ConsoleClient.png", false, "");
         byte[] bytes = remoteFsManager.readFile(path);
         assertNotNull(bytes);
         assertTrue(bytes.length > 0);
@@ -53,7 +53,7 @@ public class RemoteFsManagerTest {
     @Test
     public void readsZipFile1() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(tele2TestServer());
-        byte[] bytes = remoteFsManager.readFile(testFsPath("/1KB.zip", /*isDir*/false, ""));
+        byte[] bytes = remoteFsManager.readFile(testFsPath("/1KB.zip", false, ""));
         assertNotNull(bytes);
         assertTrue(bytes.length > 0);
     }
@@ -61,7 +61,7 @@ public class RemoteFsManagerTest {
     @Test
     public void readsZipFile2() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(tele2TestServer());
-        byte[] bytes = remoteFsManager.readFile(testFsPath("/10MB.zip", /*isDir*/false, ""));
+        byte[] bytes = remoteFsManager.readFile(testFsPath("/10MB.zip", false, ""));
         assertNotNull(bytes);
         assertTrue(bytes.length > 0);
     }
@@ -75,40 +75,40 @@ public class RemoteFsManagerTest {
     @Test(expected = IOException.class)
     public void failsToReadOnNullPath() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(tele2TestServer());
-        remoteFsManager.readFile(testFsPath(null, /*isDir*/false, ""));
+        remoteFsManager.readFile(testFsPath(null, false, ""));
     }
 
     @Test(expected = IOException.class)
     public void failsToReadDirectory() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(tele2TestServer());
-        remoteFsManager.readFile(testFsPath("/", /*isDir*/false, ""));
+        remoteFsManager.readFile(testFsPath("/", false, ""));
     }
 
     @Test
     public void listsEntries() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(rebexTestServer());
-        List<FsPath> paths = remoteFsManager.list(testFsPath("/", /*isDir*/true, ""));
+        List<FsPath> paths = remoteFsManager.list(testFsPath("/", true, ""));
         assertEquals(2, paths.size());
         assertThat(paths, containsInAnyOrder(
-                testFsPath("/pub", /*isDir*/true, "pub"),
-                testFsPath("/readme.txt", /*isDir*/false, "readme.txt")
+                testFsPath("/pub", true, "pub"),
+                testFsPath("/readme.txt", false, "readme.txt")
         ));
     }
 
     @Test
     public void listsEntriesWithCorrectPaths() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(rebexTestServer());
-        List<FsPath> paths = remoteFsManager.list(testFsPath("/pub", /*isDir*/true, ""));
+        List<FsPath> paths = remoteFsManager.list(testFsPath("/pub", true, ""));
         assertEquals(1, paths.size());
         assertThat(paths, containsInAnyOrder(
-                testFsPath("/pub/example", /*isDir*/true, "example")
+                testFsPath("/pub/example", true, "example")
         ));
     }
 
     @Test(expected = IOException.class)
     public void failsToListEntriesOnFile() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(rebexTestServer());
-        remoteFsManager.list(testFsPath("/readme.txt", /*isDir*/false, ""));
+        remoteFsManager.list(testFsPath("/readme.txt", false, ""));
     }
 
     @Test(expected = IOException.class)
@@ -120,14 +120,14 @@ public class RemoteFsManagerTest {
     @Test(expected = IOException.class)
     public void failsToListEntriesOnNullPath() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(rebexTestServer());
-        remoteFsManager.list(testFsPath(null, /*isDir*/true, ""));
+        remoteFsManager.list(testFsPath(null, true, ""));
     }
 
     // TODO consider changing this to failure as in LocalFsManager
     @Test
     public void listsNoEntriesOnInvalidPath() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(rebexTestServer());
-        FsPath path = testFsPath("/---===---", /*isDir*/true, "");
+        FsPath path = testFsPath("/---===---", true, "");
         List<FsPath> entries = remoteFsManager.list(path);
         assertNotNull(entries);
         assertEquals(0, entries.size());
@@ -137,7 +137,7 @@ public class RemoteFsManagerTest {
     @Test
     public void listsNoEntriesOnNonExistingPath() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(rebexTestServer());
-        FsPath path = testFsPath("/my-dir", /*isDir*/true, "");
+        FsPath path = testFsPath("/my-dir", true, "");
         List<FsPath> entries = remoteFsManager.list(path);
         assertNotNull(entries);
         assertEquals(0, entries.size());
@@ -146,7 +146,7 @@ public class RemoteFsManagerTest {
     @Test
     public void withFileStreamProvidesNotNullStream() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(tele2TestServer());
-        remoteFsManager.withFileStream(testFsPath("/1KB.zip", /*isDir*/false, ""), is -> {
+        remoteFsManager.withFileStream(testFsPath("/1KB.zip", false, ""), is -> {
             assertNotNull(is);
             return null;
         });
@@ -155,11 +155,11 @@ public class RemoteFsManagerTest {
     @Test
     public void withFileStreamCanBeCalledMultipleTimes() throws IOException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(tele2TestServer());
-        remoteFsManager.withFileStream(testFsPath("/1KB.zip", /*isDir*/false, ""), is -> {
+        remoteFsManager.withFileStream(testFsPath("/1KB.zip", false, ""), is -> {
             assertNotNull(is);
             return null;
         });
-        remoteFsManager.withFileStream(testFsPath("/512KB.zip", /*isDir*/false, ""), is -> {
+        remoteFsManager.withFileStream(testFsPath("/512KB.zip", false, ""), is -> {
             assertNotNull(is);
             return null;
         });

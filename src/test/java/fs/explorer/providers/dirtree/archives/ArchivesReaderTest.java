@@ -29,31 +29,29 @@ public class ArchivesReaderTest {
 
     @Test
     public void readsEntries() throws URISyntaxException, IOException {
-        ZipArchive archive =
-                archivesReader.readEntries(testZipPath("/zips/home.zip", "home.zip"));
+        ZipArchive archive = archivesReader.readEntries(testZipPath("/zips/home.zip", "home.zip"));
         assertNotNull(archive);
         List<TestUtils.ZipEntryData> data = archive.listAllEntries().stream()
                 .map(e -> new ZipEntryData(e.getName(), e.isDirectory()))
                 .collect(Collectors.toList());
         assertThat(data, containsInAnyOrder(
-                new ZipEntryData("home/", /*isDir*/true),
-                new ZipEntryData("home/documents/", /*isDir*/true),
-                new ZipEntryData("home/documents/books/", /*isDir*/true),
-                new ZipEntryData("home/documents/books/the-book.pdf", /*isDir*/false),
-                new ZipEntryData("home/music/", /*isDir*/true),
-                new ZipEntryData("home/music/track1.mp3", /*isDir*/false),
-                new ZipEntryData("home/music/track2.mp3", /*isDir*/false),
-                new ZipEntryData("home/pics/", /*isDir*/true),
-                new ZipEntryData("home/pics/photo.jpg", /*isDir*/false),
-                new ZipEntryData("home/draft.txt", /*isDir*/false),
-                new ZipEntryData("home/my-text.txt", /*isDir*/false)
+                new ZipEntryData("home/", true),
+                new ZipEntryData("home/documents/", true),
+                new ZipEntryData("home/documents/books/", true),
+                new ZipEntryData("home/documents/books/the-book.pdf", false),
+                new ZipEntryData("home/music/", true),
+                new ZipEntryData("home/music/track1.mp3", false),
+                new ZipEntryData("home/music/track2.mp3", false),
+                new ZipEntryData("home/pics/", true),
+                new ZipEntryData("home/pics/photo.jpg", false),
+                new ZipEntryData("home/draft.txt", false),
+                new ZipEntryData("home/my-text.txt", false)
         ));
     }
 
     @Test
     public void readsEntriesOfEmptyZip() throws URISyntaxException, IOException {
-        ZipArchive archive =
-                archivesReader.readEntries(testZipPath("/zips/empty.zip", "empty.zip"));
+        ZipArchive archive = archivesReader.readEntries(testZipPath("/zips/empty.zip", "empty.zip"));
         assertNotNull(archive);
         assertEquals(0, archive.listAllEntries().size());
     }
@@ -63,8 +61,7 @@ public class ArchivesReaderTest {
     // that cannot detect corrupted zip files
     @Test
     public void readsEntriesOfCorruptedZipFilesAsEmpty() throws URISyntaxException, IOException {
-        ZipArchive archive =
-                archivesReader.readEntries(testZipPath("/zips/bad.zip", "bad.zip"));
+        ZipArchive archive = archivesReader.readEntries(testZipPath("/zips/bad.zip", "bad.zip"));
         assertNotNull(archive);
         assertEquals(0, archive.listAllEntries().size());
     }
@@ -75,8 +72,7 @@ public class ArchivesReaderTest {
     @Test
     public void readsEntriesOfNonZipFilesAsEmpty() throws URISyntaxException, IOException {
         FsPath path = testDataPath("/testdirs/home/draft.txt", TargetType.FILE, "draft.txt");
-        ZipArchive archive =
-            archivesReader.readEntries(path);
+        ZipArchive archive = archivesReader.readEntries(path);
         assertNotNull(archive);
         assertEquals(0, archive.listAllEntries().size());
     }
@@ -107,8 +103,7 @@ public class ArchivesReaderTest {
     public void extractsEntryFile() throws URISyntaxException, IOException {
         FsPath archive = testZipPath("/zips/home.zip", "home.zip");
         FsPath extracted = tmpDestinationFile("extracted-draft.txt");
-        boolean entryFound =
-                archivesReader.extractEntryFile(archive, "home/draft.txt", extracted);
+        boolean entryFound = archivesReader.extractEntryFile(archive, "home/draft.txt", extracted);
         assertTrue(entryFound);
         Path extractedPath = Paths.get(extracted.getPath());
         assertTrue(Files.exists(extractedPath));
@@ -121,8 +116,7 @@ public class ArchivesReaderTest {
     public void extractsEntryZip() throws URISyntaxException, IOException {
         FsPath archive = testZipPath("/zips/nested.zip", "nested.zip");
         FsPath extracted = tmpDestinationFile("extracted-dir1.zip");
-        boolean entryFound =
-                archivesReader.extractEntryFile(archive, "nested/dir1.zip", extracted);
+        boolean entryFound = archivesReader.extractEntryFile(archive, "nested/dir1.zip", extracted);
         assertTrue(entryFound);
         Path extractedPath = Paths.get(extracted.getPath());
         assertTrue(Files.exists(extractedPath));
@@ -142,8 +136,8 @@ public class ArchivesReaderTest {
     public void doesNotExtractNonExistingEntry() throws URISyntaxException, IOException {
         FsPath archive = testZipPath("/zips/home.zip", "home.zip");
         FsPath extracted = tmpDestinationFile("extracted");
-        boolean entryFound =
-                archivesReader.extractEntryFile(archive, "home/no-such-file.txt", extracted);
+        boolean entryFound = archivesReader.extractEntryFile(
+                archive, "home/no-such-file.txt", extracted);
         assertFalse(entryFound);
     }
 
@@ -202,16 +196,12 @@ public class ArchivesReaderTest {
         verify(fsManager).withFileStream(same(archive), any());
     }
 
-    private FsPath testZipPath(
-            String relativePath, String lastComponent) throws URISyntaxException {
+    private FsPath testZipPath(String relativePath, String lastComponent) throws URISyntaxException {
         return testDataPath(relativePath, TargetType.ZIP_ARCHIVE, lastComponent);
     }
 
-    private FsPath testDataPath(
-            String relativePath,
-            TargetType targetType,
-            String lastComponent
-    ) throws URISyntaxException {
+    private FsPath testDataPath(String relativePath, TargetType targetType, String lastComponent)
+            throws URISyntaxException {
         Path dirPath = Paths.get(getClass().getResource(relativePath).toURI());
         return new FsPath(dirPath.toString(), targetType, lastComponent);
     }

@@ -78,6 +78,5 @@ public class FileTypeInfoTest {
         assertTrue(FileTypeInfo.isImageFile("c:\\some\\dir\\file.JPG"));
         assertTrue(FileTypeInfo.isImageFile("c:\\some\\dir\\file.PNG"));
         assertTrue(FileTypeInfo.isImageFile("c:\\some\\dir\\file.gif"));
-
     }
 }
