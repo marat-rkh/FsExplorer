@@ -35,7 +35,7 @@ public class AsyncPreviewProviderTest {
             cyclicBarrier.await(10, TimeUnit.SECONDS);
             try {
                 Thread.sleep(10000);
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 counter.incrementAndGet();
             } finally {
                 cyclicBarrier.await(10, TimeUnit.SECONDS);
@@ -66,7 +66,7 @@ public class AsyncPreviewProviderTest {
             cyclicBarrier.await(10, TimeUnit.SECONDS);
             try {
                 Thread.sleep(10000);
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 counter.incrementAndGet();
             } finally {
                 cyclicBarrier.await(10, TimeUnit.SECONDS);
@@ -91,5 +91,28 @@ public class AsyncPreviewProviderTest {
         assertEquals(1, counter.get());
     }
 
-    // TODO try to find a way to test cancels of delayed tasks
+    @Test
+    public void cancelsTaskWithinDelay()
+            throws InterruptedException, TimeoutException, BrokenBarrierException {
+        previewProvider = mock(PreviewProvider.class);
+
+        TreeNodeData dummyData1 = mock(TreeNodeData.class);
+        doAnswer(invocationOnMock -> {
+            counter.incrementAndGet();
+            return null;
+        }).when(previewProvider).getPreview(same(dummyData1), any(), any());
+
+        TreeNodeData dummyData2 = mock(TreeNodeData.class);
+        doNothing().when(previewProvider).getPreview(same(dummyData2), any(), any());
+
+        counter = new AtomicInteger(0);
+
+        asyncPreviewProvider = new AsyncPreviewProvider(previewProvider, 3000);
+
+        asyncPreviewProvider.getPreview(dummyData1, null, null);
+        Thread.sleep(1000);
+        asyncPreviewProvider.getPreview(dummyData2, null, null);
+        asyncPreviewProvider.shutdownNow();
+        assertEquals(0, counter.get());
+    }
 }
