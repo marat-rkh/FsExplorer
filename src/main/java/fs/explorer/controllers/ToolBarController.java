@@ -11,8 +11,10 @@ public class ToolBarController {
     private final StatusBarController statusBarController;
 
     private final DelayedUIAction delayedReconnectToRemoteFs;
+    private final DelayedUIAction delayedExploreRemoteFiles;
 
-    private static final int DEFAULT_RECONNECT_DELAY_MILLISECONDS = 100;
+    private static final int DEFAULT_RECONNECT_DELAY_MILLISECONDS = 200;
+    private static final int DEFAULT_EXPLORE_REMOTE_FILES_DELAY_MILLISECONDS = 200;
     private static final String EXPLORING_LOCAL_DRIVE = "Exploring local drive";
 
     public ToolBarController(
@@ -26,6 +28,8 @@ public class ToolBarController {
         this.dirTreeController = dirTreeController;
         this.statusBarController = statusBarController;
         this.delayedReconnectToRemoteFs = new DelayedUIAction(DEFAULT_RECONNECT_DELAY_MILLISECONDS);
+        this.delayedExploreRemoteFiles = new DelayedUIAction(
+                DEFAULT_EXPLORE_REMOTE_FILES_DELAY_MILLISECONDS);
     }
 
     ToolBarController(
@@ -33,13 +37,15 @@ public class ToolBarController {
             FTPDialogController ftpDialogController,
             DirTreeController dirTreeController,
             StatusBarController statusBarController,
-            int reconnectDelayMilliseconds
+            int reconnectDelayMilliseconds,
+            int exploreRemoteFilesDelayMilliseconds
     ) {
         this.fsTypeSwitcher = fsTypeSwitcher;
         this.ftpDialogController = ftpDialogController;
         this.dirTreeController = dirTreeController;
         this.statusBarController = statusBarController;
         this.delayedReconnectToRemoteFs = new DelayedUIAction(reconnectDelayMilliseconds);
+        this.delayedExploreRemoteFiles = new DelayedUIAction(exploreRemoteFilesDelayMilliseconds);
     }
 
     public void handleExploreLocalFiles(ActionEvent e) {
@@ -48,7 +54,7 @@ public class ToolBarController {
     }
 
     public void handleExploreRemoteFiles(ActionEvent e) {
-        ftpDialogController.showAndHandleInput();
+        delayedExploreRemoteFiles.execute(ftpDialogController::showAndHandleInput);
     }
 
     public void handleReconnectToLastRemoteHost(ActionEvent e) {

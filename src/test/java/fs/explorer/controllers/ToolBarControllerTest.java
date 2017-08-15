@@ -21,7 +21,7 @@ public class ToolBarControllerTest {
         dirTreeController = mock(DirTreeController.class);
         statusBarController = mock(StatusBarController.class);
         controller = new ToolBarController(
-                fsTypeSwitcher, ftpDialogController, dirTreeController, statusBarController, 0);
+                fsTypeSwitcher, ftpDialogController, dirTreeController, statusBarController, 0, 0);
     }
 
     @Test
