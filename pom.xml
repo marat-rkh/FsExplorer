@@ -11,6 +11,7 @@
 
     <modules>
         <module>App</module>
+        <module>Common</module>
     </modules>
     <dependencies>
         <dependency>

@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="App" />
+        <module name="Common" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="App" target="1.8" />
+      <module name="Common" target="1.8" />
       <module name="FsExplorer" target="1.5" />
     </bytecodeTargetLevel>
   </component>
