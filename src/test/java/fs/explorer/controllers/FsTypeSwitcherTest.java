@@ -38,7 +38,8 @@ public class FsTypeSwitcherTest {
                 dirTreeController,
                 previewProvider,
                 localFsManager,
-                archivesManager
+                archivesManager,
+                false
         ));
     }
 
@@ -51,28 +52,28 @@ public class FsTypeSwitcherTest {
     }
 
     @Test
-    public void switchesToRemoteFs() throws FTPException {
+    public void switchesToRemoteFs() {
         Assume.assumeTrue(TestEnvironment.ftpTestsNeeded());
 
-        fsTypeSwitcher.switchToRemoteFs(tele2TestServer());
+        FsTypeSwitchProgressHandler handler = mock(FsTypeSwitchProgressHandler.class);
+        fsTypeSwitcher.switchToRemoteFs(tele2TestServer(), handler);
         verify(fsTypeSwitcher).disposeCurrentFsDataProvider();
         verify(dirTreeController).resetDataProvider(any());
         verify(previewProvider).resetFsManager(any());
+        verify(handler).onComplete();
     }
 
     @Test
-    public void doesNotSwitchToRemoteFsOnFsManagerFail() throws FTPException {
+    public void doesNotSwitchToRemoteFsOnFsManagerFail() {
         Assume.assumeTrue(TestEnvironment.ftpTestsNeeded());
 
+        FsTypeSwitchProgressHandler handler = mock(FsTypeSwitchProgressHandler.class);
         FTPConnectionInfo noHost = new FTPConnectionInfo("", "", new char[1]);
-        try {
-            fsTypeSwitcher.switchToRemoteFs(noHost);
-            fail();
-        } catch (FTPException e) {
-            verify(fsTypeSwitcher, never()).disposeCurrentFsDataProvider();
-            verify(dirTreeController, never()).resetDataProvider(any());
-            verify(previewProvider, never()).resetFsManager(any());
-        }
+        fsTypeSwitcher.switchToRemoteFs(noHost, handler);
+        verify(fsTypeSwitcher, never()).disposeCurrentFsDataProvider();
+        verify(dirTreeController, never()).resetDataProvider(any());
+        verify(previewProvider, never()).resetFsManager(any());
+        verify(handler).onFail(any());
     }
 
     @Test
@@ -89,46 +90,44 @@ public class FsTypeSwitcherTest {
     public void switchesToRemoteFsMultipleTimes() throws FTPException {
         Assume.assumeTrue(TestEnvironment.ftpTestsNeeded());
 
-        fsTypeSwitcher.switchToRemoteFs(tele2TestServer());
-        fsTypeSwitcher.switchToRemoteFs(rebexTestServer());
-        fsTypeSwitcher.switchToRemoteFs(tele2TestServer());
+        FsTypeSwitchProgressHandler handler = mock(FsTypeSwitchProgressHandler.class);
+        fsTypeSwitcher.switchToRemoteFs(tele2TestServer(), handler);
+        fsTypeSwitcher.switchToRemoteFs(rebexTestServer(), handler);
+        fsTypeSwitcher.switchToRemoteFs(tele2TestServer(), handler);
 
         verify(fsTypeSwitcher, times(3)).disposeCurrentFsDataProvider();
         verify(dirTreeController, times(3)).resetDataProvider(any());
         verify(previewProvider, times(3)).resetFsManager(any());
+        verify(handler, times(3)).onComplete();
     }
 
     @Test
     public void switchesToRemoteFsAfterFail() throws FTPException {
         Assume.assumeTrue(TestEnvironment.ftpTestsNeeded());
 
+        FsTypeSwitchProgressHandler failHandler = mock(FsTypeSwitchProgressHandler.class);
         FTPConnectionInfo noHost = new FTPConnectionInfo("", "", new char[1]);
-        try {
-            fsTypeSwitcher.switchToRemoteFs(noHost);
-            fail();
-        } catch (FTPException e) {
-            // do nothing
-        }
-        fsTypeSwitcher.switchToRemoteFs(tele2TestServer());
+        fsTypeSwitcher.switchToRemoteFs(noHost, failHandler);
+        FsTypeSwitchProgressHandler okHandler = mock(FsTypeSwitchProgressHandler.class);
+        fsTypeSwitcher.switchToRemoteFs(tele2TestServer(), okHandler);
 
+        verify(failHandler).onFail(any());
         verify(fsTypeSwitcher).disposeCurrentFsDataProvider();
         verify(dirTreeController).resetDataProvider(any());
         verify(previewProvider).resetFsManager(any());
+        verify(okHandler).onComplete();
     }
 
     @Test
     public void switchesToLocalFsAfterFail() throws FTPException {
         Assume.assumeTrue(TestEnvironment.ftpTestsNeeded());
 
+        FsTypeSwitchProgressHandler handler = mock(FsTypeSwitchProgressHandler.class);
         FTPConnectionInfo noHost = new FTPConnectionInfo("", "", new char[1]);
-        try {
-            fsTypeSwitcher.switchToRemoteFs(noHost);
-            fail();
-        } catch (FTPException e) {
-            // do nothing
-        }
+        fsTypeSwitcher.switchToRemoteFs(noHost, handler);
         fsTypeSwitcher.switchToLocalFs();
 
+        verify(handler).onFail(any());
         verify(fsTypeSwitcher).disposeCurrentFsDataProvider();
         verify(dirTreeController).resetDataProvider(any());
         verify(previewProvider).resetFsManager(localFsManager);
@@ -138,10 +137,12 @@ public class FsTypeSwitcherTest {
     public void switchesToRemoteFsAndBack() throws FTPException {
         Assume.assumeTrue(TestEnvironment.ftpTestsNeeded());
 
+        FsTypeSwitchProgressHandler handler = mock(FsTypeSwitchProgressHandler.class);
         fsTypeSwitcher.switchToLocalFs();
-        fsTypeSwitcher.switchToRemoteFs(tele2TestServer());
+        fsTypeSwitcher.switchToRemoteFs(tele2TestServer(), handler);
         fsTypeSwitcher.switchToLocalFs();
 
+        verify(handler).onComplete();
         verify(fsTypeSwitcher, times(3)).disposeCurrentFsDataProvider();
 
         ArgumentCaptor<AsyncFsDataProvider> captor1 = ArgumentCaptor.forClass(
@@ -158,10 +159,12 @@ public class FsTypeSwitcherTest {
     public void switchesToLocalFsAndBack() throws FTPException {
         Assume.assumeTrue(TestEnvironment.ftpTestsNeeded());
 
-        fsTypeSwitcher.switchToRemoteFs(tele2TestServer());
+        FsTypeSwitchProgressHandler handler = mock(FsTypeSwitchProgressHandler.class);
+        fsTypeSwitcher.switchToRemoteFs(tele2TestServer(), handler);
         fsTypeSwitcher.switchToLocalFs();
-        fsTypeSwitcher.switchToRemoteFs(tele2TestServer());
+        fsTypeSwitcher.switchToRemoteFs(tele2TestServer(), handler);
 
+        verify(handler, times(2)).onComplete();
         verify(fsTypeSwitcher, times(3)).disposeCurrentFsDataProvider();
 
         ArgumentCaptor<AsyncFsDataProvider> captor1 = ArgumentCaptor.forClass(
@@ -180,20 +183,15 @@ public class FsTypeSwitcherTest {
 
         Runnable toLocal = () -> fsTypeSwitcher.switchToLocalFs();
         Runnable toRemote = () -> {
-            try {
-                fsTypeSwitcher.switchToRemoteFs(tele2TestServer());
-            } catch (FTPException e) {
-                fail();
-            }
+            FsTypeSwitchProgressHandler handler = mock(FsTypeSwitchProgressHandler.class);
+            fsTypeSwitcher.switchToRemoteFs(tele2TestServer(), handler);
+            verify(handler).onComplete();
         };
         Runnable toRemoteFailing = () -> {
-            try {
-                FTPConnectionInfo noHost = new FTPConnectionInfo("", "", new char[1]);
-                fsTypeSwitcher.switchToRemoteFs(noHost);
-                fail();
-            } catch (FTPException e) {
-                // thrown as expected
-            }
+            FTPConnectionInfo noHost = new FTPConnectionInfo("", "", new char[1]);
+            FsTypeSwitchProgressHandler handler = mock(FsTypeSwitchProgressHandler.class);
+            fsTypeSwitcher.switchToRemoteFs(noHost, handler);
+            verify(handler).onFail(any());
         };
         List<SwitchAction> actions = Arrays.asList(
                 new SwitchAction(toLocal, SwitchAction.Type.TO_LOCAL),

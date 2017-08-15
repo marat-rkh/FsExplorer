@@ -14,6 +14,7 @@ public class FTPDialogController {
 
     private FTPConnectionInfo lastConnectionInfo;
 
+    private static final String CONNECTING = "Connecting";
     private static final String CONNECTION_FAILED = "FTP connection failed";
     private static final String CONNECTED = "Connected";
 
@@ -52,12 +53,19 @@ public class FTPDialogController {
         if (optError.isPresent()) {
             showAndHandleInput(optError.get());
         } else {
-            try {
-                fsTypeSwitcher.switchToRemoteFs(connectionInfo);
-                statusBarController.setInfoMessage(CONNECTED, connectionInfo.getHost());
-            } catch (FTPException e) {
-                statusBarController.setErrorMessage(CONNECTION_FAILED, e.getMessage());
-            }
+            FsTypeSwitchProgressHandler handler = new FsTypeSwitchProgressHandler() {
+                @Override
+                public void onComplete() {
+                    statusBarController.setInfoMessage(CONNECTED, connectionInfo.getHost());
+                }
+
+                @Override
+                public void onFail(String errorMessage) {
+                    statusBarController.setErrorMessage(CONNECTION_FAILED, errorMessage);
+                }
+            };
+            statusBarController.setProgressMessage(CONNECTING, connectionInfo.getHost());
+            fsTypeSwitcher.switchToRemoteFs(connectionInfo, handler);
         }
     }
 }

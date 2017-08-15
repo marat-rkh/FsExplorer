@@ -14,6 +14,7 @@ public class FTPConnection implements AutoCloseable {
 
     private boolean isClosed = false;
 
+    private static final int CONNECTION_TIMEOUT_MILLISECONDS = 10000;
     private static final long KEEP_ALIVE_TIMEOUT_SECONDS = 150;
 
     FTPConnection(FTPConnectionInfo connectionInfo) {
@@ -64,6 +65,7 @@ public class FTPConnection implements AutoCloseable {
     }
 
     private void makeConnection() throws IOException, FTPException {
+        ftpClient.setConnectTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
         ftpClient.connect(connectionInfo.getHost());
         int replyCode = ftpClient.getReplyCode();
         if (!FTPReply.isPositiveCompletion(replyCode)) {

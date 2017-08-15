@@ -26,6 +26,10 @@ public class StatusBarController {
         statusBar.setTextColor(Color.BLUE);
     }
 
+    void setProgressMessage(String msg, String optionalDetail) {
+        setProgressMessage(fullMessage(msg, optionalDetail));
+    }
+
     void setErrorMessage(String msg) {
         statusBar.setText(msg);
         statusBar.setTextColor(Color.RED);

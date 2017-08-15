@@ -6,6 +6,8 @@ import fs.explorer.views.FTPDialog;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.Optional;
 
@@ -46,7 +48,7 @@ public class FTPDialogControllerTest {
 
         verify(ftpInfoValidator, never()).validate(any());
         verify(fsTypeSwitcher, never()).switchToLocalFs();
-        verify(fsTypeSwitcher, never()).switchToRemoteFs(any());
+        verify(fsTypeSwitcher, never()).switchToRemoteFs(any(), any());
         verify(statusBarController, never()).setInfoMessage(any(), any());
         verify(statusBarController, never()).setErrorMessage(any(), any());
     }
@@ -73,9 +75,16 @@ public class FTPDialogControllerTest {
                 "host", "user", new char[]{'p', 'a', 's', 's'});
         when(ftpDialog.showAndWaitResult()).thenReturn(Optional.of(testInfo));
         when(ftpInfoValidator.validate(any())).thenReturn(Optional.empty());
+        doAnswer(invocationOnMock -> {
+            FsTypeSwitchProgressHandler handler =
+                    (FsTypeSwitchProgressHandler) invocationOnMock.getArguments()[1];
+            handler.onComplete();
+            return null;
+        }).when(fsTypeSwitcher).switchToRemoteFs(any(), any());
         ftpDialogController.showAndHandleInput();
 
-        verify(fsTypeSwitcher).switchToRemoteFs(testInfo);
+        verify(fsTypeSwitcher).switchToRemoteFs(same(testInfo), any());
+        verify(statusBarController).setProgressMessage(any(), any());
         verify(statusBarController).setInfoMessage(any(), any());
     }
 
@@ -87,9 +96,16 @@ public class FTPDialogControllerTest {
         when(ftpInfoValidator.validate(any()))
                 .thenReturn(Optional.of("Some error"))
                 .thenReturn(Optional.empty());
+        doAnswer(invocationOnMock -> {
+            FsTypeSwitchProgressHandler handler =
+                    (FsTypeSwitchProgressHandler) invocationOnMock.getArguments()[1];
+            handler.onComplete();
+            return null;
+        }).when(fsTypeSwitcher).switchToRemoteFs(any(), any());
         ftpDialogController.showAndHandleInput();
 
-        verify(fsTypeSwitcher).switchToRemoteFs(testInfo);
+        verify(fsTypeSwitcher).switchToRemoteFs(same(testInfo), any());
+        verify(statusBarController).setProgressMessage(any(), any());
         verify(statusBarController).setInfoMessage(any(), any());
     }
 
@@ -99,9 +115,15 @@ public class FTPDialogControllerTest {
                 "host", "user", new char[]{'p', 'a', 's', 's'});
         when(ftpDialog.showAndWaitResult()).thenReturn(Optional.of(testInfo));
         when(ftpInfoValidator.validate(any())).thenReturn(Optional.empty());
-        doThrow(FTPException.class).when(fsTypeSwitcher).switchToRemoteFs(any());
+        doAnswer(invocationOnMock -> {
+            FsTypeSwitchProgressHandler handler =
+                    (FsTypeSwitchProgressHandler) invocationOnMock.getArguments()[1];
+            handler.onFail("");
+            return null;
+        }).when(fsTypeSwitcher).switchToRemoteFs(any(), any());
         ftpDialogController.showAndHandleInput();
 
+        verify(statusBarController).setProgressMessage(any(), any());
         verify(statusBarController, never()).setInfoMessage(any(), any());
         verify(statusBarController).setErrorMessage(any(), any());
     }
@@ -112,9 +134,16 @@ public class FTPDialogControllerTest {
                 "host", "user", new char[]{'p', 'a', 's', 's'});
         when(ftpDialog.showAndWaitResult()).thenReturn(Optional.of(testInfo));
         when(ftpInfoValidator.validate(any())).thenReturn(Optional.empty());
+        doAnswer(invocationOnMock -> {
+            FsTypeSwitchProgressHandler handler =
+                    (FsTypeSwitchProgressHandler) invocationOnMock.getArguments()[1];
+            handler.onComplete();
+            return null;
+        }).when(fsTypeSwitcher).switchToRemoteFs(any(), any());
         ftpDialogController.handleLastInput();
 
-        verify(fsTypeSwitcher).switchToRemoteFs(testInfo);
+        verify(fsTypeSwitcher).switchToRemoteFs(same(testInfo), any());
+        verify(statusBarController).setProgressMessage(any(), any());
         verify(statusBarController).setInfoMessage(any(), any());
     }
 
@@ -123,11 +152,17 @@ public class FTPDialogControllerTest {
         FTPConnectionInfo testInfo = new FTPConnectionInfo(
                 "host", "user", new char[]{'p', 'a', 's', 's'});
         when(ftpDialog.showAndWaitResult()).thenReturn(Optional.of(testInfo));
-        when(ftpInfoValidator.validate(any())).thenReturn(Optional.empty());
+        when(ftpInfoValidator.validate(any())).thenReturn(Optional.empty());doAnswer(invocationOnMock -> {
+            FsTypeSwitchProgressHandler handler =
+                    (FsTypeSwitchProgressHandler) invocationOnMock.getArguments()[1];
+            handler.onComplete();
+            return null;
+        }).when(fsTypeSwitcher).switchToRemoteFs(any(), any());
         ftpDialogController.showAndHandleInput();
         ftpDialogController.handleLastInput();
 
-        verify(fsTypeSwitcher, times(2)).switchToRemoteFs(testInfo);
+        verify(fsTypeSwitcher, times(2)).switchToRemoteFs(same(testInfo), any());
+        verify(statusBarController, times(2)).setProgressMessage(any(), any());
         verify(statusBarController, times(2)).setInfoMessage(any(), any());
     }
 }
