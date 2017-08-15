@@ -9,20 +9,20 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class FsUtils {
     public static void deleteDirectoryRecursively(Path dir) throws IOException {
-        if(!Files.isDirectory(dir)) {
+        if (!Files.isDirectory(dir)) {
             throw new IOException("not a directory");
         }
         Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
             @Override
-            public FileVisitResult visitFile(
-                    Path file, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                    throws IOException {
                 Files.delete(file);
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult postVisitDirectory(
-                    Path dir, IOException exc) throws IOException {
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc)
+                    throws IOException {
                 Files.delete(dir);
                 return FileVisitResult.CONTINUE;
             }

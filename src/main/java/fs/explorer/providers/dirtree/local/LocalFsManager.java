@@ -20,9 +20,9 @@ public class LocalFsManager implements FsManager {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[BUFFER_SIZE];
             int len;
-            while((len = fis.read(buffer)) != -1) {
+            while ((len = fis.read(buffer)) != -1) {
                 baos.write(buffer, 0, len);
-                if(Thread.currentThread().isInterrupted()) {
+                if (Thread.currentThread().isInterrupted()) {
                     throw new InterruptedIOException();
                 }
             }
@@ -31,26 +31,26 @@ public class LocalFsManager implements FsManager {
     }
 
     @Override
-    public <R> R withFileStream(
-            FsPath fsPath, IOFunction<InputStream, R> streamReader) throws IOException {
-        if(fsPath == null || fsPath.getPath() == null) {
+    public <R> R withFileStream(FsPath fsPath, IOFunction<InputStream, R> streamReader)
+            throws IOException {
+        if (fsPath == null || fsPath.getPath() == null) {
             throw new IOException("bad file path");
         }
-        try(FileInputStream fis = new FileInputStream(fsPath.getPath())) {
+        try (FileInputStream fis = new FileInputStream(fsPath.getPath())) {
             return streamReader.apply(fis);
         }
     }
 
     @Override
     public List<FsPath> list(FsPath directoryPath) throws IOException {
-        if(directoryPath == null) {
+        if (directoryPath == null) {
             throw new IOException("bad directory path");
         }
-        if(!directoryPath.isDirectory()) {
+        if (!directoryPath.isDirectory()) {
             throw new IOException("not a directory");
         }
         String pathStr = directoryPath.getPath();
-        if(pathStr == null) {
+        if (pathStr == null) {
             throw new IOException("bad directory path");
         }
         try {
@@ -60,7 +60,7 @@ public class LocalFsManager implements FsManager {
             // TODO consider checking interruption every N read entries
             // Local reads should be fast enough, so for now we check
             // interruption only after everything is read
-            if(Thread.currentThread().isInterrupted()) {
+            if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedIOException();
             }
             return entries;

@@ -21,17 +21,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Application {
+class Application {
     private MainWindow mainWindow;
     private boolean applicationInitialized = false;
     private String errorMessage;
+
+    private static final String STATUS_BAR_INITIAL_MESSAGE = "Ready";
 
     private static final String APP_START_ERROR = "Failed to start the application";
     private static final String DISK_ACCESS_ERROR = "failed to access local disk";
 
     private static final long previewTaskStartDelayMilliseconds = 100;
 
-    public Application() {
+    Application() {
         try {
             List<Disposable> disposables = new ArrayList<>();
 
@@ -41,18 +43,18 @@ public class Application {
             ArchivesManager archivesManager = new ArchivesManager(archivesReader);
             disposables.add(archivesManager);
 
-            StatusBar statusBar = new StatusBar("Ready");
+            StatusBar statusBar = new StatusBar(STATUS_BAR_INITIAL_MESSAGE);
             StatusBarController statusBarController = new StatusBarController(statusBar);
 
             PreviewPane previewPane = new PreviewPane();
             List<PreviewRenderer> previewRenderers = getPreivewRenderers();
-            DefaultPreviewProvider previewProvider =
-                    new DefaultPreviewProvider(localFsManager, archivesManager, previewRenderers);
+            DefaultPreviewProvider previewProvider = new DefaultPreviewProvider(
+                    localFsManager, archivesManager, previewRenderers);
             AsyncPreviewProvider asyncPreviewProvider = new AsyncPreviewProvider(
                     previewProvider, previewTaskStartDelayMilliseconds);
             disposables.add(asyncPreviewProvider);
-            PreviewController previewController =
-                    new PreviewController(previewPane, asyncPreviewProvider, statusBarController);
+            PreviewController previewController = new PreviewController(
+                    previewPane, asyncPreviewProvider, statusBarController);
 
             DirTreeModel dirTreeModel = new DirTreeModel();
             DirTreePane dirTreePane = new DirTreePane(dirTreeModel.getInnerTreeModel());
@@ -96,13 +98,13 @@ public class Application {
         }
     }
 
-    public void run() {
-        if(applicationInitialized) {
+    void run() {
+        if (applicationInitialized) {
             SwingUtilities.invokeLater(mainWindow::show);
         } else {
             SwingUtilities.invokeLater(() -> {
                 String msg = APP_START_ERROR;
-                if(errorMessage != null && !errorMessage.isEmpty()) {
+                if (errorMessage != null && !errorMessage.isEmpty()) {
                     msg += (": " + errorMessage);
                 }
                 JOptionPane.showMessageDialog(null, msg);

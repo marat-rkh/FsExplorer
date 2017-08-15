@@ -12,40 +12,36 @@ public class StatusBarController {
         this.statusBar = statusBar;
     }
 
-    public void setInfoMessage(String msg) {
+    void setInfoMessage(String msg) {
         statusBar.setText(msg);
         statusBar.setTextColor(CustomColors.DARK_GREEN);
     }
 
-    public void setInfoMessage(String msg, String optionalDetail) {
+    void setInfoMessage(String msg, String optionalDetail) {
         setInfoMessage(fullMessage(msg, optionalDetail));
     }
 
-    public void setProgressMessage(String msg) {
+    void setProgressMessage(String msg) {
         statusBar.setText(msg);
         statusBar.setTextColor(Color.BLUE);
     }
 
-    public void setProgressMessage(String msg, String optionalDetail) {
-        setProgressMessage(fullMessage(msg, optionalDetail));
-    }
-
-    public void setErrorMessage(String msg) {
+    void setErrorMessage(String msg) {
         statusBar.setText(msg);
         statusBar.setTextColor(Color.RED);
     }
 
-    public void setErrorMessage(String msg, String optionalDetail) {
+    void setErrorMessage(String msg, String optionalDetail) {
         setErrorMessage(fullMessage(msg, optionalDetail));
     }
 
-    public void clear() {
+    void clear() {
         statusBar.setText("");
     }
 
     private String fullMessage(String msg, String optionalDetail) {
         String fullMessage = msg;
-        if(optionalDetail != null && !optionalDetail.isEmpty()) {
+        if (optionalDetail != null && !optionalDetail.isEmpty()) {
             fullMessage += ": " + optionalDetail;
         }
         return fullMessage;

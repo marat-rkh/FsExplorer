@@ -32,6 +32,15 @@ public class DirTreeController {
             DirTreePane dirTreePane,
             DirTreeModel dirTreeModel,
             PreviewController previewController,
+            StatusBarController statusBarController
+    ) {
+        this(dirTreePane, dirTreeModel, previewController, statusBarController, null);
+    }
+
+    DirTreeController(
+            DirTreePane dirTreePane,
+            DirTreeModel dirTreeModel,
+            PreviewController previewController,
             StatusBarController statusBarController,
             AsyncFsDataProvider defaultDataProvider
     ) {
@@ -42,35 +51,7 @@ public class DirTreeController {
         this.treeDataProvider = defaultDataProvider;
     }
 
-    public DirTreeController(
-            DirTreePane dirTreePane,
-            DirTreeModel dirTreeModel,
-            PreviewController previewController,
-            StatusBarController statusBarController
-    ) {
-        this(dirTreePane, dirTreeModel, previewController, statusBarController, null);
-    }
-
-    public AsyncFsDataProvider getTreeDataProvider() {
-        return treeDataProvider;
-    }
-
-    public void resetDataProvider(AsyncFsDataProvider treeDataProvider) {
-        if (treeDataProvider == null) {
-            statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
-            return;
-        }
-        this.treeDataProvider = treeDataProvider;
-        DefaultMutableTreeNode root = dirTreeModel.getRoot();
-        dirTreeModel.removeAllChildren(root);
-        this.treeDataProvider.getTopNode(nodeData -> {
-            dirTreeModel.addNullDirChild(root, nodeData);
-            dirTreePane.expandPath(new TreePath(root.getPath()));
-        });
-    }
-
-    public void handleTreeSelection(
-            TreeSelectionEvent e, DefaultMutableTreeNode lastSelectedNode) {
+    public void handleTreeSelection(TreeSelectionEvent e, DefaultMutableTreeNode lastSelectedNode) {
         if (lastSelectedNode == null) {
             return;
         }
@@ -109,7 +90,7 @@ public class DirTreeController {
         }
     }
 
-    public void reloadLastSelectedNode() {
+    void reloadLastSelectedNode() {
         if (lastSelectedNode == null) {
             return;
         }
@@ -126,6 +107,24 @@ public class DirTreeController {
                 previewController.updatePreview(extNodeData.getNodeData());
             }
         }
+    }
+
+    AsyncFsDataProvider getTreeDataProvider() {
+        return treeDataProvider;
+    }
+
+    void resetDataProvider(AsyncFsDataProvider treeDataProvider) {
+        if (treeDataProvider == null) {
+            statusBarController.setErrorMessage(DATA_PROVIDER_ERROR, INTERNAL_ERROR);
+            return;
+        }
+        this.treeDataProvider = treeDataProvider;
+        DefaultMutableTreeNode root = dirTreeModel.getRoot();
+        dirTreeModel.removeAllChildren(root);
+        this.treeDataProvider.getTopNode(nodeData -> {
+            dirTreeModel.addNullDirChild(root, nodeData);
+            dirTreePane.expandPath(new TreePath(root.getPath()));
+        });
     }
 
     private DefaultMutableTreeNode getNode(TreeExpansionEvent event) {
@@ -173,7 +172,9 @@ public class DirTreeController {
     }
 
     private Consumer<List<TreeNodeData>> contentsInserter(
-            DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
+            DefaultMutableTreeNode node,
+            ExtTreeNodeData extNodeData
+    ) {
         return contents -> {
             if (!dirTreeModel.containsNode(node)) {
                 return;
@@ -197,7 +198,9 @@ public class DirTreeController {
     }
 
     private Consumer<String> loadContentsErrorHandler(
-            DefaultMutableTreeNode node, ExtTreeNodeData extNodeData) {
+            DefaultMutableTreeNode node,
+            ExtTreeNodeData extNodeData
+    ) {
         return errorMessage -> {
             if (!dirTreeModel.containsNode(node)) {
                 return;

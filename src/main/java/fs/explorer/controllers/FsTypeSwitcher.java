@@ -21,8 +21,7 @@ public class FsTypeSwitcher implements Disposable {
     private DefaultAsyncFsDataProvider asyncFsDataProvider;
 
     private static final FsPath localDriveTopDir = OSInfo.getRootFsPath();
-    private static final FsPath remoteHostTopDir = new FsPath(
-            "/", TargetType.DIRECTORY, "/");
+    private static final FsPath remoteHostTopDir = new FsPath("/", TargetType.DIRECTORY, "/");
 
     public FsTypeSwitcher(
             DirTreeController dirTreeController,
@@ -36,24 +35,19 @@ public class FsTypeSwitcher implements Disposable {
         this.archivesManager = archivesManager;
     }
 
-    void switchToLocalFs() {
+    @Override
+    public void dispose() {
         disposeCurrentFsDataProvider();
-        asyncFsDataProvider = new DefaultAsyncFsDataProvider(
-                new DefaultFsDataProvider(localDriveTopDir, localFsManager, archivesManager)
-        );
-        dirTreeController.resetDataProvider(asyncFsDataProvider);
-        previewProvider.resetFsManager(localFsManager);
+    }
+
+    void switchToLocalFs() {
+        switchFs(localDriveTopDir, localFsManager);
     }
 
     void switchToRemoteFs(FTPConnectionInfo connectionInfo) throws FTPException {
         RemoteFsManager remoteFsManager = new RemoteFsManager(connectionInfo);
         remoteFsManager.checkConnection();
-        disposeCurrentFsDataProvider();
-        asyncFsDataProvider = new DefaultAsyncFsDataProvider(
-                new DefaultFsDataProvider(remoteHostTopDir, remoteFsManager, archivesManager)
-        );
-        dirTreeController.resetDataProvider(asyncFsDataProvider);
-        previewProvider.resetFsManager(remoteFsManager);
+        switchFs(remoteHostTopDir, remoteFsManager);
     }
 
     void disposeCurrentFsDataProvider() {
@@ -64,8 +58,12 @@ public class FsTypeSwitcher implements Disposable {
         }
     }
 
-    @Override
-    public void dispose() {
+    private void switchFs(FsPath topDir, FsManager fsManager) {
         disposeCurrentFsDataProvider();
+        asyncFsDataProvider = new DefaultAsyncFsDataProvider(
+                new DefaultFsDataProvider(topDir, fsManager, archivesManager)
+        );
+        dirTreeController.resetDataProvider(asyncFsDataProvider);
+        previewProvider.resetFsManager(fsManager);
     }
 }

@@ -33,25 +33,20 @@ public class DirTreePane {
         this.eventsListener.setController(controller);
     }
 
-    public JComponent asJComponent() {
-        return scrollPane;
-    }
-
     public void expandPath(TreePath treePath) {
         tree.expandPath(treePath);
     }
 
-    private static class EventsListener
-            implements TreeSelectionListener, TreeExpansionListener {
+    JComponent asJComponent() {
+        return scrollPane;
+    }
+
+    private static class EventsListener implements TreeSelectionListener, TreeExpansionListener {
         private final JTree tree;
         private DirTreeController controller;
 
         private EventsListener(JTree tree) {
             this.tree = tree;
-        }
-
-        public void setController(DirTreeController controller) {
-            this.controller = controller;
         }
 
         @Override
@@ -78,6 +73,10 @@ public class DirTreePane {
                 return;
             }
             controller.handleTreeCollapse(event);
+        }
+
+        void setController(DirTreeController controller) {
+            this.controller = controller;
         }
     }
 }

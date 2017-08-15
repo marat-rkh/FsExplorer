@@ -8,6 +8,7 @@ import java.util.Set;
 
 public class FileTypeInfo {
     private static final Set<String> TEXT_FILE_EXTENSIONS = new HashSet<>();
+
     static {
         TEXT_FILE_EXTENSIONS.add("txt");
         TEXT_FILE_EXTENSIONS.add("log");
@@ -26,6 +27,7 @@ public class FileTypeInfo {
     }
 
     private static final Set<String> IMG_FILE_EXTENSIONS = new HashSet<>();
+
     static {
         IMG_FILE_EXTENSIONS.add("jpeg");
         IMG_FILE_EXTENSIONS.add("jpg");
@@ -35,16 +37,8 @@ public class FileTypeInfo {
 
     private static final String ZIP_EXTENSION = "zip";
 
-    public static boolean isTextFile(String path) {
-        return isTextFileExtension(getExtension(path));
-    }
-
     public static boolean isTextFileExtension(String extension) {
         return TEXT_FILE_EXTENSIONS.contains(extension);
-    }
-
-    public static boolean isImageFile(String path) {
-        return isImageFileExtension(getExtension(path));
     }
 
     public static boolean isImageFileExtension(String extension) {
@@ -58,18 +52,26 @@ public class FileTypeInfo {
     // TODO there are better alternatives, see:
     // https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FilenameUtils.html#getExtension(java.lang.String)
     public static String getExtension(String path) {
-        if(path == null) {
+        if (path == null) {
             return "";
         }
         String fileName = getLastComponent(path);
-        if(fileName.isEmpty()) {
+        if (fileName.isEmpty()) {
             return "";
         }
         int lastDotIndex = fileName.lastIndexOf(".");
-        if(lastDotIndex != -1 && lastDotIndex != 0) {
+        if (lastDotIndex != -1 && lastDotIndex != 0) {
             return fileName.substring(lastDotIndex + 1).toLowerCase();
         }
         return "";
+    }
+
+    static boolean isTextFile(String path) {
+        return isTextFileExtension(getExtension(path));
+    }
+
+    static boolean isImageFile(String path) {
+        return isImageFileExtension(getExtension(path));
     }
 
     private static String getLastComponent(String path) {

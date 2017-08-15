@@ -13,11 +13,7 @@ class TextChunksAppender implements AdjustmentListener {
 
     private static final int DEFAULT_APPEND_OFFSET = 40;
 
-    TextChunksAppender(
-            JTextArea textArea,
-            Queue<String> textChunks,
-            JScrollBar targetScrollBar
-    ) {
+    TextChunksAppender(JTextArea textArea, Queue<String> textChunks, JScrollBar targetScrollBar) {
         this(textArea, textChunks, targetScrollBar, DEFAULT_APPEND_OFFSET);
     }
 
@@ -27,7 +23,7 @@ class TextChunksAppender implements AdjustmentListener {
             JScrollBar targetScrollBar,
             int appendOffset
     ) {
-        if(appendOffset < 0) {
+        if (appendOffset < 0) {
             throw new IllegalArgumentException("append offset must be >= 0");
         }
         this.textArea = textArea;

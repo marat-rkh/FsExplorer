@@ -24,7 +24,10 @@ public class DefaultFsDataProvider implements FsDataProvider {
     private static final String DATA_READ_ERROR = "data read error";
 
     public DefaultFsDataProvider(
-            FsPath topDir, FsManager fsManager, ArchivesManager archivesManager) {
+            FsPath topDir,
+            FsManager fsManager,
+            ArchivesManager archivesManager
+    ) {
         this.topDir = topDir;
         this.fsManager = fsManager;
         this.archivesManager = archivesManager;

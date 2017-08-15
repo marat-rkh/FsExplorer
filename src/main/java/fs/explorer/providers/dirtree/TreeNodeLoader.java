@@ -5,7 +5,7 @@ import java.util.concurrent.Future;
 public class TreeNodeLoader {
     private final Future<?> future;
 
-    public TreeNodeLoader(Future<?> future) {
+    TreeNodeLoader(Future<?> future) {
         this.future = future;
     }
 

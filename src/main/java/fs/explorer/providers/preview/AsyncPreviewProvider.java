@@ -28,7 +28,7 @@ public class AsyncPreviewProvider implements PreviewProvider, Disposable {
             PreviewProgressHandler progressHandler
     ) {
         try {
-            if(currentTask != null) {
+            if (currentTask != null) {
                 currentTask.cancel(true);
             }
             PreviewProgressHandler asyncHandler = new PreviewProgressHandler() {
@@ -48,27 +48,24 @@ public class AsyncPreviewProvider implements PreviewProvider, Disposable {
                 }
             };
             Runnable task = () -> previewProvider.getPreview(data, context, asyncHandler);
-            currentTask = executor.schedule(
-                    task, taskStartDelayMilliseconds, TimeUnit.MILLISECONDS);
+            currentTask = executor.schedule(task, taskStartDelayMilliseconds, TimeUnit.MILLISECONDS);
         } catch (RejectedExecutionException e) {
             progressHandler.onError(INTERNAL_ERROR);
-        }
-    }
-
-    public void shutdownNow() {
-        executor.shutdownNow();
-        try {
-            if(!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                // failed to shutdown
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 
     @Override
     public void dispose() {
         shutdownNow();
+    }
+
+    void shutdownNow() {
+        executor.shutdownNow();
+        try {
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }

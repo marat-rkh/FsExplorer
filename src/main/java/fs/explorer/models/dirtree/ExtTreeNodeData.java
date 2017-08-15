@@ -12,7 +12,7 @@ public class ExtTreeNodeData {
 
     private TreeNodeLoader loader;
 
-    public ExtTreeNodeData(TreeNodeData nodeData, Status status, Type type) {
+    private ExtTreeNodeData(TreeNodeData nodeData, Status status, Type type) {
         this.nodeData = nodeData;
         this.status = status;
         this.type = type;
@@ -58,16 +58,16 @@ public class ExtTreeNodeData {
         FAKE
     }
 
-    public static ExtTreeNodeData fakeNodeData(String text) {
+    static ExtTreeNodeData fakeNodeData(String text) {
         TreeNodeData nodeData = new TreeNodeData(text, new FsPath("", TargetType.FILE, ""));
         return new ExtTreeNodeData(nodeData, Status.LOADED, Type.FAKE);
     }
 
-    public static ExtTreeNodeData nullNodeData(TreeNodeData nodeData) {
+    static ExtTreeNodeData nullNodeData(TreeNodeData nodeData) {
         return new ExtTreeNodeData(nodeData, Status.NULL, Type.NORMAL);
     }
 
-    public static ExtTreeNodeData loadedNodeData(TreeNodeData nodeData) {
+    static ExtTreeNodeData loadedNodeData(TreeNodeData nodeData) {
         return new ExtTreeNodeData(nodeData, Status.LOADED, Type.NORMAL);
     }
 }

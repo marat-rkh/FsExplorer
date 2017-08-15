@@ -16,11 +16,17 @@ public final class FsPath {
         this.lastComponent = lastComponent;
     }
 
-    public String getPath() { return path; }
+    public String getPath() {
+        return path;
+    }
 
-    public TargetType getTargetType() { return targetType; }
+    public TargetType getTargetType() {
+        return targetType;
+    }
 
-    public String getLastComponent() { return lastComponent; }
+    public String getLastComponent() {
+        return lastComponent;
+    }
 
     public boolean isDirectory() {
         return targetType == TargetType.DIRECTORY;
@@ -28,10 +34,10 @@ public final class FsPath {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) {
+        if (this == obj) {
             return true;
         }
-        if(!(obj instanceof FsPath)) {
+        if (!(obj instanceof FsPath)) {
             return false;
         }
         FsPath other = (FsPath) obj;
@@ -52,19 +58,21 @@ public final class FsPath {
     }
 
     @Override
-    public String toString() { return path; }
+    public String toString() {
+        return path;
+    }
 
     public static FsPath fromPath(Path path) {
-        if(path == null) {
+        if (path == null) {
             return null;
         }
         Path fileName = path.getFileName();
         String lastComponent = fileName == null ? "" : fileName.toString();
         String pathStr = path.toString();
-        TargetType targetType = null;
-        if(Files.isDirectory(path)) {
+        TargetType targetType;
+        if (Files.isDirectory(path)) {
             targetType = TargetType.DIRECTORY;
-        } else if(FileTypeInfo.isZipArchive(pathStr)) {
+        } else if (FileTypeInfo.isZipArchive(pathStr)) {
             targetType = TargetType.ZIP_ARCHIVE;
         } else {
             targetType = TargetType.FILE;

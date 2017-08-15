@@ -44,7 +44,7 @@ class ResizableImageLabel {
             if (newSize == null) {
                 return;
             }
-            if(lastResizer != null) {
+            if (lastResizer != null) {
                 lastResizer.cancel(true);
             }
             lastResizer = new ImageLabelResizer(
@@ -58,12 +58,15 @@ class ResizableImageLabel {
         }
 
         @Override
-        public void componentMoved(ComponentEvent e) { }
+        public void componentMoved(ComponentEvent e) {
+        }
 
         @Override
-        public void componentShown(ComponentEvent e) {}
+        public void componentShown(ComponentEvent e) {
+        }
 
         @Override
-        public void componentHidden(ComponentEvent e) {}
+        public void componentHidden(ComponentEvent e) {
+        }
     }
 }

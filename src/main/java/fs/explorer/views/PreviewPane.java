@@ -22,9 +22,11 @@ public class PreviewPane {
         panel.add(defaultPreview);
     }
 
-    JComponent asJComponent() { return panel; }
-
     public Dimension getSize() {
         return panel.getSize();
+    }
+
+    JComponent asJComponent() {
+        return panel;
     }
 }

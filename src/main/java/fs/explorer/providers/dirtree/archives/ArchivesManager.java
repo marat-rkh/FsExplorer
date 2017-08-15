@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-// @ThreadSafe
 public class ArchivesManager implements Disposable {
     private final ConcurrentMap<FsPath, ArchiveData> archives;
     private final ArchivesReader archivesReader;
@@ -28,72 +27,60 @@ public class ArchivesManager implements Disposable {
         this.archiveCacheDirectory = Files.createTempDirectory(ARCHIVE_CACHE_PREFIX);
     }
 
-    public ZipArchive addArchiveIfAbsent(
-            FsPath archivePath, FsManager fsManager) throws IOException {
-        if(archivePath.getTargetType() != TargetType.ZIP_ARCHIVE) {
+    public ZipArchive addArchiveIfAbsent(FsPath archivePath, FsManager fsManager)
+            throws IOException {
+        if (archivePath.getTargetType() != TargetType.ZIP_ARCHIVE) {
             throw new IOException("not a zip archive");
         }
-        ArchiveData archiveData = addArchiveIfAbsent(
-                archivePath, /*isTopLevel*/true, fsManager);
+        ArchiveData archiveData = addArchiveIfAbsent(archivePath, true, fsManager);
         return archiveData.getZipArchive();
     }
 
-    public boolean containsArchive(FsPath archivePath) {
-        return archives.containsKey(archivePath);
-    }
-
-    public List<ArchiveEntryPath> listArchive(
-            FsPath archivePath, FsManager fsManager) throws IOException {
+    public List<ArchiveEntryPath> listArchive(FsPath archivePath, FsManager fsManager)
+            throws IOException {
         ArchiveData archiveData = archives.get(archivePath);
-        if(archiveData == null) {
+        if (archiveData == null) {
             return null;
         }
         return archiveData.getZipArchive().listRoot();
     }
 
-    public List<ArchiveEntryPath> listSubEntry(
-            ArchiveEntryPath entryPath, FsManager fsManager) throws IOException {
+    public List<ArchiveEntryPath> listSubEntry(ArchiveEntryPath entryPath, FsManager fsManager)
+            throws IOException {
         ArchiveData archiveData = archives.get(entryPath.getArchivePath());
-        if(archiveData == null) {
+        if (archiveData == null) {
             return null;
         }
         TargetType entryType = entryPath.getTargetType();
-        if(entryType == TargetType.DIRECTORY) {
+        if (entryType == TargetType.DIRECTORY) {
             return archiveData.getZipArchive().list(entryPath);
-        } else if(entryType == TargetType.ZIP_ARCHIVE) {
+        } else if (entryType == TargetType.ZIP_ARCHIVE) {
             FsPath subArchivePath = extractSubArchive(archiveData, entryPath, fsManager);
-            ArchiveData subArchiveData = addArchiveIfAbsent(
-                    subArchivePath, /*isTopLevel*/false, fsManager);
+            ArchiveData subArchiveData = addArchiveIfAbsent(subArchivePath, false, fsManager);
             return subArchiveData.getZipArchive().listRoot();
         } else {
             return null;
         }
     }
 
-    public byte[] readEntry(
-            ArchiveEntryPath entryPath, FsManager fsManager) throws IOException {
+    public byte[] readEntry(ArchiveEntryPath entryPath, FsManager fsManager) throws IOException {
         FsPath archivePath = entryPath.getArchivePath();
         ArchiveData archiveData = archives.get(archivePath);
-        if(archiveData == null) {
+        if (archiveData == null) {
             return null;
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        boolean entryFound = false;
-        if(archiveData.isTopLevel()) {
+        boolean entryFound;
+        if (archiveData.isTopLevel()) {
             entryFound = archivesReader.readEntryFile(
                     archivePath, entryPath.getEntryPath(), baos, fsManager);
         } else {
-            entryFound = archivesReader.readEntryFile(
-                    archivePath, entryPath.getEntryPath(), baos);
+            entryFound = archivesReader.readEntryFile(archivePath, entryPath.getEntryPath(), baos);
         }
-        if(!entryFound) {
+        if (!entryFound) {
             return null;
         }
         return baos.toByteArray();
-    }
-
-    public void clearCache() throws IOException {
-        FsUtils.deleteDirectoryRecursively(archiveCacheDirectory);
     }
 
     @Override
@@ -105,6 +92,14 @@ public class ArchivesManager implements Disposable {
         }
     }
 
+    boolean containsArchive(FsPath archivePath) {
+        return archives.containsKey(archivePath);
+    }
+
+    void clearCache() throws IOException {
+        FsUtils.deleteDirectoryRecursively(archiveCacheDirectory);
+    }
+
     private ArchiveData addArchiveIfAbsent(
             FsPath archivePath,
             boolean isTopLevel,
@@ -112,8 +107,8 @@ public class ArchivesManager implements Disposable {
     ) throws IOException {
         ArchiveData archiveData = archives.computeIfAbsent(
                 archivePath, key -> tryMakeArchive(key, isTopLevel, fsManager));
-        if(archiveData == null) {
-            if(Thread.currentThread().isInterrupted()) {
+        if (archiveData == null) {
+            if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedIOException();
             } else {
                 throw new IOException("failed to process archive");
@@ -122,11 +117,10 @@ public class ArchivesManager implements Disposable {
         return archiveData;
     }
 
-    private ArchiveData tryMakeArchive(
-            FsPath archivePath, boolean isTopLevel, FsManager fsManager) {
+    private ArchiveData tryMakeArchive(FsPath archivePath, boolean isTopLevel, FsManager fsManager) {
         try {
-            ZipArchive zipArchive = null;
-            if(isTopLevel) {
+            ZipArchive zipArchive;
+            if (isTopLevel) {
                 // only fsManager knows where to find top level archives
                 zipArchive = archivesReader.readEntries(archivePath, fsManager);
             } else {
@@ -152,17 +146,16 @@ public class ArchivesManager implements Disposable {
         String entryName = entryPath.getEntryPath();
         FsPath destinationPath = FsPath.fromPath(subArchiveFile);
 
-        boolean entryFound = false;
-        if(archiveData.isTopLevel()) {
+        boolean entryFound;
+        if (archiveData.isTopLevel()) {
             // only fsManager knows where to find top level archives
             entryFound = archivesReader.extractEntryFile(
                     archivePath, entryName, destinationPath, fsManager);
         } else {
             // we extracted this archive so we know it is on local FS
-            entryFound = archivesReader.extractEntryFile(
-                    archivePath, entryName, destinationPath);
+            entryFound = archivesReader.extractEntryFile(archivePath, entryName, destinationPath);
         }
-        if(!entryFound) {
+        if (!entryFound) {
             throw new IOException("zip entry not found - " + entryPath);
         }
         return destinationPath;
@@ -177,8 +170,12 @@ public class ArchivesManager implements Disposable {
             this.isTopLevel = isTopLevel;
         }
 
-        public ZipArchive getZipArchive() { return zipArchive; }
+        ZipArchive getZipArchive() {
+            return zipArchive;
+        }
 
-        public boolean isTopLevel() { return isTopLevel; }
+        boolean isTopLevel() {
+            return isTopLevel;
+        }
     }
 }

@@ -11,9 +11,15 @@ public class FTPConnectionInfo {
         this.password = password;
     }
 
-    public String getHost() { return host; }
+    public String getHost() {
+        return host;
+    }
 
-    public String getUser() { return user; }
+    public String getUser() {
+        return user;
+    }
 
-    public char[] getPassword() { return password; }
+    public char[] getPassword() {
+        return password;
+    }
 }

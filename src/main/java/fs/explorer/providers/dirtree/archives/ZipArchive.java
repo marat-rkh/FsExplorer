@@ -11,33 +11,25 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 // TODO improve performance
-// @ThreadSafe
 public class ZipArchive {
     private final FsPath path;
     private final List<ExtZipEntry> entries;
 
-    public ZipArchive(FsPath path, List<ZipEntry> entries) {
+    ZipArchive(FsPath path, List<ZipEntry> entries) {
         this.path = path;
         this.entries = entries.stream()
                 .map(ZipArchive::toExtZipEntry)
                 .collect(Collectors.toList());
     }
 
-    public List<ArchiveEntryPath> listRoot() {
-        return entries.stream()
-                .filter(ee -> ee.getNameComponentsCount() == 1)
-                .map(this::toArchiveEntryPath)
-                .collect(Collectors.toList());
-    }
-
     public List<ArchiveEntryPath> list(ArchiveEntryPath entryPath) {
-        if(!path.equals(entryPath.getArchivePath())) {
+        if (!path.equals(entryPath.getArchivePath())) {
             return null;
         }
         Optional<ExtZipEntry> optExtEntry = entries.stream()
                 .filter(ee -> ee.getZipEntry().getName().equals(entryPath.getEntryPath()))
                 .findFirst();
-        if(!optExtEntry.isPresent()) {
+        if (!optExtEntry.isPresent()) {
             return null;
         }
         ExtZipEntry extEntry = optExtEntry.get();
@@ -50,7 +42,14 @@ public class ZipArchive {
                 .collect(Collectors.toList());
     }
 
-    public List<ZipEntry> listAllEntries() {
+    List<ArchiveEntryPath> listRoot() {
+        return entries.stream()
+                .filter(ee -> ee.getNameComponentsCount() == 1)
+                .map(this::toArchiveEntryPath)
+                .collect(Collectors.toList());
+    }
+
+    List<ZipEntry> listAllEntries() {
         return entries.stream()
                 .map(ExtZipEntry::getZipEntry)
                 .collect(Collectors.toList());
@@ -64,10 +63,10 @@ public class ZipArchive {
     private ArchiveEntryPath toArchiveEntryPath(ExtZipEntry extEntry) {
         ZipEntry entry = extEntry.getZipEntry();
         String entryName = entry.getName();
-        TargetType targetType = null;
-        if(entry.isDirectory()) {
+        TargetType targetType;
+        if (entry.isDirectory()) {
             targetType = TargetType.DIRECTORY;
-        } else if(FileTypeInfo.isZipArchive(entryName)) {
+        } else if (FileTypeInfo.isZipArchive(entryName)) {
             targetType = TargetType.ZIP_ARCHIVE;
         } else {
             targetType = TargetType.FILE;
@@ -85,8 +84,12 @@ public class ZipArchive {
             this.nameComponentsCount = nameComponentsCount;
         }
 
-        public ZipEntry getZipEntry() { return zipEntry; }
+        ZipEntry getZipEntry() {
+            return zipEntry;
+        }
 
-        public int getNameComponentsCount() { return nameComponentsCount; }
+        int getNameComponentsCount() {
+            return nameComponentsCount;
+        }
     }
 }

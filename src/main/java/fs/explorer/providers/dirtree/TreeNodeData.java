@@ -19,9 +19,13 @@ public class TreeNodeData {
         this.path = new PathContainer(archiveEntryPath);
     }
 
-    public String getLabel() { return label; }
+    public String getLabel() {
+        return label;
+    }
 
-    public PathContainer getPath() { return path; }
+    public PathContainer getPath() {
+        return path;
+    }
 
     @Override
     public String toString() {
@@ -29,9 +33,9 @@ public class TreeNodeData {
     }
 
     public boolean pathTargetIsDirectory() {
-        if(path.isFsPath()) {
+        if (path.isFsPath()) {
             return path.asFsPath().isDirectory();
-        } else if(path.isArchiveEntryPath()) {
+        } else if (path.isArchiveEntryPath()) {
             return path.asArchiveEntryPath().isDirectory();
         } else {
             throw new IllegalStateException("unexpected PathContainer state");
@@ -39,9 +43,9 @@ public class TreeNodeData {
     }
 
     public String getPathLastComponent() {
-        if(path.isFsPath()) {
+        if (path.isFsPath()) {
             return path.asFsPath().getLastComponent();
-        } else if(path.isArchiveEntryPath()) {
+        } else if (path.isArchiveEntryPath()) {
             return path.asArchiveEntryPath().getLastComponent();
         } else {
             throw new IllegalStateException("unexpected PathContainer state");
@@ -49,19 +53,19 @@ public class TreeNodeData {
     }
 
     public TargetType getPathTargetType() {
-        if(path.isFsPath()) {
+        if (path.isFsPath()) {
             return path.asFsPath().getTargetType();
-        } else if(path.isArchiveEntryPath()) {
+        } else if (path.isArchiveEntryPath()) {
             return path.asArchiveEntryPath().getTargetType();
         } else {
             throw new IllegalStateException("unexpected PathContainer state");
         }
     }
 
-    public String pathToString() {
-        if(path.isFsPath()) {
+    String pathToString() {
+        if (path.isFsPath()) {
             return path.asFsPath().toString();
-        } else if(path.isArchiveEntryPath()) {
+        } else if (path.isArchiveEntryPath()) {
             return path.asArchiveEntryPath().toString();
         } else {
             throw new IllegalStateException("unexpected PathContainer state");

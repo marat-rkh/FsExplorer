@@ -10,22 +10,20 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-// @ThreadSafe
 public class ArchivesReader {
     private static final int BUFFER_SIZE = 8192;
 
-    public ZipArchive readEntries(FsPath archivePath) throws IOException {
+    ZipArchive readEntries(FsPath archivePath) throws IOException {
         return readEntries(archivePath, null);
     }
 
-    public ZipArchive readEntries(
-            FsPath archivePath, FsManager fsManager) throws IOException {
+    ZipArchive readEntries(FsPath archivePath, FsManager fsManager) throws IOException {
         return withZipStream(archivePath, fsManager, zis -> {
             List<ZipEntry> zipEntries = new ArrayList<>();
-            ZipEntry entry = null;
-            while((entry = zis.getNextEntry()) != null) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
                 zipEntries.add(entry);
-                if(Thread.currentThread().isInterrupted()) {
+                if (Thread.currentThread().isInterrupted()) {
                     throw new InterruptedIOException();
                 }
             }
@@ -33,28 +31,23 @@ public class ArchivesReader {
         });
     }
 
-    public boolean extractEntryFile(
-            FsPath archivePath,
-            String entryName,
-            FsPath destinationPath
-    ) throws IOException {
+    boolean extractEntryFile(FsPath archivePath, String entryName, FsPath destinationPath)
+            throws IOException {
         return extractEntryFile(archivePath, entryName, destinationPath, null);
     }
 
-    public boolean extractEntryFile(
+    boolean extractEntryFile(
             FsPath archivePath,
             String entryName,
             FsPath destinationPath,
             FsManager fsManager
     ) throws IOException {
-        try(
-                FileOutputStream fos = new FileOutputStream(destinationPath.getPath())
-        ) {
+        try (FileOutputStream fos = new FileOutputStream(destinationPath.getPath())) {
             return readEntryFile(archivePath, entryName, fos, fsManager);
         }
     }
 
-    public boolean readEntryFile(
+    boolean readEntryFile(
             FsPath archivePath,
             String entryName,
             OutputStream destination
@@ -62,7 +55,7 @@ public class ArchivesReader {
         return readEntryFile(archivePath, entryName, destination, null);
     }
 
-    public boolean readEntryFile(
+    boolean readEntryFile(
             FsPath archivePath,
             String entryName,
             OutputStream destination,
@@ -70,24 +63,24 @@ public class ArchivesReader {
     ) throws IOException {
         return withZipStream(archivePath, fsManager, zis -> {
             boolean entryFound = false;
-            ZipEntry zipEntry = null;
-            while((zipEntry = zis.getNextEntry()) != null) {
-                if(zipEntry.getName().equals(entryName)) {
-                    if(zipEntry.isDirectory()) {
+            ZipEntry zipEntry;
+            while ((zipEntry = zis.getNextEntry()) != null) {
+                if (zipEntry.getName().equals(entryName)) {
+                    if (zipEntry.isDirectory()) {
                         throw new IOException("failed to extract entry directory");
                     }
                     entryFound = true;
                     byte[] buffer = new byte[BUFFER_SIZE];
                     int len;
-                    while((len = zis.read(buffer)) != -1) {
+                    while ((len = zis.read(buffer)) != -1) {
                         destination.write(buffer, 0, len);
-                        if(Thread.currentThread().isInterrupted()) {
+                        if (Thread.currentThread().isInterrupted()) {
                             throw new InterruptedIOException();
                         }
                     }
                     break;
                 }
-                if(Thread.currentThread().isInterrupted()) {
+                if (Thread.currentThread().isInterrupted()) {
                     throw new InterruptedIOException();
                 }
             }
@@ -100,7 +93,7 @@ public class ArchivesReader {
             FsManager fsManager,
             IOFunction<ZipInputStream, R> streamReader
     ) throws IOException {
-        if(fsManager != null) {
+        if (fsManager != null) {
             return fsManager.withFileStream(archivePath, is -> {
                 try {
                     // we do not close this stream as `is` will also be closed
@@ -115,7 +108,7 @@ public class ArchivesReader {
                 }
             });
         } else {
-            try(
+            try (
                     FileInputStream fis = new FileInputStream(archivePath.getPath());
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     ZipInputStream zis = new ZipInputStream(bis)

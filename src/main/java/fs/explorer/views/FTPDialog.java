@@ -7,16 +7,17 @@ import java.awt.*;
 import java.util.Optional;
 
 public class FTPDialog {
-    private static final String TITLE = "Connect to FTP host";
     private final JTextField host = new JTextField();
     private final JTextField username = new JTextField();
     private final JPasswordField password = new JPasswordField();
     private final JLabel errorMessage = new JLabel();
     private final JComponent[] components;
 
+    private static final String TITLE = "Connect to FTP host";
+
     public FTPDialog() {
         errorMessage.setForeground(Color.RED);
-        this.components = new JComponent[] {
+        this.components = new JComponent[]{
                 new JLabel("Host"),
                 host,
                 new JLabel("Username"),

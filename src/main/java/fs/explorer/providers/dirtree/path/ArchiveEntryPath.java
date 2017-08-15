@@ -24,20 +24,28 @@ public final class ArchiveEntryPath {
         return targetType == TargetType.DIRECTORY;
     }
 
-    public FsPath getArchivePath() { return archivePath; }
+    public FsPath getArchivePath() {
+        return archivePath;
+    }
 
-    public String getEntryPath() { return entryPath; }
+    public String getEntryPath() {
+        return entryPath;
+    }
 
-    public TargetType getTargetType() { return targetType; }
+    public TargetType getTargetType() {
+        return targetType;
+    }
 
-    public String getLastComponent() { return lastComponent; }
+    public String getLastComponent() {
+        return lastComponent;
+    }
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) {
+        if (this == obj) {
             return true;
         }
-        if(!(obj instanceof ArchiveEntryPath)) {
+        if (!(obj instanceof ArchiveEntryPath)) {
             return false;
         }
         ArchiveEntryPath other = (ArchiveEntryPath) obj;
@@ -60,11 +68,11 @@ public final class ArchiveEntryPath {
     @Override
     public String toString() {
         String prefix = archivePath == null ? "-" : archivePath.getPath();
-        if(prefix == null) {
+        if (prefix == null) {
             prefix = "-";
         }
         String path = entryPath;
-        if(path == null) {
+        if (path == null) {
             path = "-";
         }
         return prefix + ":" + path;

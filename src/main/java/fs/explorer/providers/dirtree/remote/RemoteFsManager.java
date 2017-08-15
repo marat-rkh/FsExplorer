@@ -97,7 +97,7 @@ public class RemoteFsManager implements FsManager {
         }
         // we do not have control over listFiles so we can
         // only check interruption after operation is completed
-        if(Thread.currentThread().isInterrupted()) {
+        if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedIOException();
         }
         if (entries == null) {

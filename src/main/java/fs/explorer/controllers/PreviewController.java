@@ -29,12 +29,12 @@ public class PreviewController {
     }
 
     void updatePreview(TreeNodeData nodeData) {
-        if(nodeData == null) {
+        if (nodeData == null) {
             statusBarController.setErrorMessage(PREVIEW_FAILED, INTERNAL_ERROR);
             previewPane.showDefaultPreview();
             return;
         }
-        if(nodeData.pathTargetIsDirectory()) {
+        if (nodeData.pathTargetIsDirectory()) {
             return;
         }
         String lastComponent = nodeData.getPathLastComponent();

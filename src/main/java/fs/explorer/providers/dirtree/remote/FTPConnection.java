@@ -21,6 +21,20 @@ public class FTPConnection implements AutoCloseable {
         this.connectionInfo = connectionInfo;
     }
 
+    @Override
+    public void close() throws FTPException {
+        if (!isClosed && ftpClient.isConnected()) {
+            try {
+                ftpClient.logout();
+                ftpClient.disconnect();
+            } catch (IOException e) {
+                throw new FTPException("failed to disconnect");
+            } finally {
+                isClosed = true;
+            }
+        }
+    }
+
     void open() throws FTPException {
         if (isClosed) {
             throw new FTPException("attempt to reopen closed connection");
@@ -34,20 +48,6 @@ public class FTPConnection implements AutoCloseable {
             configureClient();
         } catch (IOException e) {
             throw new FTPException(e.getMessage());
-        }
-    }
-
-    @Override
-    public void close() throws FTPException {
-        if (!isClosed && ftpClient.isConnected()) {
-            try {
-                ftpClient.logout();
-                ftpClient.disconnect();
-            } catch (IOException e) {
-                throw new FTPException("failed to disconnect");
-            } finally {
-                isClosed = true;
-            }
         }
     }
 

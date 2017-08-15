@@ -21,10 +21,10 @@ public class TextPreviewRenderer implements PreviewRenderer {
     }
 
     TextPreviewRenderer(int textChunkSize, int maxPreLoadedChunks) {
-        if(textChunkSize <= 0) {
+        if (textChunkSize <= 0) {
             throw new IllegalArgumentException("chunk size must be > 0");
         }
-        if(maxPreLoadedChunks < 0) {
+        if (maxPreLoadedChunks < 0) {
             throw new IllegalArgumentException("pre loaded chunk number must be >= 0");
         }
         this.textChunkSize = textChunkSize;
@@ -49,8 +49,7 @@ public class TextPreviewRenderer implements PreviewRenderer {
         return lazyTextArea == null ? null : lazyTextArea.asJComponent();
     }
 
-    LazyScrollableTextArea renderLazyTextArea(byte[] bytes)
-            throws InterruptedException {
+    LazyScrollableTextArea renderLazyTextArea(byte[] bytes) throws InterruptedException {
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
         textArea.setLineWrap(true);

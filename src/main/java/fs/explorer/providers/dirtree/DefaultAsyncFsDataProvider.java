@@ -30,11 +30,11 @@ public class DefaultAsyncFsDataProvider implements AsyncFsDataProvider, Disposab
     ) {
         try {
             Future<?> task = executor.submit(() ->
-                fsDataProvider.getNodesFor(
-                    node,
-                    arg -> SwingUtilities.invokeLater(() -> onComplete.accept(arg)),
-                    arg -> SwingUtilities.invokeLater(() -> onFail.accept(arg))
-                )
+                    fsDataProvider.getNodesFor(
+                            node,
+                            arg -> SwingUtilities.invokeLater(() -> onComplete.accept(arg)),
+                            arg -> SwingUtilities.invokeLater(() -> onFail.accept(arg))
+                    )
             );
             return new TreeNodeLoader(task);
         } catch (RejectedExecutionException e) {
@@ -43,20 +43,18 @@ public class DefaultAsyncFsDataProvider implements AsyncFsDataProvider, Disposab
         }
     }
 
-    public void shutdownNow() {
+    @Override
+    public void dispose() {
+        shutdownNow();
+    }
+
+    void shutdownNow() {
         executor.shutdownNow();
         try {
-            if(!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                // failed to shutdown
-            }
+            executor.awaitTermination(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             executor.shutdownNow();
             Thread.currentThread().interrupt();
         }
-    }
-
-    @Override
-    public void dispose() {
-        shutdownNow();
     }
 }
