@@ -15,11 +15,13 @@ public class PreviewPane {
     public void updatePreview(JComponent preview) {
         panel.removeAll();
         panel.add(preview);
+        panel.repaint();
     }
 
     public void showDefaultPreview() {
         panel.removeAll();
         panel.add(defaultPreview);
+        panel.repaint();
     }
 
     public Dimension getSize() {
