@@ -31,7 +31,7 @@ public class ArchivesReaderTest {
     public void readsEntries() throws URISyntaxException, IOException {
         ZipArchive archive = archivesReader.readEntries(testZipPath("/zips/home.zip", "home.zip"));
         assertNotNull(archive);
-        List<TestUtils.ZipEntryData> data = archive.listAllEntries().stream()
+        List<ZipEntryData> data = archive.listAllEntries().stream()
                 .map(e -> new ZipEntryData(e.getName(), e.isDirectory()))
                 .collect(Collectors.toList());
         assertThat(data, containsInAnyOrder(
