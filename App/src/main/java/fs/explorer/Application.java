@@ -10,13 +10,13 @@ import fs.explorer.providers.dirtree.archives.ArchivesReader;
 import fs.explorer.providers.preview.AsyncPreviewProvider;
 import fs.explorer.providers.preview.DefaultPreviewProvider;
 import fs.explorer.providers.preview.PreviewRenderer;
+import fs.explorer.providers.preview.PreviewRenderersService;
 import fs.explorer.utils.Disposable;
 import fs.explorer.views.*;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 class Application {
@@ -111,6 +111,6 @@ class Application {
     }
 
     private List<PreviewRenderer> getPreivewRenderers() {
-        return Collections.emptyList();
+        return PreviewRenderersService.getRenderers();
     }
 }

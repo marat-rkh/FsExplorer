@@ -2,8 +2,6 @@ package fs.explorer.providers.preview.renderers.image;
 
 import fs.explorer.TestResourceReader;
 import fs.explorer.providers.preview.PreviewRenderingData;
-import fs.explorer.providers.preview.renderers.image.ImagePreviewRenderer;
-import fs.explorer.providers.preview.renderers.image.ResizableImageLabel;
 import org.junit.Test;
 
 import java.awt.*;

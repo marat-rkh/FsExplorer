@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Renderers</artifactId>
+    <artifactId>RenderersService</artifactId>
     <build>
         <plugins>
             <plugin>
@@ -22,16 +22,4 @@
             </plugin>
         </plugins>
     </build>
-    <dependencies>
-        <dependency>
-            <groupId>org.home</groupId>
-            <artifactId>Common</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.home</groupId>
-            <artifactId>RenderersService</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
 </project>

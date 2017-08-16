@@ -1,0 +1,2 @@
+fs.explorer.providers.preview.renderers.text.TextPreviewRenderer
+fs.explorer.providers.preview.renderers.image.ImagePreviewRenderer

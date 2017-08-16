@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/Common/Common.iml" filepath="$PROJECT_DIR$/Common/Common.iml" />
       <module fileurl="file://$PROJECT_DIR$/FsExplorer.iml" filepath="$PROJECT_DIR$/FsExplorer.iml" />
       <module fileurl="file://$PROJECT_DIR$/Renderers/Renderers.iml" filepath="$PROJECT_DIR$/Renderers/Renderers.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RenderersService/RenderersService.iml" filepath="$PROJECT_DIR$/RenderersService/RenderersService.iml" />
     </modules>
   </component>
 </project>
