@@ -1,7 +1,5 @@
 package fs.explorer.providers.preview.renderers.image;
 
-import fs.explorer.providers.preview.renderers.image.ImageIconMaker;
-import fs.explorer.providers.preview.renderers.image.ImageLabelResizer;
 import org.junit.Before;
 import org.junit.Test;
 

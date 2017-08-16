@@ -1,7 +1,6 @@
 package fs.explorer.controllers;
 
 import fs.explorer.providers.dirtree.remote.FTPConnectionInfo;
-import fs.explorer.providers.dirtree.remote.FTPException;
 import fs.explorer.views.FTPDialog;
 
 import java.util.Optional;

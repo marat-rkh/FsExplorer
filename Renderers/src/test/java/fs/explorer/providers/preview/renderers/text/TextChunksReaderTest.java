@@ -1,7 +1,6 @@
 package fs.explorer.providers.preview.renderers.text;
 
 import fs.explorer.TestResourceReader;
-import fs.explorer.providers.preview.renderers.text.TextChunksReader;
 import org.junit.Test;
 
 import java.io.*;

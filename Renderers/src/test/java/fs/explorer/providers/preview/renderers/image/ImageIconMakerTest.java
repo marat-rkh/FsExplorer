@@ -1,7 +1,6 @@
 package fs.explorer.providers.preview.renderers.image;
 
 import fs.explorer.TestResourceReader;
-import fs.explorer.providers.preview.renderers.image.ImageIconMaker;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;

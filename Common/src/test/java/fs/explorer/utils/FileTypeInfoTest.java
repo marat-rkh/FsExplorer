@@ -1,6 +1,5 @@
 package fs.explorer.utils;
 
-import fs.explorer.utils.FileTypeInfo;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

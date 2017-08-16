@@ -1,7 +1,5 @@
 package fs.explorer.providers.preview.renderers.text;
 
-import fs.explorer.providers.preview.renderers.text.LazyScrollableTextArea;
-import fs.explorer.providers.preview.renderers.text.TextChunksAppender;
 import org.junit.Test;
 
 import javax.swing.*;
