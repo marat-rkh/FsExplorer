@@ -19,7 +19,7 @@ public class TextPreviewRenderer implements PreviewRenderer {
     private static final int DEFAULT_TEXT_CHUNK_SIZE = 5000;
     private static final int DEFAULT_MAX_PRE_LOADED_CHUNKS = 4;
 
-    TextPreviewRenderer() {
+    public TextPreviewRenderer() {
         textChunkSize = DEFAULT_TEXT_CHUNK_SIZE;
         maxPreLoadedChunks = DEFAULT_MAX_PRE_LOADED_CHUNKS;
     }
