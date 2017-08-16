@@ -111,6 +111,8 @@ class Application {
     }
 
     private List<PreviewRenderer> getPreivewRenderers() {
-        return PreviewRenderersService.getRenderers();
+        List<PreviewRenderer> renderers = PreviewRenderersService.getRenderers();
+        System.out.println("Loaded preview renderers number: " + renderers.size());
+        return renderers;
     }
 }
