@@ -20,6 +20,7 @@
 1. Написать класс-отрисовщик, который реализует интерфейс `fs.explorer.providers.preview.PreviewRenderer` из модуля RenderersService.
 2. Положить реализованный класс в модуль Renderers. 
 3. Пересобрать jar-архив модуля Renderers.
+
 Далее, можно пересобрать все приложение и новый отрисовщик превью автоматически будет использован программой. Однако, полная пересборка не является обязательной. Можно просто запустить приложение и передать ему на вход jar-файл модулья Renderers с добавленными/исправленными отрисовщиками. Пример запуска из командной строки:
 
 `java -Djava.ext.dirs=${PROJECT_PATH}/Common/target:${PROJECT_PATH}/RenderersService/target:${PROJECT_PATH}/Renderers/target -jar ${PROJECT_PATH}/App/target/App-1.0-SNAPSHOT-jar-with-dependencies.jar`
